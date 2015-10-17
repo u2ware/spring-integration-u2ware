@@ -1,0 +1,2 @@
+http\://u2ware.github.io/schema/integration/modbus/spring-integration-modbus-1.0.xsd=io/github/u2ware/integration/modbus/config/xml/spring-integration-modbus-1.0.xsd
+http\://u2ware.github.io/schema/integration/modbus/spring-integration-modbus.xsd=io/github/u2ware/integration/modbus/config/xml/spring-integration-modbus-1.0.xsd

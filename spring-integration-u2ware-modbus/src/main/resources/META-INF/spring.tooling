@@ -1,0 +1,4 @@
+# Tooling related information for the integration Modbus namespace
+http\://u2ware.github.io/schema/integration/modbus@name=integration Modbus Namespace
+http\://u2ware.github.io/schema/integration/modbus@prefix=int-u2ware-modbus
+http\://u2ware.github.io/schema/integration/modbus@icon=io/github/u2ware/integration/modbus/config/xml/spring-integration-modbus.gif
