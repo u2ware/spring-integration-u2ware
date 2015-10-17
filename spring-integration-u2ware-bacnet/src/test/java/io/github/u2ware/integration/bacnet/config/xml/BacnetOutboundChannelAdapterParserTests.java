@@ -1,0 +1,64 @@
+package io.github.u2ware.integration.bacnet.config.xml;
+
+import io.github.u2ware.integration.bacnet.core.BacnetExecutor;
+
+import java.util.Arrays;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.ApplicationContext;
+import org.springframework.integration.channel.AbstractMessageChannel;
+import org.springframework.integration.endpoint.EventDrivenConsumer;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration
+public class BacnetOutboundChannelAdapterParserTests {
+
+	
+    protected Log logger = LogFactory.getLog(getClass());
+
+    @Autowired
+    protected ApplicationContext applicationContext;
+
+	@Before
+	public void before() throws Exception {
+        logger.debug("===================================================");
+        String[] beanNames = applicationContext.getBeanDefinitionNames();
+        Arrays.sort(beanNames, 0, beanNames.length);
+        for(String name : beanNames){
+            logger.debug(name+"="+applicationContext.getBean(name).getClass());
+        }
+        logger.debug("===================================================");
+	}
+	
+	@Autowired @Qualifier("bacnetRequest")
+	private AbstractMessageChannel bacnetRequest;
+
+	@Autowired
+	private BacnetExecutor bacnetExecutor;
+
+	@Autowired @Qualifier("bacnetOutboundChannelAdapter")
+	private EventDrivenConsumer consumer;
+
+
+	@Test
+	public void testMessageHandlerParser() throws Exception {
+
+		Assert.assertNotNull(bacnetRequest);
+		Assert.assertEquals("bacnetRequest", bacnetRequest.getComponentName());
+		
+		Assert.assertNotNull(bacnetExecutor);
+
+		Assert.assertNotNull(consumer);
+	
+	}
+
+}

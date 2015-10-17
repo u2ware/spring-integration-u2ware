@@ -1,0 +1,4 @@
+# Tooling related information for the integration Bacnet namespace
+http\://u2ware.github.io/schema/integration/bacnet@name=integration Bacnet Namespace
+http\://u2ware.github.io/schema/integration/bacnet@prefix=int-u2ware-bacnet
+http\://u2ware.github.io/schema/integration/bacnet@icon=org/springframework/integration/u2ware/bacnet/config/xml/spring-integration-u2ware-bacnet.gif

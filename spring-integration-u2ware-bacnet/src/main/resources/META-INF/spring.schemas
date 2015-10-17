@@ -1,0 +1,2 @@
+http\://u2ware.github.io/schema/integration/bacnet/spring-integration-bacnet-1.0.xsd=io/github/u2ware/integration/bacnet/config/xml/spring-integration-bacnet-1.0.xsd
+http\://u2ware.github.io/schema/integration/bacnet/spring-integration-bacnet.xsd=io/github/u2ware/integration/bacnet/config/xml/spring-integration-bacnet-1.0.xsd

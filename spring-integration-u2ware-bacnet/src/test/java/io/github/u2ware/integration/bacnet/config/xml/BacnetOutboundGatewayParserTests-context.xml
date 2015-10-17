@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:int="http://www.springframework.org/schema/integration"
+	xmlns:int-u2ware-bacnet="http://u2ware.github.io/schema/integration/bacnet"
+	xsi:schemaLocation="
+		http://www.springframework.org/schema/beans 
+		http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/integration 
+		http://www.springframework.org/schema/integration/spring-integration.xsd
+		http://u2ware.github.io/schema/integration/bacnet 
+		http://u2ware.github.io/schema/integration/bacnet/spring-integration-bacnet.xsd">
+
+	<int:channel id="bacnetRequest"/>
+
+	<int-u2ware-bacnet:outbound-gateway id="bacnetOutboundGateway"
+		
+		componentName="myBacnet"
+		localPort="9993"
+		remoteAddress="127.0.0.1:47808"
+		remoteInstanceNumber="47808"
+		
+		request-channel="bacnetRequest"
+		reply-channel="bacnetResponse"
+		reply-timeout="100"/>
+
+	<int:channel id="bacnetResponse"/>
+
+</beans>
