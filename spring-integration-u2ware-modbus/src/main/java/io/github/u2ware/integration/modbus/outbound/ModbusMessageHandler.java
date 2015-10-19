@@ -49,6 +49,14 @@ public class ModbusMessageHandler extends AbstractReplyProducingMessageHandler {
 		this.producesReply = producesReply;
 	}
 
+	/*
+	@Override
+	protected boolean shouldCopyRequestHeaders() {
+		return false;
+	}
+	*/
+	
+	
 	@Override
 	protected Object handleRequestMessage(Message<?> requestMessage) {
 
