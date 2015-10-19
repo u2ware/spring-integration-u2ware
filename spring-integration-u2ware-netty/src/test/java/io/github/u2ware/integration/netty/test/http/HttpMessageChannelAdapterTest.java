@@ -29,8 +29,12 @@ public class HttpMessageChannelAdapterTest {
 		httpResponse.send(MessageBuilder.withPayload("hello world").build());
 		
 		RestTemplate restTemplate = new RestTemplate();
-		String result = restTemplate.getForObject("http://localhost:9094", String.class);
-		Assert.assertEquals("hello world", result);
+		//String result = restTemplate.getForObject("http://localhost:9094", String.class);
+		//Assert.assertEquals("hello world", result);
+
+		String result2 = restTemplate.postForObject("http://localhost:9094", null, String.class);
+		Assert.assertNotNull(result2);
+	
 	}
 }
 

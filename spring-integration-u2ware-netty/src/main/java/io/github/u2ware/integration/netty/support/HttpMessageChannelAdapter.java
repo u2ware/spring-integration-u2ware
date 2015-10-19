@@ -9,18 +9,19 @@ import io.netty.handler.codec.http.HttpRequestDecoder;
 import io.netty.handler.codec.http.HttpResponseEncoder;
 
 import org.springframework.messaging.MessageChannel;
+import org.springframework.messaging.PollableChannel;
 
 public class HttpMessageChannelAdapter extends NettyTcpServer{
 	
 	private MessageChannel sendChannel;
-	private MessageChannel receiveChannel;
+	private PollableChannel receiveChannel;
 	private int maxContentLength = 1048576;
 	private int messagingTimeout = 10000;
 
 	public void setSendChannel(MessageChannel sendChannel) {
 		this.sendChannel = sendChannel;
 	}
-	public void setReceiveChannel(MessageChannel receiveChannel) {
+	public void setReceiveChannel(PollableChannel receiveChannel) {
 		this.receiveChannel = receiveChannel;
 	}
 	public void setMaxContentLength(int maxContentLength) {

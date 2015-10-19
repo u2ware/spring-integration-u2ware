@@ -1,7 +1,5 @@
 package io.github.u2ware.integration.netty.handler;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.springframework.integration.support.MessageBuilder;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageHeaders;
@@ -12,7 +10,7 @@ import org.springframework.util.ClassUtils;
 
 public class NettyMessageConverter implements MessageConverter {
 
-	protected Log logger = LogFactory.getLog(getClass());
+	//protected Log logger = LogFactory.getLog(getClass());
 
 	@Override
 	public Object fromMessage(Message<?> message, Class<?> targetClass) {

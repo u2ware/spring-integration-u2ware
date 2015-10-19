@@ -7,6 +7,12 @@
 		http://www.springframework.org/schema/beans/spring-beans.xsd
 		http://www.springframework.org/schema/integration 
 		http://www.springframework.org/schema/integration/spring-integration.xsd">
+	
+	<bean id="echoHttp" class="io.github.u2ware.integration.netty.support.HttpMessageChannelAdapter">
+		<property name="port" value="9093"/>
+		<property name="receiveChannel" ref="echoResponse"/>
+		<property name="sendChannel" ref="echoRequest"/>
+	</bean>
 		
 	<int:channel id="echoRequest">
 		<int:queue/>
@@ -23,11 +29,6 @@
 		<int:queue/>
 	</int:channel>
 	
-	<bean id="echoHttp" class="io.github.u2ware.integration.netty.support.HttpMessageChannelAdapter">
-		<property name="port" value="9093"/>
-		<property name="receiveChannel" ref="echoResponse"/>
-		<property name="sendChannel" ref="echoRequest"/>
-	</bean>
 
 	
 	

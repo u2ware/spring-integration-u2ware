@@ -7,7 +7,6 @@ import io.netty.handler.codec.http.DefaultFullHttpResponse;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.FullHttpResponse;
 import io.netty.handler.codec.http.HttpHeaders;
-import io.netty.handler.codec.http.HttpResponse;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.HttpVersion;
 
@@ -36,9 +35,7 @@ public class NettyHttpMessageConverter implements MessageConverter {
 
 	//protected Log logger = LogFactory.getLog(getClass());
 
-
 	private final MessageBuilderFactory messageBuilderFactory;
-	//private final JsonObjectMapper<?, ?> jsonObjectMapper = JsonObjectMapperProvider.newInstance();
 
 	public NettyHttpMessageConverter() {
 		this(new DefaultMessageBuilderFactory());
@@ -52,17 +49,17 @@ public class NettyHttpMessageConverter implements MessageConverter {
 	public Object fromMessage(Message<?> message, Class<?> targetClass) {
 
 		Assert.notNull(message, "message must not be null.");
-		Assert.isAssignable(HttpResponse.class, targetClass);
+		Assert.isAssignable(FullHttpResponse.class, targetClass);
 
 		try{
-			//String json = this.jsonObjectMapper.toJson(message.getPayload());
 			String payload = message.getPayload().toString();
-			//logger.debug("HTTP Response Content: length["+payload.length()+"]");
-			//logger.debug("HTTP Response Content: "+payload);
-			
 			ByteBuf content = ByteBufUtil.encodeString(UnpooledByteBufAllocator.DEFAULT, CharBuffer.wrap(payload), Charset.defaultCharset());
-	        FullHttpResponse response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.OK, content);
-	        for(String key : message.getHeaders().keySet()){
+			FullHttpResponse response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.OK, content);
+
+			/////////////////////
+			//Http Headers
+			/////////////////////
+			for(String key : message.getHeaders().keySet()){
 				if(MessageHeaders.CONTENT_TYPE.equals(key)){
 					response.headers().set(HttpHeaders.Names.CONTENT_TYPE, message.getHeaders().get(key));
 					//logger.debug("HTTP Response Headers: "+HttpHeaders.Names.CONTENT_TYPE+"="+message.getHeaders().get(key));
@@ -71,9 +68,12 @@ public class NettyHttpMessageConverter implements MessageConverter {
 					//logger.debug("HTTP Response Headers: "+key+"="+message.getHeaders().get(key));
 				}
 	        }
+			response.headers().set(HttpHeaders.Names.CONTENT_LENGTH, content.readableBytes());
+	        
 			return response;
 			
 		}catch(Exception e){
+			e.printStackTrace();
 			throw new MessageConversionException("Failed to convert netty event to a Message", e);
 		}
 	}
@@ -87,7 +87,12 @@ public class NettyHttpMessageConverter implements MessageConverter {
 			FullHttpRequest request = (FullHttpRequest) payload;
 			
 			
+			/////////////////////
+			//Message Headers
+			//////////////////////
 			Map<String, Object> messageHeaders = Maps.newHashMap();
+
+			boolean keepAlive = HttpHeaders.isKeepAlive(request);
 			Charset charsetToUse = null;
 			boolean binary = false;
 			for (Entry<String, String> entry : request.headers()) {
@@ -104,15 +109,16 @@ public class NettyHttpMessageConverter implements MessageConverter {
 			}
 			messageHeaders.put(NettyHeaders.HTTP_REQUEST_PATH, request.getUri());
 			messageHeaders.put(NettyHeaders.HTTP_REQUEST_METHOD, request.getMethod().toString());
+			if(keepAlive){
+				messageHeaders.put(HttpHeaders.Names.CONNECTION, HttpHeaders.Values.KEEP_ALIVE);
+			}
 			if(header != null){
 				messageHeaders.putAll(header);
 			}
-//	        for(String key : messageHeaders.keySet()){
-//				logger.debug("HTTP Request Headers: "+key+"="+messageHeaders.get(key));
-//	        }
-	        
-	        
-	        
+
+			/////////////////////
+			//Message Payload
+			//////////////////////
 			ByteBuf buf = request.content();
 			AbstractIntegrationMessageBuilder<?> builder;
 			if (binary) {

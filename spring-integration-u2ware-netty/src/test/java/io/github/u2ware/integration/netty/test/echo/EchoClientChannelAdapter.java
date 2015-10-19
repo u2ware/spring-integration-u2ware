@@ -9,16 +9,17 @@ import io.netty.handler.codec.string.StringEncoder;
 import io.netty.handler.logging.LoggingHandler;
 
 import org.springframework.messaging.MessageChannel;
+import org.springframework.messaging.PollableChannel;
 
 public class EchoClientChannelAdapter extends NettyTcpClient{
 	
 	private MessageChannel sendChannel;
-	private MessageChannel receiveChannel;
+	private PollableChannel receiveChannel;
 
 	public void setSendChannel(MessageChannel sendChannel) {
 		this.sendChannel = sendChannel;
 	}
-	public void setReceiveChannel(MessageChannel receiveChannel) {
+	public void setReceiveChannel(PollableChannel receiveChannel) {
 		this.receiveChannel = receiveChannel;
 	}
 

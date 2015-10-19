@@ -13,6 +13,7 @@ import org.springframework.integration.core.MessagingTemplate;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.MessageHeaders;
+import org.springframework.messaging.PollableChannel;
 import org.springframework.messaging.converter.MessageConverter;
 import org.springframework.util.Assert;
 
@@ -20,19 +21,19 @@ import com.google.common.collect.Maps;
 
 public class NettyMessageHandler extends ChannelDuplexHandler {
 
-	protected Log logger = LogFactory.getLog(getClass());
+	protected static Log logger = LogFactory.getLog(NettyMessageHandler.class);
 
 	private MessagingTemplate template = new MessagingTemplate();
 	private MessageConverter converter;
 	private MessageChannel sendChannel;
-	private MessageChannel receiveChannel;
+	private PollableChannel receiveChannel;
 
 	private ScheduledFuture<?> scheduledFuture;
 
-	public NettyMessageHandler(MessageChannel sendChannel, MessageChannel receiveChannel, long timeout){
+	public NettyMessageHandler(MessageChannel sendChannel, PollableChannel receiveChannel, long timeout){
 		this(new NettyMessageConverter(), sendChannel, receiveChannel, timeout);
 	}
-	public NettyMessageHandler(MessageConverter converter, MessageChannel sendChannel, MessageChannel receiveChannel, long timeout){
+	public NettyMessageHandler(MessageConverter converter, MessageChannel sendChannel, PollableChannel receiveChannel, long timeout){
 		Assert.notNull(converter, "converter must not be null.");
 		this.converter = converter;
 		this.sendChannel = sendChannel;
@@ -94,6 +95,7 @@ public class NettyMessageHandler extends ChannelDuplexHandler {
         		if(message != null){
     	    		Object msg = handler.converter.fromMessage(message, null);
             		ctx.writeAndFlush(msg);
+            		logger.info("Write Netty Message: "+msg);
         		}
     		}catch(Exception e){
     			//e.printStackTrace();
@@ -118,8 +120,10 @@ public class NettyMessageHandler extends ChannelDuplexHandler {
     		try{
     			Map<String, Object> headers = Maps.newHashMap();
     			headers.put(NettyHeaders.REMOTE_ADDRESS, ctx.channel().remoteAddress().toString());
+    			
 	    		Message<?> message = handler.converter.toMessage(payload, new MessageHeaders(headers));
         		if(message != null){
+        			logger.info("Read Netty Message: "+payload);
         			handler.template.send(handler.sendChannel, message);
         		}
     		}catch(Exception e){
