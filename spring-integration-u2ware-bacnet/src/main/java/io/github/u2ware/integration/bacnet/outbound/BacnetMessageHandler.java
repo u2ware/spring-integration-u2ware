@@ -49,13 +49,17 @@ public class BacnetMessageHandler extends AbstractReplyProducingMessageHandler {
 		this.producesReply = producesReply;
 	}
 
+	/*
+	@Override
+	protected boolean shouldCopyRequestHeaders() {
+		return false;
+	}
+	*/
 
 	@Override
 	protected Object handleRequestMessage(Message<?> requestMessage) {
 
 		try{
-			logger.debug("handleRequestMessage: for controller ");
-
 			Object requestPayload = requestMessage.getPayload();
 
 			if(! (requestPayload instanceof BacnetRequest)) {
@@ -78,7 +82,6 @@ public class BacnetMessageHandler extends AbstractReplyProducingMessageHandler {
 			}
 
 		}catch(Exception e){
-			logger.debug("handleRequestMessage", e);
 			return null;
 		}
 	}

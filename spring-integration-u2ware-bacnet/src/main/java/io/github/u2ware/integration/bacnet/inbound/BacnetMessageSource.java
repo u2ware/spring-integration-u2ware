@@ -68,7 +68,6 @@ implements MessageSource<List<BacnetResponse>>{
 			return MessageBuilder.withPayload(response).copyHeaders(headers).build();
 			
 		}catch(Exception e){
-			logger.debug("receive", e);
 			return null;
 		}
 	}	
