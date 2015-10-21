@@ -1,51 +1,37 @@
 package io.github.u2ware.integration.modbus.core;
 
-import java.io.Serializable;
+import io.github.u2ware.integration.common.BuildingAutomationSystemData;
 
-public class ModbusResponse implements Serializable, Comparable<ModbusResponse>{
+public class ModbusResponse implements BuildingAutomationSystemData{
 	
 	private static final long serialVersionUID = 256607891287558382L;
 
-	private String componentName;
 	private String id;
-	private Object presentValue;
+	private Object value;
 	
 	public ModbusResponse(){
 	}
 	
-	public ModbusResponse(String componentName, String id, Object presentValue){
-		this.componentName = componentName;
+	public ModbusResponse(String id, Object value){
 		this.id = id;
-		this.presentValue = presentValue;
+		this.value = value;
 	}
 
-	public String getComponentName() {
-		return componentName;
-	}
-	public void setComponentName(String componentName) {
-		this.componentName = componentName;
-	}
 	public String getId() {
 		return id;
 	}
 	public void setId(String id) {
 		this.id = id;
 	}
-	public Object getPresentValue() {
-		return presentValue;
+	public Object getValue() {
+		return value;
 	}
-	public void setPresentValue(Object presentValue) {
-		this.presentValue = presentValue;
+	public void setValue(Object value) {
+		this.value = value;
 	}
 
-	@Override
-	public int compareTo(ModbusResponse o) {
-		return id.compareTo(o.id);
-	}
 	@Override
 	public String toString() {
-		return "ModbusRes [componentName=" + componentName + ", id=" + id
-				+ ", presentValue=" + presentValue + "]";
+		return "ModbusResponse [id=" + id + ", value=" + value + "]";
 	}
-
 }

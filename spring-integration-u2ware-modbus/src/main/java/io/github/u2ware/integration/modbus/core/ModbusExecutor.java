@@ -31,16 +31,9 @@ public class ModbusExecutor implements InitializingBean, DisposableBean{
 
 	private Log logger = LogFactory.getLog(getClass());
 
-	private String componentName;
 	private String host;
 	private int port = Modbus.DEFAULT_PORT;
 	
-	public String getComponentName() {
-		return componentName;
-	}
-	public void setComponentName(String componentName) {
-		this.componentName = componentName;
-	}
 	public String getHost() {
 		return host;
 	}
@@ -144,26 +137,26 @@ public class ModbusExecutor implements InitializingBean, DisposableBean{
 			ReadCoilsResponse res = (ReadCoilsResponse)response;
 			//byte[] bytes = res.getCoils().getBytes();
 			for(int i=0 ; i < res.getCoils().size(); i++){
-				results.add(new ModbusResponse(getComponentName(), res.getUnitID()+"_"+Modbus.READ_COILS+"_"+i, res.getCoils().getBit(i)));
+				results.add(new ModbusResponse(res.getUnitID()+"_"+Modbus.READ_COILS+"_"+i, res.getCoils().getBit(i)));
 			}
 		}else if(Modbus.READ_INPUT_DISCRETES == response.getFunctionCode()){ //0x02
 			ReadInputDiscretesResponse res = (ReadInputDiscretesResponse)response;
 			//byte[] bytes = res.getDiscretes().getBytes();
 			for(int i=0 ; i < res.getDiscretes().size(); i++){
-				results.add(new ModbusResponse(getComponentName(), res.getUnitID()+"_"+Modbus.READ_INPUT_DISCRETES+"_"+i, res.getDiscretes().getBit(i)));
+				results.add(new ModbusResponse(res.getUnitID()+"_"+Modbus.READ_INPUT_DISCRETES+"_"+i, res.getDiscretes().getBit(i)));
 			}
 		}else if(Modbus.READ_MULTIPLE_REGISTERS == response.getFunctionCode()){ //0x03
 			ReadMultipleRegistersResponse res = (ReadMultipleRegistersResponse)response;
 			
 			for(int i=0 ; i < res.getWordCount(); i++){
 				Register r = res.getRegister(i);
-				results.add(new ModbusResponse(getComponentName(), res.getUnitID()+"_"+Modbus.READ_MULTIPLE_REGISTERS+"_"+i, r.toUnsignedShort()));
+				results.add(new ModbusResponse(res.getUnitID()+"_"+Modbus.READ_MULTIPLE_REGISTERS+"_"+i, r.toUnsignedShort()));
 			}
 		}else if(Modbus.READ_INPUT_REGISTERS == response.getFunctionCode()){ //0x04
 			ReadInputRegistersResponse res = (ReadInputRegistersResponse)response;
 			for(int i=0 ; i < res.getWordCount(); i++){
 				InputRegister r = res.getRegister(i);
-				results.add(new ModbusResponse(getComponentName(), res.getUnitID()+"_"+Modbus.READ_INPUT_REGISTERS+"_"+i, r.toUnsignedShort()));
+				results.add(new ModbusResponse(res.getUnitID()+"_"+Modbus.READ_INPUT_REGISTERS+"_"+i, r.toUnsignedShort()));
 			}
 		}
 		return results;

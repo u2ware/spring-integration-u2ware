@@ -13,7 +13,6 @@
 	
 	<int-u2ware-modbus:inbound-channel-adapter id="modbusInboundChannelAdapter"
 			
-			componentName="modbus"
 			host="127.0.0.1"
 			port="10503"
 			

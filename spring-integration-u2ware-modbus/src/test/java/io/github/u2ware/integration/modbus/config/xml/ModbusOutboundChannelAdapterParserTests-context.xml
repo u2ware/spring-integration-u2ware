@@ -15,7 +15,6 @@
 
 	<int-u2ware-modbus:outbound-channel-adapter id="modbusOutboundChannelAdapter" 
 		
-		componentName="myModbus"
 		host="127.0.0.1"
 		port="10503"
 		

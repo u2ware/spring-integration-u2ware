@@ -210,13 +210,6 @@
 			</xsd:simpleType>
 		</xsd:attribute>
 
-		<xsd:attribute name="componentName" use="required" type="xsd:string">
-			<xsd:annotation>
-				<xsd:documentation><![CDATA[
-					Modbus Component Name. <ip>
-				]]></xsd:documentation>
-			</xsd:annotation>
-		</xsd:attribute>
 		<xsd:attribute name="host" use="required" type="xsd:string">
 			<xsd:annotation>
 				<xsd:documentation><![CDATA[
