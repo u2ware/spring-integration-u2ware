@@ -61,7 +61,6 @@ public class BacnetExecutor extends ThreadPoolTaskExecutor {
 
 	private Log logger = LogFactory.getLog(getClass());
 	
-	protected String componentName;
 	protected int localPort = IpNetwork.DEFAULT_PORT; //47808;
 	protected String remoteAddress;
 	protected int remoteInstanceNumber;
@@ -69,12 +68,6 @@ public class BacnetExecutor extends ThreadPoolTaskExecutor {
 	private Transport transport;
 	private IpNetwork network;
 	
-	public String getComponentName() {
-		return componentName;
-	}
-	public void setComponentName(String componentName) {
-		this.componentName = componentName;
-	}
 	public int getLocalPort() {
 		return localPort;
 	}
@@ -275,13 +268,12 @@ public class BacnetExecutor extends ThreadPoolTaskExecutor {
             		obj = new BacnetResponse();
                 	
             		obj.setId(remoteDevice.getInstanceNumber()+"_"+oid.getInstanceNumber()+"_"+oid.getObjectType().intValue());
-            		obj.setComponentName(getComponentName());
             		obj.setObjectIdentifier(oid.toString());
             	}
             	
             	
             	if(PropertyIdentifier.presentValue.equals(pid)){
-            		obj.setPresentValue(value.toString());
+            		obj.setValue(value.toString());
         		
             	}else if(PropertyIdentifier.units.equals(pid)){
             		obj.setUnits(value.toString());
@@ -300,7 +292,6 @@ public class BacnetExecutor extends ThreadPoolTaskExecutor {
         }
         
         List<BacnetResponse> results = Lists.newArrayList(responseMap.values().iterator());
-        Collections.sort(results);
 		return results;
 	}
 	

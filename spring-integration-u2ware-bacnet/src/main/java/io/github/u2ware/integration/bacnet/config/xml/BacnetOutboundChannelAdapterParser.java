@@ -47,7 +47,6 @@ public class BacnetOutboundChannelAdapterParser extends AbstractOutboundChannelA
 		////////
 		final BeanDefinitionBuilder executorBuilder = BeanDefinitionBuilder.genericBeanDefinition(BacnetExecutor.class);
 		IntegrationNamespaceUtils.setValueIfAttributeDefined(executorBuilder, element, "localPort");
-		IntegrationNamespaceUtils.setValueIfAttributeDefined(executorBuilder, element, "componentName");
 		IntegrationNamespaceUtils.setValueIfAttributeDefined(executorBuilder, element, "remoteAddress");
 		IntegrationNamespaceUtils.setValueIfAttributeDefined(executorBuilder, element, "remoteInstanceNumber");
 

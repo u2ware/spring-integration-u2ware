@@ -17,7 +17,6 @@
 	
 	<int-u2ware-bacnet:outbound-gateway id="bacnetOutboundGateway" 
 
-		componentName="myBacnet"
 		localPort="9997"
 		remoteAddress="127.0.0.1:47805"
 		remoteInstanceNumber="47805"

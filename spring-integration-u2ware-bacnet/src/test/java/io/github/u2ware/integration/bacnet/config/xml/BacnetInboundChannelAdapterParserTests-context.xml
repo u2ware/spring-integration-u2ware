@@ -13,7 +13,6 @@
 
 	<int-u2ware-bacnet:inbound-channel-adapter id="bacnetInboundChannelAdapter"
 
-		componentName="myBacnet"
 		localPort="9991"
 		remoteAddress="127.0.0.1:47808"
 		remoteInstanceNumber="47808"

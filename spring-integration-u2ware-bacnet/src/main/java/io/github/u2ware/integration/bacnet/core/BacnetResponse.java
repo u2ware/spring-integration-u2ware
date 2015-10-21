@@ -1,27 +1,22 @@
 package io.github.u2ware.integration.bacnet.core;
 
-import java.io.Serializable;
+import io.github.u2ware.integration.common.BuildingAutomationSystemData;
 
 
-public class BacnetResponse implements Serializable, Comparable<BacnetResponse>{
+public class BacnetResponse implements BuildingAutomationSystemData{
 	
 	private static final long serialVersionUID = 8696164872704881555L;
 	
-	private String componentName;
 	private String id; //<remoteDevice instanceNumber>_<oid instanceNumber>_<oid type>
-	private String presentValue;
+	private Object value;
+	
 	private String objectIdentifier;
 	private String units;
 	private String outputUnits;
 	private String inactiveText;
 	private String activeText;
 	private String stateText;
-	public String getComponentName() {
-		return componentName;
-	}
-	public void setComponentName(String componentName) {
-		this.componentName = componentName;
-	}
+
 	public String getId() {
 		return id;
 	}
@@ -34,11 +29,11 @@ public class BacnetResponse implements Serializable, Comparable<BacnetResponse>{
 	public void setObjectIdentifier(String objectIdentifier) {
 		this.objectIdentifier = objectIdentifier;
 	}
-	public String getPresentValue() {
-		return presentValue;
+	public Object getValue() {
+		return value;
 	}
-	public void setPresentValue(String presentValue) {
-		this.presentValue = presentValue;
+	public void setValue(Object value) {
+		this.value = value;
 	}
 	public String getUnits() {
 		return units;
@@ -71,17 +66,11 @@ public class BacnetResponse implements Serializable, Comparable<BacnetResponse>{
 		this.stateText = stateText;
 	}
 	@Override
-	public int compareTo(BacnetResponse o) {
-		return id.compareTo(o.id);
-	}
-	@Override
 	public String toString() {
-		return "BacnetResponse [componentName=" + componentName + ", id=" + id
-				+ ", presentValue=" + presentValue + ", objectIdentifier="
-				+ objectIdentifier + ", units=" + units + ", outputUnits="
-				+ outputUnits + ", inactiveText=" + inactiveText
-				+ ", activeText=" + activeText + ", stateText=" + stateText
-				+ "]";
+		return "BacnetResponse [id=" + id + ", value=" + value
+				+ ", objectIdentifier=" + objectIdentifier + ", units=" + units
+				+ ", outputUnits=" + outputUnits + ", inactiveText="
+				+ inactiveText + ", activeText=" + activeText + ", stateText="
+				+ stateText + "]";
 	}
-
 }
