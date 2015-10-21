@@ -27,12 +27,25 @@
 	    </repository>
 	</distributionManagement>
 
+	<repositories>
+	    <repository>
+	        <id>u2ware-mvm-repo</id>
+	        <url>https://raw.github.com/u2ware/u2ware.github.com/mvn-repo/</url>
+	    </repository>
+	</repositories>
+
 	<dependencies>
 
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-integration</artifactId>
 			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
+		    <groupId>io.github.u2ware</groupId>
+		    <artifactId>spring-integration-u2ware-common</artifactId>
+		    <version>1.0.0</version>
 		</dependency>
 		
 		<dependency>
