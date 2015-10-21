@@ -20,7 +20,6 @@ public class EchoClientHttpChannelAdapterTest {
 	@BeforeClass
 	public static void beforeClass() throws Exception{
 		echoServer = new EchoServer();
-		echoServer.setComponentName("EchoClientHttpChannelAdapterTest");
 		echoServer.setPort(9092);
 		echoServer.afterPropertiesSet();
 	}

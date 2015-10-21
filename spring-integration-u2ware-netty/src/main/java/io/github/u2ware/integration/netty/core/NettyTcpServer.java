@@ -41,8 +41,8 @@ public abstract class NettyTcpServer extends NettyAdapter{
         // Start the server.
         b.bind(getPort()).sync();
         
-		logger.info(getComponentName()+" is opened. [localhost:"+getPort()+"]");
-		System.out.println(getComponentName()+" is opened. [localhost:"+getPort()+"]");
+		logger.info("[<local>:"+getPort()+"]  is opened.");
+		System.out.println("[<local>:"+getPort()+"]  is opened. ");
 	}
 	
 	@Override
@@ -56,9 +56,9 @@ public abstract class NettyTcpServer extends NettyAdapter{
             bossGroup.shutdownGracefully();
         	if(workerGroup != null)
             workerGroup.shutdownGracefully();
-    		logger.info(getComponentName()+" is closed. [localhost:"+getPort()+"]");
-    		System.out.println(getComponentName()+" is closed. [localhost:"+getPort()+"]");
-    		
+    		logger.info("[<local>:"+getPort()+"]  is closed.");
+    		System.out.println("[<local>:"+getPort()+"]  is closed. ");
+
     		bossGroup = null;
     		workerGroup = null;
         }

@@ -44,12 +44,12 @@ public abstract class NettyTcpClient extends NettyAdapter{
 			public void operationComplete(ChannelFuture future) throws Exception {
 
 				if(future.isSuccess()){
-			        logger.info(getComponentName()+" is opened. ["+getHost()+":"+getPort()+"]");
-			        System.out.println(getComponentName()+" is opened. ["+getHost()+":"+getPort()+"]");
+			        logger.info("["+getHost()+":"+getPort()+"] is opened. ");
+			        System.out.println("["+getHost()+":"+getPort()+"] is opened. ");
 				}else{
-			        logger.info(getComponentName()+" is failured. ["+getHost()+":"+getPort()+"]");
-			        System.out.println(getComponentName()+" is failured. ["+getHost()+":"+getPort()+"]");
-					
+			        logger.info("["+getHost()+":"+getPort()+"] is failured. ");
+			        System.out.println("["+getHost()+":"+getPort()+"] is failured. ");
+
 					final EventLoop loop = future.channel().eventLoop();  
 					loop.schedule(new Runnable() {
 						@Override
@@ -73,8 +73,8 @@ public abstract class NettyTcpClient extends NettyAdapter{
         	if(group != null)
             // Shut down the event loop to terminate all threads.
             group.shutdownGracefully();
-            logger.info(getComponentName()+" is closed. ["+getHost()+":"+getPort()+"]");
-            System.out.println(getComponentName()+" is closed. ["+getHost()+":"+getPort()+"]");
+	        logger.info("["+getHost()+":"+getPort()+"] is closed. ");
+	        System.out.println("["+getHost()+":"+getPort()+"] is closed. ");
 
             group = null;
         }

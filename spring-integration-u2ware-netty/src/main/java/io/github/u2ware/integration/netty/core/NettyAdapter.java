@@ -7,25 +7,17 @@ import io.netty.handler.ssl.SslHandler;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.beans.factory.BeanNameAware;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 
-public abstract class NettyAdapter extends ChannelInitializer<Channel> implements InitializingBean, DisposableBean, BeanNameAware{
+public abstract class NettyAdapter extends ChannelInitializer<Channel> implements InitializingBean, DisposableBean{
 
 	protected Log logger = LogFactory.getLog(getClass());
 
-	private String componentName;
 	private String host;
 	private int port;
 	private boolean ssl;
 	
-	public String getComponentName() {
-		return componentName;
-	}
-	public void setComponentName(String componentName) {
-		this.componentName = componentName;
-	}
 	public String getHost() {
 		return host;
 	}
@@ -43,11 +35,6 @@ public abstract class NettyAdapter extends ChannelInitializer<Channel> implement
 	}
 	public void setSsl(boolean ssl) {
 		this.ssl = ssl;
-	}
-
-	@Override
-	public void setBeanName(String name) {
-		this.componentName = name;
 	}
 
 	@Override
