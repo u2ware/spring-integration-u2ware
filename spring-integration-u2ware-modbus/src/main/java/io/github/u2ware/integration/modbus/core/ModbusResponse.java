@@ -1,8 +1,8 @@
 package io.github.u2ware.integration.modbus.core;
 
-import io.github.u2ware.integration.common.BuildingAutomationSystemData;
+import java.io.Serializable;
 
-public class ModbusResponse implements BuildingAutomationSystemData{
+public class ModbusResponse implements Serializable{
 	
 	private static final long serialVersionUID = 256607891287558382L;
 
