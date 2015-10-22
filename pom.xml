@@ -41,12 +41,6 @@
 			<artifactId>spring-boot-starter-integration</artifactId>
 			<scope>provided</scope>
 		</dependency>
-
-		<dependency>
-		    <groupId>io.github.u2ware</groupId>
-		    <artifactId>spring-integration-u2ware-common</artifactId>
-		    <version>1.0.0</version>
-		</dependency>
 		
 		<dependency>
 			<groupId>com.google.guava</groupId>
