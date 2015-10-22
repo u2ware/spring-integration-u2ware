@@ -1,9 +1,10 @@
 package io.github.u2ware.integration.bacnet.core;
 
-import io.github.u2ware.integration.common.BuildingAutomationSystemData;
+import java.io.Serializable;
 
 
-public class BacnetResponse implements BuildingAutomationSystemData{
+
+public class BacnetResponse implements Serializable{
 	
 	private static final long serialVersionUID = 8696164872704881555L;
 	
