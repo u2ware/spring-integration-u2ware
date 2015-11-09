@@ -1,5 +1,6 @@
-package io.github.u2ware.integration.netty.handler;
+package io.github.u2ware.integration.netty.support.http;
 
+import io.github.u2ware.integration.netty.support.NettyHeaders;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
 import io.netty.buffer.UnpooledByteBufAllocator;
@@ -31,17 +32,17 @@ import com.google.common.collect.Maps;
  *
  * @author u2waremanager@gamil.com
  */
-public class NettyHttpMessageConverter implements MessageConverter {
+public class HttpMessageConverter implements MessageConverter {
 
 	//protected Log logger = LogFactory.getLog(getClass());
 
 	private final MessageBuilderFactory messageBuilderFactory;
 
-	public NettyHttpMessageConverter() {
+	public HttpMessageConverter() {
 		this(new DefaultMessageBuilderFactory());
 	}
 
-	public NettyHttpMessageConverter(MessageBuilderFactory messageBuilderFactory) {
+	public HttpMessageConverter(MessageBuilderFactory messageBuilderFactory) {
 		this.messageBuilderFactory = messageBuilderFactory;
 	}
 

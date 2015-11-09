@@ -1,7 +1,8 @@
-package io.github.u2ware.integration.netty.handler;
+package io.github.u2ware.integration.netty.support;
 
 import io.netty.channel.ChannelDuplexHandler;
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelHandler.Sharable;
 import io.netty.util.concurrent.ScheduledFuture;
 
 import java.util.Map;
@@ -19,6 +20,7 @@ import org.springframework.util.Assert;
 
 import com.google.common.collect.Maps;
 
+@Sharable
 public class NettyMessageHandler extends ChannelDuplexHandler {
 
 	protected static Log logger = LogFactory.getLog(NettyMessageHandler.class);

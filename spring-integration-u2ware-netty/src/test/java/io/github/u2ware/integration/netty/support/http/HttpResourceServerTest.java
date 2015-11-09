@@ -1,4 +1,4 @@
-package io.github.u2ware.integration.netty.test.http;
+package io.github.u2ware.integration.netty.support.http;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -11,10 +11,9 @@ import org.springframework.web.client.RestTemplate;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration
-public class HttpStaticFileChannelAdapterTest {
+public class HttpResourceServerTest {
 
     protected Log logger = LogFactory.getLog(getClass());
-
 
 	@Test
 	public void test() throws Exception{

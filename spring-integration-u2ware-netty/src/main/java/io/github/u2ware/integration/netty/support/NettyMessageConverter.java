@@ -1,4 +1,4 @@
-package io.github.u2ware.integration.netty.handler;
+package io.github.u2ware.integration.netty.support;
 
 import org.springframework.integration.support.MessageBuilder;
 import org.springframework.messaging.Message;

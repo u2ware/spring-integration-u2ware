@@ -1,7 +1,6 @@
-package io.github.u2ware.integration.netty.support;
+package io.github.u2ware.integration.netty.support.http;
 
 import io.github.u2ware.integration.netty.core.NettyTcpServer;
-import io.github.u2ware.integration.netty.handler.NettyHttpMessageHandler;
 import io.netty.channel.ChannelPipeline;
 import io.netty.handler.codec.http.HttpContentCompressor;
 import io.netty.handler.codec.http.HttpObjectAggregator;
@@ -11,7 +10,7 @@ import io.netty.handler.codec.http.HttpResponseEncoder;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.PollableChannel;
 
-public class HttpMessageChannelAdapter extends NettyTcpServer{
+public class HttpMessageServer extends NettyTcpServer{
 	
 	private MessageChannel sendChannel;
 	private PollableChannel receiveChannel;
@@ -36,6 +35,6 @@ public class HttpMessageChannelAdapter extends NettyTcpServer{
 	    pipeline.addLast(new HttpObjectAggregator(maxContentLength));
 		pipeline.addLast(new HttpResponseEncoder());
 	    pipeline.addLast(new HttpContentCompressor());
-		pipeline.addLast(new NettyHttpMessageHandler(sendChannel, receiveChannel, messagingTimeout));
+		pipeline.addLast(new HttpMessageHandler(sendChannel, receiveChannel, messagingTimeout));
 	}
 }

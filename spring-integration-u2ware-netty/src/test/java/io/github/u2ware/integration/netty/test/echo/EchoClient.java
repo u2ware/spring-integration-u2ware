@@ -1,7 +1,7 @@
 package io.github.u2ware.integration.netty.test.echo;
 
 import io.github.u2ware.integration.netty.core.NettyTcpClient;
-import io.github.u2ware.integration.netty.handler.NettyMessageHandler;
+import io.github.u2ware.integration.netty.support.NettyMessageHandler;
 import io.netty.channel.ChannelPipeline;
 import io.netty.handler.codec.LineBasedFrameDecoder;
 import io.netty.handler.codec.string.StringDecoder;
@@ -11,7 +11,7 @@ import io.netty.handler.logging.LoggingHandler;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.PollableChannel;
 
-public class EchoClientChannelAdapter extends NettyTcpClient{
+public class EchoClient extends NettyTcpClient{
 	
 	private MessageChannel sendChannel;
 	private PollableChannel receiveChannel;

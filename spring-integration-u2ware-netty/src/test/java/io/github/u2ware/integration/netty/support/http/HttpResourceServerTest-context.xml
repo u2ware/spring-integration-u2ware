@@ -14,10 +14,9 @@
 		<int:queue/>
 	</int:channel>
 
-	<bean id="http" class="io.github.u2ware.integration.netty.support.HttpMessageChannelAdapter">
-		<property name="port" value="9094"/>
-		<property name="sendChannel" ref="httpRequest"/>
-		<property name="receiveChannel" ref="httpResponse"/>
+	<bean id="http" class="io.github.u2ware.integration.netty.support.http.HttpResourceServer">
+		<property name="port" value="9095"/>
+		<property name="resourcePrefix" value="classpath:"/>
 	</bean>
 	
 	

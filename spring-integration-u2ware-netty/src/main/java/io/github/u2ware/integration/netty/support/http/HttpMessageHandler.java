@@ -1,11 +1,13 @@
-package io.github.u2ware.integration.netty.handler;
+package io.github.u2ware.integration.netty.support.http;
 
+import io.github.u2ware.integration.netty.support.NettyHeaders;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
 import io.netty.buffer.UnpooledByteBufAllocator;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
+import io.netty.channel.ChannelHandler.Sharable;
 import io.netty.handler.codec.http.DefaultFullHttpResponse;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.FullHttpResponse;
@@ -35,9 +37,9 @@ import com.google.common.collect.Maps;
 *
 * @author u2waremanager@gamil.com
 */
-public class NettyHttpMessageHandler extends SimpleChannelInboundHandler<FullHttpRequest>{
+@Sharable
+public class HttpMessageHandler extends SimpleChannelInboundHandler<FullHttpRequest>{
 	
-
 	protected Log logger = LogFactory.getLog(getClass());
 
 	private MessagingTemplate template = new MessagingTemplate();
@@ -45,10 +47,10 @@ public class NettyHttpMessageHandler extends SimpleChannelInboundHandler<FullHtt
 	private MessageChannel sendChannel;
 	private MessageConverter converter;
 	
-	public NettyHttpMessageHandler(MessageChannel sendChannel, PollableChannel receiveChannel, long timeout){
-		this(new NettyHttpMessageConverter(), sendChannel, receiveChannel, timeout);
+	public HttpMessageHandler(MessageChannel sendChannel, PollableChannel receiveChannel, long timeout){
+		this(new HttpMessageConverter(), sendChannel, receiveChannel, timeout);
 	}	
-	public NettyHttpMessageHandler(MessageConverter converter, MessageChannel sendChannel, PollableChannel receiveChannel, long timeout){
+	public HttpMessageHandler(MessageConverter converter, MessageChannel sendChannel, PollableChannel receiveChannel, long timeout){
 		Assert.notNull(converter, "converter must not be null.");
 		Assert.notNull(sendChannel, "sendChannel must not be null.");
 		Assert.notNull(receiveChannel, "receiveChannel must not be null.");

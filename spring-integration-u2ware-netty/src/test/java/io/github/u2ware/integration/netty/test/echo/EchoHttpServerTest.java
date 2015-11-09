@@ -13,7 +13,7 @@ import org.springframework.web.client.RestTemplate;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration
-public class EchoClientHttpChannelAdapterTest {
+public class EchoHttpServerTest {
 
 	protected static EchoServer echoServer;
 	
