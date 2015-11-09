@@ -90,7 +90,7 @@ public class EchoClient extends NettyTcpClient{
 ```
 1. 연결된 네트워크 응용프로그램으로 부터 메세지를 수신 했을 때, 이 메세지를 sendChannel 에 전송합니다.
 2. receiveChannel 에 메세지가 채워질 때, 이 메세지를 연결된 네트워크 응용프로그램에 전송합니다.
-3. [NettyMessageHandler](src/main/java/io/github/u2ware/integration/netty/handler/NettyMessageHandler.java) 를 ChannelPipeline 에 추가하면 (1), (2) 이벤트가 주기적으로 동작합니다.
+3. [NettyMessageHandler](src/main/java/io/github/u2ware/integration/netty/support/NettyMessageHandler.java) 를 ChannelPipeline 에 추가하면 (1), (2) 이벤트가 주기적으로 동작합니다.
 
 
 ##Configuration
@@ -116,7 +116,7 @@ NettyAdapter 구현체가 작성되었다면 이를 bean 으로 등록하여 Mes
 
 ##Sample Code
 
-* [EchoClientChannelAdapterTest-context.xml](src/test/java/io/github/u2ware/integration/netty/test/echo/EchoClientChannelAdapterTest-context.xml)
-* [EchoClientChannelAdapterTest.java](src/test/java/io/github/u2ware/integration/netty/test/echo/EchoClientChannelAdapterTest.java)
+* [EchoClientTest-context.xml](src/test/java/io/github/u2ware/integration/netty/test/echo/EchoClientTest-context.xml)
+* [EchoClientTest.java](src/test/java/io/github/u2ware/integration/netty/test/echo/EchoClientTest.java)
 
 
