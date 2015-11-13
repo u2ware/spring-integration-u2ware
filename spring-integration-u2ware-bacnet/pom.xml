@@ -8,11 +8,14 @@
 		<groupId>io.github.u2ware</groupId>
 		<artifactId>spring-integration-u2ware</artifactId>
 		<version>1.0.0</version>
-	    <relativePath>../</relativePath>
 	</parent>
 
 
 	<repositories>
+	    <repository>
+	        <id>u2ware-mvm-repo</id>
+	        <url>https://raw.github.com/u2ware/u2ware.github.com/mvn-repo/</url>
+	    </repository>
 	    <repository>
 	        <id>bacnet4j-mvn-repo</id>
 	        <url>https://raw.github.com/u2ware/BACnet4j/mvn-repo/</url>
@@ -20,18 +23,6 @@
 	</repositories>
 
 	<dependencies>
-		<!--  
-	  	<dependency>
-	  		<groupId>org.springframework.integration</groupId>
-	  		<artifactId>spring-integration-mongodb</artifactId>
-	  	</dependency>
-		<dependency>
-			<groupId>org.springframework.integration</groupId>
-			<artifactId>spring-integration-feed</artifactId>
-			<version>4.1.6.RELEASE</version> 
-		</dependency>
-		-->
-	
 	  	<dependency>
 	  		<groupId>com.serotonin</groupId>
 	  		<artifactId>bacnet4j</artifactId>
