@@ -8,8 +8,14 @@
 		<groupId>io.github.u2ware</groupId>
 		<artifactId>spring-integration-u2ware</artifactId>
 		<version>1.0.0</version>
-	    <relativePath>../</relativePath>
 	</parent>
+
+	<repositories>
+	    <repository>
+	        <id>u2ware-mvm-repo</id>
+	        <url>https://raw.github.com/u2ware/u2ware.github.com/mvn-repo/</url>
+	    </repository>
+	</repositories>
 
 	<dependencies>
 
