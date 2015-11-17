@@ -7,11 +7,8 @@ import static io.netty.handler.codec.http.HttpHeaders.Names.DATE;
 import static io.netty.handler.codec.http.HttpHeaders.Names.EXPIRES;
 import static io.netty.handler.codec.http.HttpHeaders.Names.IF_MODIFIED_SINCE;
 import static io.netty.handler.codec.http.HttpHeaders.Names.LAST_MODIFIED;
-import static io.netty.handler.codec.http.HttpHeaders.Names.LOCATION;
 import static io.netty.handler.codec.http.HttpMethod.GET;
 import static io.netty.handler.codec.http.HttpResponseStatus.BAD_REQUEST;
-import static io.netty.handler.codec.http.HttpResponseStatus.FORBIDDEN;
-import static io.netty.handler.codec.http.HttpResponseStatus.FOUND;
 import static io.netty.handler.codec.http.HttpResponseStatus.INTERNAL_SERVER_ERROR;
 import static io.netty.handler.codec.http.HttpResponseStatus.METHOD_NOT_ALLOWED;
 import static io.netty.handler.codec.http.HttpResponseStatus.NOT_FOUND;
@@ -22,12 +19,12 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
+import io.netty.channel.ChannelHandler.Sharable;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelProgressiveFuture;
 import io.netty.channel.ChannelProgressiveFutureListener;
-import io.netty.channel.DefaultFileRegion;
+import io.netty.channel.FileRegion;
 import io.netty.channel.SimpleChannelInboundHandler;
-import io.netty.channel.ChannelHandler.Sharable;
 import io.netty.handler.codec.http.DefaultFullHttpResponse;
 import io.netty.handler.codec.http.DefaultHttpResponse;
 import io.netty.handler.codec.http.FullHttpRequest;
@@ -38,15 +35,17 @@ import io.netty.handler.codec.http.HttpResponse;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.LastHttpContent;
 import io.netty.handler.ssl.SslHandler;
-import io.netty.handler.stream.ChunkedFile;
+import io.netty.handler.stream.ChunkedInput;
+import io.netty.util.AbstractReferenceCounted;
 import io.netty.util.CharsetUtil;
-import io.netty.util.internal.SystemPropertyUtil;
+import io.netty.util.IllegalReferenceCountException;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.RandomAccessFile;
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.nio.channels.WritableByteChannel;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -94,51 +93,24 @@ public class HttpResourceHandler extends SimpleChannelInboundHandler<FullHttpReq
     	logger.info(ctx.channel() + " Request Uri: "+uri);
         
         
-        //final String path = sanitizeUri(uri);
-        final Resource path = sanitizeResource(resourceLoader, resourceLocation, uri);
-    	logger.info(ctx.channel() + " Request Resource: "+path);
-        
-        if (path == null) {
-            sendError(ctx, FORBIDDEN);
+        final Resource resource = sanitizeResource(resourceLoader, resourceLocation, uri);
+    	
+    	
+        if (resource == null) {
+            sendError(ctx, NOT_FOUND);
             return;
         }
         //Thread.sleep(10000);
-    	logger.info(ctx.channel() + " Request Resource: "+path.exists());
-
-        File file = null;//
-        try{
-	        file = path.getFile();
-        	logger.info(ctx.channel() + " Request File: "+file);
-        }catch(Exception e){
-        	e.printStackTrace();
-            sendError(ctx, NOT_FOUND);
-            return;
-        }
-
-        //File file = new File(path);
-        if (file.isHidden() || !file.exists()) {
-            sendError(ctx, NOT_FOUND);
-            return;
-        }
-
-        if (file.isDirectory()) {
-        	
-            if (uri.endsWith("/")) {
-                //sendListing(ctx, file);
-                sendRedirect(ctx, uri + "index.html");
-	        	logger.info(ctx.channel() + " sendRedirect ");
-            } else {
-                sendRedirect(ctx, uri + "/index.html");
-	        	logger.info(ctx.channel() + " sendRedirect ");
-            }
-            return;
-        }
-
-        if (!file.isFile()) {
-            sendError(ctx, FORBIDDEN);
-            return;
-        }
+//    	logger.info(ctx.channel() + " Request Resource: "+resource.exists());
+//    	logger.info(ctx.channel() + " Request Resource: "+resource.getClass());
+//    	logger.info(ctx.channel() + " Request Resource: "+resource.getFilename());
+//    	logger.info(ctx.channel() + " Request Resource: "+resource.getURL());
+//    	logger.info(ctx.channel() + " Request Resource: "+resource.contentLength());
+//    	logger.info(ctx.channel() + " Request Resource: "+resource.lastModified());
         
+    	long contentLength = resource.contentLength();
+    	long lastModified = resource.lastModified();
+    	
         // Cache Validation
         String ifModifiedSince = request.headers().get(IF_MODIFIED_SINCE);
         if (ifModifiedSince != null && !ifModifiedSince.isEmpty()) {
@@ -148,27 +120,19 @@ public class HttpResourceHandler extends SimpleChannelInboundHandler<FullHttpReq
             // Only compare up to the second because the datetime format we send to the client
             // does not have milliseconds
             long ifModifiedSinceDateSeconds = ifModifiedSinceDate.getTime() / 1000;
-            long fileLastModifiedSeconds = file.lastModified() / 1000;
+            long fileLastModifiedSeconds = lastModified / 1000;
             if (ifModifiedSinceDateSeconds == fileLastModifiedSeconds) {
                 sendNotModified(ctx);
             	logger.info(ctx.channel() + " Response complete.");
                 return;
             }
         }
-
-        RandomAccessFile raf;
-        try {
-            raf = new RandomAccessFile(file, "r");
-        } catch (FileNotFoundException ignore) {
-            sendError(ctx, NOT_FOUND);
-            return;
-        }
-        long fileLength = raf.length();
-
+    	
+    	
         HttpResponse response = new DefaultHttpResponse(HTTP_1_1, OK);
-        HttpHeaders.setContentLength(response, fileLength);
-        setContentTypeHeader(response, file);
-        setDateAndCacheHeaders(response, file);
+        HttpHeaders.setContentLength(response, contentLength);
+        setContentTypeHeader(response, resource);
+        setDateAndCacheHeaders(response, resource);
         if (HttpHeaders.isKeepAlive(request)) {
             response.headers().set(CONNECTION, HttpHeaders.Values.KEEP_ALIVE);
         }
@@ -181,12 +145,12 @@ public class HttpResourceHandler extends SimpleChannelInboundHandler<FullHttpReq
         ChannelFuture lastContentFuture;
         if (ctx.pipeline().get(SslHandler.class) == null) {
             sendFileFuture =
-                    ctx.write(new DefaultFileRegion(raf.getChannel(), 0, fileLength), ctx.newProgressivePromise());
+                    ctx.write(new ResourceFileRegion(resource, 0, contentLength), ctx.newProgressivePromise());
             // Write the end marker.
             lastContentFuture = ctx.writeAndFlush(LastHttpContent.EMPTY_LAST_CONTENT);
         } else {
-            sendFileFuture =
-                    ctx.writeAndFlush(new HttpChunkedInput(new ChunkedFile(raf, 0, fileLength, 8192)),
+            sendFileFuture = null;
+                    ctx.writeAndFlush(new HttpChunkedInput(new ChunkedResource(resource, 0, contentLength, 8192)),
                             ctx.newProgressivePromise());
             // HttpChunkedInput will write the end marker (LastHttpContent) for us.
             lastContentFuture = sendFileFuture;
@@ -260,93 +224,6 @@ public class HttpResourceHandler extends SimpleChannelInboundHandler<FullHttpReq
         return null;
     }
 	
-	
-    @SuppressWarnings("unused")
-	private static String sanitizeUri(String uri) {
-        // Decode the path.
-        try {
-            uri = URLDecoder.decode(uri, "UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            throw new Error(e);
-        }
-
-        if (uri.isEmpty() || uri.charAt(0) != '/') {
-            return null;
-        }
-
-        // Convert file separators.
-        uri = uri.replace('/', File.separatorChar);
-
-        // Simplistic dumb security check.
-        // You will have to do something serious in the production environment.
-        if (uri.contains(File.separator + '.') ||
-            uri.contains('.' + File.separator) ||
-            uri.charAt(0) == '.' || uri.charAt(uri.length() - 1) == '.' ||
-            INSECURE_URI.matcher(uri).matches()) {
-            return null;
-        }
-
-        // Convert to absolute path.
-        return SystemPropertyUtil.get("user.dir") + File.separator + uri;
-    }
-
-    private static final Pattern ALLOWED_FILE_NAME = Pattern.compile("[A-Za-z0-9][-_A-Za-z0-9\\.]*");
-
-    
-    @SuppressWarnings("unused")
-	private static void sendListing(ChannelHandlerContext ctx, File dir) {
-        FullHttpResponse response = new DefaultFullHttpResponse(HTTP_1_1, OK);
-        response.headers().set(CONTENT_TYPE, "text/html; charset=UTF-8");
-
-        String dirPath = dir.getPath();
-        StringBuilder buf = new StringBuilder()
-            .append("<!DOCTYPE html>\r\n")
-            .append("<html><head><title>")
-            .append("Listing of: ")
-            .append(dirPath)
-            .append("</title></head><body>\r\n")
-
-            .append("<h3>Listing of: ")
-            .append(dirPath)
-            .append("</h3>\r\n")
-
-            .append("<ul>")
-            .append("<li><a href=\"../\">..</a></li>\r\n");
-
-        for (File f: dir.listFiles()) {
-            if (f.isHidden() || !f.canRead()) {
-                continue;
-            }
-
-            String name = f.getName();
-            if (!ALLOWED_FILE_NAME.matcher(name).matches()) {
-                continue;
-            }
-
-            buf.append("<li><a href=\"")
-               .append(name)
-               .append("\">")
-               .append(name)
-               .append("</a></li>\r\n");
-        }
-
-        buf.append("</ul></body></html>\r\n");
-        ByteBuf buffer = Unpooled.copiedBuffer(buf, CharsetUtil.UTF_8);
-        response.content().writeBytes(buffer);
-        buffer.release();
-
-        // Close the connection as soon as the error message is sent.
-        ctx.writeAndFlush(response).addListener(ChannelFutureListener.CLOSE);
-    }
-
-    private static void sendRedirect(ChannelHandlerContext ctx, String newUri) {
-        FullHttpResponse response = new DefaultFullHttpResponse(HTTP_1_1, FOUND);
-        response.headers().set(LOCATION, newUri);
-
-        // Close the connection as soon as the error message is sent.
-        ctx.writeAndFlush(response).addListener(ChannelFutureListener.CLOSE);
-    }
-
     private static void sendError(ChannelHandlerContext ctx, HttpResponseStatus status) {
         FullHttpResponse response = new DefaultFullHttpResponse(
                 HTTP_1_1, status, Unpooled.copiedBuffer("Failure: " + status + "\r\n", CharsetUtil.UTF_8));
@@ -391,8 +268,9 @@ public class HttpResourceHandler extends SimpleChannelInboundHandler<FullHttpReq
      *            HTTP response
      * @param fileToCache
      *            file to extract content type
+     * @throws IOException 
      */
-    private static void setDateAndCacheHeaders(HttpResponse response, File fileToCache) {
+    private static void setDateAndCacheHeaders(HttpResponse response, Resource resource) throws IOException {
         SimpleDateFormat dateFormatter = new SimpleDateFormat(HTTP_DATE_FORMAT, Locale.US);
         dateFormatter.setTimeZone(TimeZone.getTimeZone(HTTP_DATE_GMT_TIMEZONE));
 
@@ -405,7 +283,7 @@ public class HttpResourceHandler extends SimpleChannelInboundHandler<FullHttpReq
         response.headers().set(EXPIRES, dateFormatter.format(time.getTime()));
         response.headers().set(CACHE_CONTROL, "private, max-age=" + HTTP_CACHE_SECONDS);
         response.headers().set(
-                LAST_MODIFIED, dateFormatter.format(new Date(fileToCache.lastModified())));
+                LAST_MODIFIED, dateFormatter.format(new Date(resource.lastModified())));
     }
 
     /**
@@ -416,8 +294,164 @@ public class HttpResourceHandler extends SimpleChannelInboundHandler<FullHttpReq
      * @param file
      *            file to extract content type
      */
-    private static void setContentTypeHeader(HttpResponse response, File file) {
+    private static void setContentTypeHeader(HttpResponse response, Resource resource) {
     	ConfigurableMimeFileTypeMap mimeTypesMap = new ConfigurableMimeFileTypeMap();
-        response.headers().set(CONTENT_TYPE, mimeTypesMap.getContentType(file.getPath()));
+        response.headers().set(CONTENT_TYPE, mimeTypesMap.getContentType(resource.getFilename()));
+    }
+    
+    
+    private static class ResourceFileRegion extends AbstractReferenceCounted implements FileRegion {
+
+        private final InputStream in;
+        private final long position;
+        private final long count;
+        private long transfered;
+    	
+        private ResourceFileRegion(Resource resource, long position, long count) throws IOException {
+            if (resource == null) {
+                throw new NullPointerException("file");
+            }
+            if (position < 0) {
+                throw new IllegalArgumentException("position must be >= 0 but was " + position);
+            }
+            if (count < 0) {
+                throw new IllegalArgumentException("count must be >= 0 but was " + count);
+            }
+            this.in = resource.getInputStream();
+            this.position = position;
+            this.count = count;
+        }
+
+        @Override
+        public long position() {
+            return position;
+        }
+
+        @Override
+        public long count() {
+            return count;
+        }
+
+        @Override
+        public long transfered() {
+            return transfered;
+        }
+
+		@Override
+		public long transferTo(WritableByteChannel target, long position) throws IOException {
+	        long count = this.count - position;
+	        if (count < 0 || position < 0) {
+	            throw new IllegalArgumentException(
+	                    "position out of range: " + position +
+	                    " (expected: 0 - " + (this.count - 1) + ')');
+	        }
+	        if (count == 0) {
+	            return 0L;
+	        }
+	        if (refCnt() == 0) {
+	            throw new IllegalReferenceCountException(0);
+	        }
+	        
+	        
+	        ByteBuf src = Unpooled.buffer();
+	        src.writeBytes(in, (int)count);
+	        
+	        long written = target.write(src.nioBuffer());
+
+	        if (written > 0) {
+	            transfered += written;
+	        }
+	        return written;
+		}
+
+		@Override
+		protected void deallocate() {
+			try {
+				in.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+    }
+    
+    private static class ChunkedResource implements ChunkedInput<ByteBuf> {
+    	
+        private final InputStream in;
+        private final long endOffset;
+        private final int chunkSize;
+        private long offset;
+
+        /**
+         * Creates a new instance that fetches data from the specified file.
+         *
+         * @param chunkSize the number of bytes to fetch on each
+         *                  {@link #readChunk(ChannelHandlerContext)} call
+         */
+        private ChunkedResource(Resource resource, int chunkSize) throws IOException {
+            this(resource, 0, resource.contentLength(), chunkSize);
+        }
+
+        private ChunkedResource(Resource resource, long offset, long length, int chunkSize) throws IOException {
+            if (resource == null) {
+                throw new NullPointerException("resource");
+            }
+            if (offset < 0) {
+                throw new IllegalArgumentException(
+                        "offset: " + offset + " (expected: 0 or greater)");
+            }
+            if (length < 0) {
+                throw new IllegalArgumentException(
+                        "length: " + length + " (expected: 0 or greater)");
+            }
+            if (chunkSize <= 0) {
+                throw new IllegalArgumentException(
+                        "chunkSize: " + chunkSize +
+                        " (expected: a positive integer)");
+            }
+
+            this.in = resource.getInputStream();
+            this.offset = offset;
+            endOffset = offset + length;
+            this.chunkSize = chunkSize;
+        }
+
+        @Override
+        public boolean isEndOfInput() throws Exception {
+            return !(offset < endOffset);
+        }
+
+        @Override
+        public void close() throws Exception {
+            in.close();
+        }
+
+        @Override
+        public ByteBuf readChunk(ChannelHandlerContext ctx) throws Exception {
+            long offset = this.offset;
+            if (offset >= endOffset) {
+                return null;
+            }
+
+            int chunkSize = (int) Math.min(this.chunkSize, endOffset - offset);
+            // Check if the buffer is backed by an byte array. If so we can optimize it a bit an safe a copy
+
+            ByteBuf buf = ctx.alloc().heapBuffer(chunkSize);
+            boolean release = true;
+            try {
+                in.read(buf.array(), buf.arrayOffset(), chunkSize);
+                
+                buf.writerIndex(chunkSize);
+                
+                
+                this.offset = offset + chunkSize;
+                release = false;
+                return buf;
+            } finally {
+                if (release) {
+                    buf.release();
+                }
+            }
+        }
+        
     }
 }
