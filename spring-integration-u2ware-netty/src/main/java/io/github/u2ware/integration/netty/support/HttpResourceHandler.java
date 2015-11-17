@@ -103,12 +103,14 @@ public class HttpResourceHandler extends SimpleChannelInboundHandler<FullHttpReq
             return;
         }
         //Thread.sleep(10000);
+    	logger.info(ctx.channel() + " Request Resource: "+path.exists());
 
         File file = null;//
         try{
 	        file = path.getFile();
         	logger.info(ctx.channel() + " Request File: "+file);
         }catch(Exception e){
+        	e.printStackTrace();
             sendError(ctx, NOT_FOUND);
             return;
         }
@@ -252,7 +254,10 @@ public class HttpResourceHandler extends SimpleChannelInboundHandler<FullHttpReq
         //return SystemPropertyUtil.get("user.dir") + File.separator + uri;
         Resource result = resourceLoader.getResource(path);
         
-        return result;
+        if(result.exists()){
+            return result;
+        }
+        return null;
     }
 	
 	
