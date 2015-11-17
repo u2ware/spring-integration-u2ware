@@ -1,4 +1,4 @@
-package io.github.u2ware.integration.netty.support.http;
+package io.github.u2ware.integration.netty.support;
 
 import static io.netty.handler.codec.http.HttpHeaders.Names.CONTENT_TYPE;
 import static io.netty.handler.codec.http.HttpResponseStatus.BAD_REQUEST;

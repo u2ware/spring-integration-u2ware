@@ -1,4 +1,4 @@
-package io.github.u2ware.integration.netty.support.http;
+package io.github.u2ware.integration.netty.support;
 
 import io.github.u2ware.integration.netty.core.NettyTcpServer;
 import io.netty.channel.ChannelPipeline;
@@ -11,11 +11,11 @@ import org.springframework.core.io.ResourceLoader;
 
 public class HttpResourceServer extends NettyTcpServer implements ResourceLoaderAware{
 
-    private String resourcePrefix;
+    private String resourceLocation;
 	private ResourceLoader resourceLoader;
 	
-	public void setResourcePrefix(String resourcePrefix) {
-		this.resourcePrefix = resourcePrefix;
+	public void setResourceLocation(String resourceLocation) {
+		this.resourceLocation = resourceLocation;
 	}
 	@Override
 	public void setResourceLoader(ResourceLoader resourceLoader) {
@@ -27,6 +27,6 @@ public class HttpResourceServer extends NettyTcpServer implements ResourceLoader
         pipeline.addLast(new HttpServerCodec());
         pipeline.addLast(new HttpObjectAggregator(65536));
         pipeline.addLast(new ChunkedWriteHandler());
-        pipeline.addLast(new HttpResourceHandler(resourceLoader, resourcePrefix));
+        pipeline.addLast(new HttpResourceHandler(resourceLoader, resourceLocation));
 	}
 }

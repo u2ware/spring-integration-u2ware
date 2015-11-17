@@ -1,4 +1,4 @@
-package io.github.u2ware.integration.netty.support.http;
+package io.github.u2ware.integration.netty.support;
 
 import io.github.u2ware.integration.netty.core.NettyTcpServer;
 import io.netty.channel.ChannelPipeline;

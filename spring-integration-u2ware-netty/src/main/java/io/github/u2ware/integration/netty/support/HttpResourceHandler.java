@@ -1,4 +1,4 @@
-package io.github.u2ware.integration.netty.support.http;
+package io.github.u2ware.integration.netty.support;
 
 import static io.netty.handler.codec.http.HttpHeaders.Names.CACHE_CONTROL;
 import static io.netty.handler.codec.http.HttpHeaders.Names.CONNECTION;
@@ -71,11 +71,11 @@ public class HttpResourceHandler extends SimpleChannelInboundHandler<FullHttpReq
     protected Log logger = LogFactory.getLog(getClass());
     
 	public ResourceLoader resourceLoader;
-	public String resourcePrefix;
+	public String resourceLocation;
 
-	public HttpResourceHandler(ResourceLoader resourceLoader, String resourcePrefix){
+	public HttpResourceHandler(ResourceLoader resourceLoader, String resourceLocation){
 		this.resourceLoader = resourceLoader;
-		this.resourcePrefix = resourcePrefix;
+		this.resourceLocation = resourceLocation;
 	}
     
     @Override
@@ -95,7 +95,7 @@ public class HttpResourceHandler extends SimpleChannelInboundHandler<FullHttpReq
         
         
         //final String path = sanitizeUri(uri);
-        final Resource path = sanitizeResource(resourceLoader, resourcePrefix, uri);
+        final Resource path = sanitizeResource(resourceLoader, resourceLocation, uri);
     	logger.info(ctx.channel() + " Request Resource: "+path);
         
         if (path == null) {

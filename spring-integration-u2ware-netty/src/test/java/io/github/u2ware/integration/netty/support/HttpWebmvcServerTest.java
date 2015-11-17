@@ -1,4 +1,4 @@
-package io.github.u2ware.integration.netty.support.http;
+package io.github.u2ware.integration.netty.support;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
