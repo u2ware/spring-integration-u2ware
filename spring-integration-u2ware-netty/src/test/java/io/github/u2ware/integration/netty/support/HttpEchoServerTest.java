@@ -1,4 +1,6 @@
-package io.github.u2ware.integration.netty.test.echo;
+package io.github.u2ware.integration.netty.support;
+
+import io.github.u2ware.integration.netty.test.echo.EchoServer;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -13,7 +15,9 @@ import org.springframework.web.client.RestTemplate;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration
-public class EchoHttpServerTest {
+public class HttpEchoServerTest {
+
+    protected Log logger = LogFactory.getLog(getClass());
 
 	protected static EchoServer echoServer;
 	
@@ -28,18 +32,17 @@ public class EchoHttpServerTest {
 		echoServer.destroy();
 	}
 
-	protected Log logger = LogFactory.getLog(getClass());
-	
+
 	@Test
-	public void testRunning() throws Exception {
+	public void test() throws Exception{
+				
+		//httpResponse.send(MessageBuilder.withPayload("hello world").build());
 		
-		Thread.sleep(3000);
 		RestTemplate restTemplate = new RestTemplate();
-		
-		Object result = restTemplate.postForEntity("http://localhost:9093", "hello echo~\n", null);
-		Assert.assertNotNull(result);
-		logger.debug("result : "+result.getClass());
-		logger.debug("result : "+result);
+		String result = restTemplate.postForObject("http://localhost:9094", "hello world~", String.class);
+		logger.debug(result);
+		Assert.assertEquals("hello world~", result);
 	}
-	
 }
+
+

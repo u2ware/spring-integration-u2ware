@@ -15,7 +15,6 @@ import static io.netty.handler.codec.http.HttpResponseStatus.NOT_FOUND;
 import static io.netty.handler.codec.http.HttpResponseStatus.NOT_MODIFIED;
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 import static io.netty.handler.codec.http.HttpVersion.HTTP_1_1;
-import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
@@ -23,29 +22,21 @@ import io.netty.channel.ChannelHandler.Sharable;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelProgressiveFuture;
 import io.netty.channel.ChannelProgressiveFutureListener;
-import io.netty.channel.FileRegion;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.http.DefaultFullHttpResponse;
 import io.netty.handler.codec.http.DefaultHttpResponse;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.FullHttpResponse;
-import io.netty.handler.codec.http.HttpChunkedInput;
 import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpResponse;
 import io.netty.handler.codec.http.HttpResponseStatus;
-import io.netty.handler.codec.http.LastHttpContent;
-import io.netty.handler.ssl.SslHandler;
-import io.netty.handler.stream.ChunkedInput;
-import io.netty.util.AbstractReferenceCounted;
+import io.netty.handler.stream.ChunkedStream;
 import io.netty.util.CharsetUtil;
-import io.netty.util.IllegalReferenceCountException;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
-import java.nio.channels.WritableByteChannel;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -90,23 +81,22 @@ public class HttpResourceHandler extends SimpleChannelInboundHandler<FullHttpReq
         }
 
         final String uri = request.getUri();
-    	logger.info(ctx.channel() + " Request Uri: "+uri);
+    	//logger.info(ctx.channel() + " Request Uri: "+uri);
         
         
         final Resource resource = sanitizeResource(resourceLoader, resourceLocation, uri);
-    	
     	
         if (resource == null) {
             sendError(ctx, NOT_FOUND);
             return;
         }
         //Thread.sleep(10000);
-//    	logger.info(ctx.channel() + " Request Resource: "+resource.exists());
-//    	logger.info(ctx.channel() + " Request Resource: "+resource.getClass());
-//    	logger.info(ctx.channel() + " Request Resource: "+resource.getFilename());
-//    	logger.info(ctx.channel() + " Request Resource: "+resource.getURL());
-//    	logger.info(ctx.channel() + " Request Resource: "+resource.contentLength());
-//    	logger.info(ctx.channel() + " Request Resource: "+resource.lastModified());
+    	//logger.info(ctx.channel() + " Request Resource: "+resource.exists());
+    	//logger.info(ctx.channel() + " Request Resource: "+resource.getClass());
+    	//logger.info(ctx.channel() + " Request Resource: "+resource.getFilename());
+    	logger.info(ctx.channel() + " Request Resource: "+resource.getURL());
+    	//logger.info(ctx.channel() + " Request Resource: "+resource.contentLength());
+    	//logger.info(ctx.channel() + " Request Resource: "+resource.lastModified());
         
     	long contentLength = resource.contentLength();
     	long lastModified = resource.lastModified();
@@ -141,23 +131,10 @@ public class HttpResourceHandler extends SimpleChannelInboundHandler<FullHttpReq
         ctx.write(response);
 
         // Write the content.
-        ChannelFuture sendFileFuture;
-        ChannelFuture lastContentFuture;
-        if (ctx.pipeline().get(SslHandler.class) == null) {
-            sendFileFuture =
-                    ctx.write(new ResourceFileRegion(resource, 0, contentLength), ctx.newProgressivePromise());
-            // Write the end marker.
-            lastContentFuture = ctx.writeAndFlush(LastHttpContent.EMPTY_LAST_CONTENT);
-        } else {
-            sendFileFuture = null;
-                    ctx.writeAndFlush(new HttpChunkedInput(new ChunkedResource(resource, 0, contentLength, 8192)),
-                            ctx.newProgressivePromise());
-            // HttpChunkedInput will write the end marker (LastHttpContent) for us.
-            lastContentFuture = sendFileFuture;
-        }
-
+        ChannelFuture sendFileFuture = ctx.writeAndFlush(new ChunkedStream(resource.getInputStream()));
         sendFileFuture.addListener(new ChannelProgressiveFutureListener() {
-            @Override
+            
+        	@Override
             public void operationProgressed(ChannelProgressiveFuture future, long progress, long total) {
                 if (total < 0) { // total unknown
                 	logger.info(future.channel() + " Response progress: " + progress);
@@ -171,12 +148,8 @@ public class HttpResourceHandler extends SimpleChannelInboundHandler<FullHttpReq
             	logger.info(future.channel() + " Response complete.");
             }
         });
-
-        // Decide whether to close the connection or not.
-        if (!HttpHeaders.isKeepAlive(request)) {
-            // Close the connection when the whole content is written out.
-            lastContentFuture.addListener(ChannelFutureListener.CLOSE);
-        }
+        
+        sendFileFuture.addListener(ChannelFutureListener.CLOSE);
     }
 
     @Override
@@ -297,161 +270,5 @@ public class HttpResourceHandler extends SimpleChannelInboundHandler<FullHttpReq
     private static void setContentTypeHeader(HttpResponse response, Resource resource) {
     	ConfigurableMimeFileTypeMap mimeTypesMap = new ConfigurableMimeFileTypeMap();
         response.headers().set(CONTENT_TYPE, mimeTypesMap.getContentType(resource.getFilename()));
-    }
-    
-    
-    private static class ResourceFileRegion extends AbstractReferenceCounted implements FileRegion {
-
-        private final InputStream in;
-        private final long position;
-        private final long count;
-        private long transfered;
-    	
-        private ResourceFileRegion(Resource resource, long position, long count) throws IOException {
-            if (resource == null) {
-                throw new NullPointerException("file");
-            }
-            if (position < 0) {
-                throw new IllegalArgumentException("position must be >= 0 but was " + position);
-            }
-            if (count < 0) {
-                throw new IllegalArgumentException("count must be >= 0 but was " + count);
-            }
-            this.in = resource.getInputStream();
-            this.position = position;
-            this.count = count;
-        }
-
-        @Override
-        public long position() {
-            return position;
-        }
-
-        @Override
-        public long count() {
-            return count;
-        }
-
-        @Override
-        public long transfered() {
-            return transfered;
-        }
-
-		@Override
-		public long transferTo(WritableByteChannel target, long position) throws IOException {
-	        long count = this.count - position;
-	        if (count < 0 || position < 0) {
-	            throw new IllegalArgumentException(
-	                    "position out of range: " + position +
-	                    " (expected: 0 - " + (this.count - 1) + ')');
-	        }
-	        if (count == 0) {
-	            return 0L;
-	        }
-	        if (refCnt() == 0) {
-	            throw new IllegalReferenceCountException(0);
-	        }
-	        
-	        
-	        ByteBuf src = Unpooled.buffer();
-	        src.writeBytes(in, (int)count);
-	        
-	        long written = target.write(src.nioBuffer());
-
-	        if (written > 0) {
-	            transfered += written;
-	        }
-	        return written;
-		}
-
-		@Override
-		protected void deallocate() {
-			try {
-				in.close();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
-    }
-    
-    private static class ChunkedResource implements ChunkedInput<ByteBuf> {
-    	
-        private final InputStream in;
-        private final long endOffset;
-        private final int chunkSize;
-        private long offset;
-
-        /**
-         * Creates a new instance that fetches data from the specified file.
-         *
-         * @param chunkSize the number of bytes to fetch on each
-         *                  {@link #readChunk(ChannelHandlerContext)} call
-         */
-        private ChunkedResource(Resource resource, int chunkSize) throws IOException {
-            this(resource, 0, resource.contentLength(), chunkSize);
-        }
-
-        private ChunkedResource(Resource resource, long offset, long length, int chunkSize) throws IOException {
-            if (resource == null) {
-                throw new NullPointerException("resource");
-            }
-            if (offset < 0) {
-                throw new IllegalArgumentException(
-                        "offset: " + offset + " (expected: 0 or greater)");
-            }
-            if (length < 0) {
-                throw new IllegalArgumentException(
-                        "length: " + length + " (expected: 0 or greater)");
-            }
-            if (chunkSize <= 0) {
-                throw new IllegalArgumentException(
-                        "chunkSize: " + chunkSize +
-                        " (expected: a positive integer)");
-            }
-
-            this.in = resource.getInputStream();
-            this.offset = offset;
-            endOffset = offset + length;
-            this.chunkSize = chunkSize;
-        }
-
-        @Override
-        public boolean isEndOfInput() throws Exception {
-            return !(offset < endOffset);
-        }
-
-        @Override
-        public void close() throws Exception {
-            in.close();
-        }
-
-        @Override
-        public ByteBuf readChunk(ChannelHandlerContext ctx) throws Exception {
-            long offset = this.offset;
-            if (offset >= endOffset) {
-                return null;
-            }
-
-            int chunkSize = (int) Math.min(this.chunkSize, endOffset - offset);
-            // Check if the buffer is backed by an byte array. If so we can optimize it a bit an safe a copy
-
-            ByteBuf buf = ctx.alloc().heapBuffer(chunkSize);
-            boolean release = true;
-            try {
-                in.read(buf.array(), buf.arrayOffset(), chunkSize);
-                
-                buf.writerIndex(chunkSize);
-                
-                
-                this.offset = offset + chunkSize;
-                release = false;
-                return buf;
-            } finally {
-                if (release) {
-                    buf.release();
-                }
-            }
-        }
-        
     }
 }

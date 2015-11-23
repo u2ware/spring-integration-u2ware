@@ -1,11 +1,10 @@
 package io.github.u2ware.integration.netty.support;
 
 import io.netty.channel.ChannelDuplexHandler;
-import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelHandler.Sharable;
+import io.netty.channel.ChannelHandlerContext;
 import io.netty.util.concurrent.ScheduledFuture;
 
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.logging.Log;
@@ -13,35 +12,37 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.integration.core.MessagingTemplate;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
-import org.springframework.messaging.MessageHeaders;
 import org.springframework.messaging.PollableChannel;
-import org.springframework.messaging.converter.MessageConverter;
 import org.springframework.util.Assert;
-
-import com.google.common.collect.Maps;
 
 @Sharable
 public class NettyMessageHandler extends ChannelDuplexHandler {
 
 	protected static Log logger = LogFactory.getLog(NettyMessageHandler.class);
 
-	private MessagingTemplate template = new MessagingTemplate();
-	private MessageConverter converter;
+	private ScheduledFuture<?> scheduledFuture;
+
+	private MessagingTemplate template;
 	private MessageChannel sendChannel;
 	private PollableChannel receiveChannel;
 
-	private ScheduledFuture<?> scheduledFuture;
-
-	public NettyMessageHandler(MessageChannel sendChannel, PollableChannel receiveChannel, long timeout){
-		this(new NettyMessageConverter(), sendChannel, receiveChannel, timeout);
-	}
-	public NettyMessageHandler(MessageConverter converter, MessageChannel sendChannel, PollableChannel receiveChannel, long timeout){
-		Assert.notNull(converter, "converter must not be null.");
-		this.converter = converter;
+	public NettyMessageHandler(MessageChannel sendChannel, PollableChannel receiveChannel){
+		this.template = new MessagingTemplate();
 		this.sendChannel = sendChannel;
 		this.receiveChannel = receiveChannel;
+	}
+	public NettyMessageHandler(MessageChannel sendChannel, PollableChannel receiveChannel, long timeout){
+		this.template = new MessagingTemplate();
 		template.setReceiveTimeout(timeout);
 		template.setSendTimeout(timeout);
+		this.sendChannel = sendChannel;
+		this.receiveChannel = receiveChannel;
+	}
+	public NettyMessageHandler(MessageChannel sendChannel, PollableChannel receiveChannel, MessagingTemplate template){
+		Assert.notNull(template, "template must not be null.");
+		this.template = template;
+		this.sendChannel = sendChannel;
+		this.receiveChannel = receiveChannel;
 	}
 
 	@Override
@@ -66,8 +67,7 @@ public class NettyMessageHandler extends ChannelDuplexHandler {
 	@Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
 		if(sendChannel != null){
-    		//logger.debug("channelRead");
-    		Runnable worker = new SendChannelWorker(this, ctx, msg);
+    		Runnable worker = new SendChannelWorker(this, msg);
     		ctx.executor().submit(worker);
     	}
     	super.channelRead(ctx, msg);
@@ -82,52 +82,48 @@ public class NettyMessageHandler extends ChannelDuplexHandler {
 	
 	private static class ReceiveChannelWorker implements Runnable{
 
-		private final NettyMessageHandler handler;
+		private final MessagingTemplate template;
+		private final PollableChannel receiveChannel;
 		private final ChannelHandlerContext ctx;
 		
 		private ReceiveChannelWorker(NettyMessageHandler handler, ChannelHandlerContext ctx){
-			this.handler = handler;
 			this.ctx = ctx;
+			this.template = handler.template;
+			this.receiveChannel = handler.receiveChannel;
 		}
 		
 		@Override
 		public void run() {
     		try{
-	    		Message<?> message = handler.template.receive(handler.receiveChannel);
+	    		Message<?> message = template.receive(receiveChannel);
         		if(message != null){
-    	    		Object msg = handler.converter.fromMessage(message, null);
-            		ctx.writeAndFlush(msg);
-            		logger.info("Write Netty Message: "+msg);
+            		ctx.writeAndFlush(message.getPayload());
+            		logger.info("Write Netty Message: "+message);
         		}
     		}catch(Exception e){
-    			//e.printStackTrace();
+    			e.printStackTrace();
     		}
 		}
 	}
 	
 	private static class SendChannelWorker implements Runnable{
 
-		private final NettyMessageHandler handler;
-		private final ChannelHandlerContext ctx;
+		private final MessagingTemplate template;
+		private final MessageChannel sendChannel;
 		private final Object payload;
 		
-		private SendChannelWorker(NettyMessageHandler handler, ChannelHandlerContext ctx, Object payload){
-			this.handler = handler;
-			this.ctx = ctx;
+		private SendChannelWorker(NettyMessageHandler handler, Object payload){
+			this.template = handler.template;
+			this.sendChannel = handler.sendChannel;
 			this.payload = payload;
 		}
 		
 		@Override
 		public void run() {
     		try{
-    			Map<String, Object> headers = Maps.newHashMap();
-    			headers.put(NettyHeaders.REMOTE_ADDRESS, ctx.channel().remoteAddress().toString());
-    			
-	    		Message<?> message = handler.converter.toMessage(payload, new MessageHeaders(headers));
-        		if(message != null){
-        			logger.info("Read Netty Message: "+payload);
-        			handler.template.send(handler.sendChannel, message);
-        		}
+    			logger.info("Read Netty Message: "+payload);
+    			template.convertAndSend(sendChannel, payload);
+
     		}catch(Exception e){
     			e.printStackTrace();
     		}

@@ -8,7 +8,7 @@
 
 	<bean id="http" class="io.github.u2ware.integration.netty.support.HttpResourceServer">
 		<property name="port" value="9095"/>
-		<property name="resourceLocation" value="classpath:"/>
+		<property name="resourceLocation" value="classpath:io/github/u2ware/integration/netty/test/resource/"/>
 	</bean>
 	
 	
