@@ -158,6 +158,11 @@ public class HttpWebmvcHandler extends SimpleChannelInboundHandler<FullHttpReque
 				response.headers().add(name, value);
 			}
 		}
+		response.headers().set("Access-Control-Allow-Credentials", true);
+		response.headers().set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, PUT, DELETE");
+		response.headers().set("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");		
+		response.headers().set("Access-Control-Allow-Origin", "*");
+		response.headers().set("Access-Control-Max-Age", "3600");
 
 		// Write the initial line and the header.
 		channelHandlerContext.write(response);

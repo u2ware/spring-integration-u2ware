@@ -126,10 +126,11 @@ public class HttpResourceHandler extends SimpleChannelInboundHandler<FullHttpReq
         if (HttpHeaders.isKeepAlive(request)) {
             response.headers().set(CONNECTION, HttpHeaders.Values.KEEP_ALIVE);
         }
+		response.headers().set("Access-Control-Allow-Credentials", true);
+		response.headers().set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, PUT, DELETE");
+		response.headers().set("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");		
 		response.headers().set("Access-Control-Allow-Origin", "*");
-		response.headers().set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, DELETE");
 		response.headers().set("Access-Control-Max-Age", "3600");
-		response.headers().set("Access-Control-Allow-Headers", "x-requested-with");		
 
         
         // Write the initial line and the header.

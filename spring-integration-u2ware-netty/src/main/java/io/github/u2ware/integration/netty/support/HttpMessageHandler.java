@@ -172,11 +172,12 @@ public class HttpMessageHandler extends SimpleChannelInboundHandler<FullHttpRequ
 			}
         }
 		response.headers().set(HttpHeaders.Names.CONTENT_LENGTH, content.readableBytes());
+		response.headers().set("Access-Control-Allow-Credentials", true);
+		response.headers().set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, PUT, DELETE");
+		response.headers().set("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");		
 		response.headers().set("Access-Control-Allow-Origin", "*");
-		response.headers().set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, DELETE");
 		response.headers().set("Access-Control-Max-Age", "3600");
-		response.headers().set("Access-Control-Allow-Headers", "x-requested-with");		
-
+        
 		return response;
 	}
 }
