@@ -23,7 +23,7 @@ public class EchoClientTest {
 	@BeforeClass
 	public static void beforeClass() throws Exception{
 		echoServer = new EchoServer();
-		echoServer.setPort(9091);
+		echoServer.setPort(10602);
 		echoServer.afterPropertiesSet();
 	}
 	@AfterClass
@@ -43,6 +43,8 @@ public class EchoClientTest {
 
 	@Test
 	public void testRunning() throws Exception {
+		
+		
 
 		Thread.sleep(2000);
 		echoRequest.send(MessageBuilder.withPayload("MESSAGE\n").build());

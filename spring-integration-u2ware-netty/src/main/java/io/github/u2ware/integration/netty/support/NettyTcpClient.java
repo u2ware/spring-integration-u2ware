@@ -1,9 +1,11 @@
-package io.github.u2ware.integration.netty.core;
+package io.github.u2ware.integration.netty.support;
 
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelOption;
 import io.netty.channel.ChannelPipeline;
@@ -32,6 +34,7 @@ public abstract class NettyTcpClient extends ChannelInitializer<Channel> impleme
 	private String host;
 	private int port;
 	private boolean ssl;
+	private boolean autoConnection;
 	private EventLoopGroup group;
 
 	public String getHost() {
@@ -52,17 +55,29 @@ public abstract class NettyTcpClient extends ChannelInitializer<Channel> impleme
 	public void setSsl(boolean ssl) {
 		this.ssl = ssl;
 	}
-	
-	
+	public boolean isAutoConnection() {
+		return autoConnection;
+	}
+	public void setAutoConnection(boolean autoConnection) {
+		this.autoConnection = autoConnection;
+	}
+
 	@Override
 	public void afterPropertiesSet() throws Exception {
+    	logger.info("["+getHost()+":"+getPort()+"] is initailize. ");
+        System.out.println("["+getHost()+":"+getPort()+"] is initailize. ");
         this.group = new NioEventLoopGroup();
         connect(new Bootstrap(), group);
 	}
-	
-	
-	private void connect(Bootstrap b, EventLoopGroup group) {
+	@Override
+	public void destroy() throws Exception {
+		disconnect(group);
+	}
 
+	///////////////////
+	//
+	///////////////////
+	private void connect(Bootstrap b, EventLoopGroup group)  {
         b.group(group)
          .channel(NioSocketChannel.class)
          .option(ChannelOption.TCP_NODELAY, true)
@@ -70,47 +85,20 @@ public abstract class NettyTcpClient extends ChannelInitializer<Channel> impleme
         
         initBootstrap(b);
         
-        
-        b.connect(getHost(), getPort()).addListener(new ChannelFutureListener(){
-
-			@Override
-			public void operationComplete(ChannelFuture future) throws Exception {
-
-				if(future.isSuccess()){
-			        logger.info("["+getHost()+":"+getPort()+"] is opened. ");
-			        System.out.println("["+getHost()+":"+getPort()+"] is opened. ");
-				}else{
-			        logger.info("["+getHost()+":"+getPort()+"] is failured. ");
-			        System.out.println("["+getHost()+":"+getPort()+"] is failured. ");
-
-					final EventLoop loop = future.channel().eventLoop();  
-					loop.schedule(new Runnable() {
-						@Override
-						public void run() {
-							connect(new Bootstrap(), loop);
-						}  
-						
-					}, 3, TimeUnit.SECONDS);
-				}
-			}
-        });
+        if(isAutoConnection()){
+            b.connect(getHost(), getPort()).addListener(new ConnectionListener());
+        }else{
+        	b.connect(getHost(), getPort());
+        }
 	}
-	
-	
-	@Override
-	public void destroy() throws Exception {
-        try {
-            // Wait until the connection is closed.
-            //f.channel().closeFuture().sync();
-        } finally {
-        	if(group != null)
+
+	private void disconnect(EventLoopGroup group) {
+    	if(group != null){
             // Shut down the event loop to terminate all threads.
             group.shutdownGracefully();
-	        logger.info("["+getHost()+":"+getPort()+"] is closed. ");
-	        System.out.println("["+getHost()+":"+getPort()+"] is closed. ");
-
-            group = null;
-        }
+        	logger.info("["+getHost()+":"+getPort()+"] is destory. ");
+            System.out.println("["+getHost()+":"+getPort()+"] is destory. ");
+    	}
 	}
 	
 	protected void initBootstrap(Bootstrap b) {
@@ -119,6 +107,9 @@ public abstract class NettyTcpClient extends ChannelInitializer<Channel> impleme
 	@Override
 	protected void initChannel(Channel ch) throws Exception{
 		ChannelPipeline pipeline = ch.pipeline();
+		if(isAutoConnection()){
+			pipeline.addLast(new ConnectionHandler());
+		}
 		if(isSsl()){
 			SslHandler handler = createSslHandler(ch);
 			if(handler != null){
@@ -132,5 +123,43 @@ public abstract class NettyTcpClient extends ChannelInitializer<Channel> impleme
 	protected SslHandler createSslHandler(Channel channel) throws SSLException {
 		SslContext sslCtx = SslContextBuilder.forClient().trustManager(InsecureTrustManagerFactory.INSTANCE).build();
 		return sslCtx.newHandler(channel.alloc(), getHost(), getPort());
+	}
+	
+	
+	@Sharable
+	private class ConnectionHandler extends ChannelInboundHandlerAdapter{
+		
+		@Override
+		public void channelActive(ChannelHandlerContext ctx) throws Exception {
+	    	logger.info("["+getHost()+":"+getPort()+"] is connected. ");
+	        System.out.println("["+getHost()+":"+getPort()+"] is connected. ");
+			super.channelActive(ctx);
+		}
+		
+		@Override
+		public void channelInactive(ChannelHandlerContext ctx) throws Exception {
+			final EventLoop eventLoop = ctx.channel().eventLoop();  
+			eventLoop.schedule(new Runnable() {  
+				public void run() {  
+					connect(new Bootstrap(), eventLoop);  
+				}  
+			}, 3, TimeUnit.SECONDS);  
+			super.channelInactive(ctx);
+		}
+	}
+	
+	private class ConnectionListener implements ChannelFutureListener{
+
+		public void operationComplete(ChannelFuture future) throws Exception {
+			if(! future.isSuccess()){
+				final EventLoop loop = future.channel().eventLoop();  
+				loop.schedule(new Runnable() {
+					@Override
+					public void run() {
+						connect(new Bootstrap(), loop);
+					}  
+				}, 3, TimeUnit.SECONDS);
+			}
+		}
 	}
 }

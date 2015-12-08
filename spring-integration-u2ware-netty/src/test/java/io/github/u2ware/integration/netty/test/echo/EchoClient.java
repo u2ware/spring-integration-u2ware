@@ -1,7 +1,7 @@
 package io.github.u2ware.integration.netty.test.echo;
 
-import io.github.u2ware.integration.netty.core.NettyTcpClient;
 import io.github.u2ware.integration.netty.support.NettyMessageHandler;
+import io.github.u2ware.integration.netty.support.NettyTcpClient;
 import io.netty.channel.ChannelPipeline;
 import io.netty.handler.codec.LineBasedFrameDecoder;
 import io.netty.handler.codec.string.StringDecoder;

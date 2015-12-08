@@ -1,6 +1,5 @@
 package io.github.u2ware.integration.netty.support;
 
-import io.github.u2ware.integration.netty.core.NettyTcpServer;
 import io.netty.channel.ChannelPipeline;
 import io.netty.handler.codec.http.HttpContentCompressor;
 import io.netty.handler.codec.http.HttpObjectAggregator;

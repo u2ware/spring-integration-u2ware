@@ -24,7 +24,7 @@ public class HttpEchoServerTest {
 	@BeforeClass
 	public static void beforeClass() throws Exception{
 		echoServer = new EchoServer();
-		echoServer.setPort(9092);
+		echoServer.setPort(10603);
 		echoServer.afterPropertiesSet();
 	}
 	@AfterClass
@@ -39,7 +39,7 @@ public class HttpEchoServerTest {
 		//httpResponse.send(MessageBuilder.withPayload("hello world").build());
 		
 		RestTemplate restTemplate = new RestTemplate();
-		String result = restTemplate.postForObject("http://localhost:9094", "hello world~", String.class);
+		String result = restTemplate.postForObject("http://localhost:10604", "hello world~", String.class);
 		logger.debug(result);
 		Assert.assertEquals("hello world~", result);
 	}

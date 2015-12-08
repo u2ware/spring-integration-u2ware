@@ -7,7 +7,7 @@
 
 
 	<bean id="echoHttp" class="io.github.u2ware.integration.netty.support.HttpMessageServer">
-		<property name="port" value="9094"/>
+		<property name="port" value="10604"/>
 		<property name="receiveChannel" ref="echoResponse"/>
 		<property name="sendChannel" ref="httpRequest"/>
 	</bean>
@@ -29,7 +29,7 @@
 	
 	<bean id="echoClient" class="io.github.u2ware.integration.netty.test.echo.EchoClient">
 		<property name="host" value="127.0.0.1"/>
-		<property name="port" value="9092"/>
+		<property name="port" value="10603"/>
 		<property name="receiveChannel" ref="echoRequest"/>
 		<property name="sendChannel" ref="echoResponse"/>
 	</bean>

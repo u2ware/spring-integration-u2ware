@@ -7,7 +7,7 @@
 
 
 	<bean id="httpServer" class="io.github.u2ware.integration.netty.support.HttpWebmvcServer">
-		<property name="port" value="9096"/>
+		<property name="port" value="10607"/>
 		<property name="configClass" value="io.github.u2ware.integration.netty.test.http_webmvc_server.app.AppConfig"/>
 	</bean>
 

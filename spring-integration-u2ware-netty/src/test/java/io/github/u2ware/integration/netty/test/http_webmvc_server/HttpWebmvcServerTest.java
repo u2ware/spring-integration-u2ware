@@ -21,7 +21,7 @@ public class HttpWebmvcServerTest {
 		Thread.sleep(3000);
 
 		RestTemplate restTemplate = new RestTemplate();
-		String result = restTemplate.getForObject("http://localhost:9096/hello",  String.class);
+		String result = restTemplate.getForObject("http://localhost:10607/hello",  String.class);
 		logger.debug(result);
 		Assert.assertEquals("hello world", result);
 	}
