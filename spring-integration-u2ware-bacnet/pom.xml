@@ -10,12 +10,7 @@
 		<version>1.0.0</version>
 	</parent>
 
-
 	<repositories>
-	    <repository>
-	        <id>u2ware-mvm-repo</id>
-	        <url>https://raw.github.com/u2ware/u2ware.github.com/mvn-repo/</url>
-	    </repository>
 	    <repository>
 	        <id>bacnet4j-mvn-repo</id>
 	        <url>https://raw.github.com/u2ware/BACnet4j/mvn-repo/</url>
@@ -27,15 +22,7 @@
 	  		<groupId>com.serotonin</groupId>
 	  		<artifactId>bacnet4j</artifactId>
 	  		<version>3.1.1</version>
-	  		<exclusions>
-	  			<exclusion>
-		            <groupId>org.slf4j</groupId>
-		            <artifactId>slf4j-simple</artifactId>
-	  			</exclusion>
-	  		</exclusions>
-	  	</dependency>
-	  	
-	  	
+	  	</dependency>	  		  	
 	</dependencies>
 
 
