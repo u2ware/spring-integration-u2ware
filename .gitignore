@@ -20,5 +20,10 @@ target/
 
 recycle/
 mvn-repo/
+
 spring-integration-u2ware-template/
+spring-integration-u2ware-hyundai-elevator/
+spring-integration-u2ware-siemens-fire/
+
+spring-integration-u2ware-unknown-elevator/
 
