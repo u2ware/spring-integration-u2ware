@@ -1,4 +1,4 @@
-package io.github.u2ware.integration.netty.support;
+package io.github.u2ware.integration.netty.test.http_webmvc_server;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -11,17 +11,19 @@ import org.springframework.web.client.RestTemplate;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration
-public class HttpResourceServerTest {
+public class HttpWebmvcServerTest {
 
     protected Log logger = LogFactory.getLog(getClass());
 
 	@Test
-	public void test() throws Exception{
-				
+	public void test() throws Exception {
+
+		Thread.sleep(3000);
+
 		RestTemplate restTemplate = new RestTemplate();
-		String result = restTemplate.getForObject("http://localhost:9095/a/b/c.html", String.class);
+		String result = restTemplate.getForObject("http://localhost:9096/hello",  String.class);
 		logger.debug(result);
-		Assert.assertEquals("<html><body><h1>Hello World!!</h1></body></html>", result);
+		Assert.assertEquals("hello world", result);
 	}
 }
 

@@ -6,11 +6,9 @@
 	   xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd http://www.springframework.org/schema/integration http://www.springframework.org/schema/integration/spring-integration.xsd">
 
 
-	<bean id="http" class="io.github.u2ware.integration.netty.support.HttpResourceServer">
-		<property name="port" value="9095"/>
-		<property name="resourceLocation" value="classpath:io/github/u2ware/integration/netty/test/resource/"/>
+	<bean id="httpServer" class="io.github.u2ware.integration.netty.support.HttpWebmvcServer">
+		<property name="port" value="9096"/>
+		<property name="configClass" value="io.github.u2ware.integration.netty.test.http_webmvc_server.app.AppConfig"/>
 	</bean>
-	
-	
-	
+
 </beans>

@@ -1,4 +1,4 @@
-package io.github.u2ware.integration.netty.support;
+package io.github.u2ware.integration.netty.test.http_echo_server;
 
 import io.github.u2ware.integration.netty.test.echo.EchoServer;
 

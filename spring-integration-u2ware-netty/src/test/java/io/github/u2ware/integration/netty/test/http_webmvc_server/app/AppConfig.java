@@ -1,4 +1,4 @@
-package io.github.u2ware.integration.netty.test.webmvc;
+package io.github.u2ware.integration.netty.test.http_webmvc_server.app;
 
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;

@@ -1,4 +1,4 @@
-package io.github.u2ware.integration.netty.test.webmvc.controller;
+package io.github.u2ware.integration.netty.test.http_webmvc_server.app;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
