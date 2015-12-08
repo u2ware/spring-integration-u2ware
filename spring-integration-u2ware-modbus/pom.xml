@@ -10,15 +10,7 @@
 		<version>1.0.0</version>
 	</parent>
 
-	<repositories>
-	    <repository>
-	        <id>u2ware-mvm-repo</id>
-	        <url>https://raw.github.com/u2ware/u2ware.github.com/mvn-repo/</url>
-	    </repository>
-	</repositories>
-
 	<dependencies>
-
 		<dependency>
 		    <groupId>net.wimpi</groupId>
 		    <artifactId>jamod</artifactId>
