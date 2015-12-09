@@ -22,8 +22,8 @@ recycle/
 mvn-repo/
 
 spring-integration-u2ware-template/
-spring-integration-u2ware-hyundai-elevator/
-spring-integration-u2ware-siemens-fire/
 
-spring-integration-u2ware-unknown-elevator/
+spring-integration-u2ware-netty-hyundai-elevator/
+spring-integration-u2ware-netty-siemens-fire/
+spring-integration-u2ware-netty-unknown-elevator/
 
