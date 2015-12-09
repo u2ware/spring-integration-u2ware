@@ -1,7 +1,7 @@
 package io.github.u2ware.integration.netty.x;
 
-import io.github.u2ware.integration.netty.NettyMessageHandler;
-import io.github.u2ware.integration.netty.AbstractTcpClient;
+import io.github.u2ware.integration.netty.core.AbstractTcpClient;
+import io.github.u2ware.integration.netty.support.NettyMessageHandler;
 import io.netty.channel.ChannelPipeline;
 import io.netty.handler.codec.LineBasedFrameDecoder;
 import io.netty.handler.codec.string.StringDecoder;

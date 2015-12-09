@@ -1,4 +1,4 @@
-package io.github.u2ware.integration.netty;
+package io.github.u2ware.integration.netty.core;
 
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.Channel;

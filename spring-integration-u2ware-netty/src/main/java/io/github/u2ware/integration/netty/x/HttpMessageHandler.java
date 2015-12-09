@@ -1,6 +1,6 @@
 package io.github.u2ware.integration.netty.x;
 
-import io.github.u2ware.integration.netty.NettyHeaders;
+import io.github.u2ware.integration.netty.support.NettyHeaders;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
 import io.netty.buffer.UnpooledByteBufAllocator;

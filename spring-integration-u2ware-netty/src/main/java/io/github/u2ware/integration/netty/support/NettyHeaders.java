@@ -1,4 +1,4 @@
-package io.github.u2ware.integration.netty;
+package io.github.u2ware.integration.netty.support;
 
 
 /**
