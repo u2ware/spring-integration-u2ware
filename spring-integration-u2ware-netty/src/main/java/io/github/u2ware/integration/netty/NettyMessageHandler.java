@@ -1,4 +1,4 @@
-package io.github.u2ware.integration.netty.support;
+package io.github.u2ware.integration.netty;
 
 import io.netty.channel.ChannelDuplexHandler;
 import io.netty.channel.ChannelHandler.Sharable;

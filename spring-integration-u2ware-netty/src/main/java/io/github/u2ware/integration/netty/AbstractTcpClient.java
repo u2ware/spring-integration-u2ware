@@ -1,4 +1,4 @@
-package io.github.u2ware.integration.netty.core;
+package io.github.u2ware.integration.netty;
 
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
@@ -27,7 +27,7 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 
-public abstract class NettyTcpClient extends ChannelInitializer<Channel> implements InitializingBean, DisposableBean{
+public abstract class AbstractTcpClient extends ChannelInitializer<Channel> implements InitializingBean, DisposableBean{
 	
 	protected Log logger = LogFactory.getLog(getClass());
 

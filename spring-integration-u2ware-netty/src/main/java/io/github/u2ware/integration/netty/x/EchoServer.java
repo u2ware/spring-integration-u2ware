@@ -1,12 +1,12 @@
 package io.github.u2ware.integration.netty.x;
 
-import io.github.u2ware.integration.netty.core.NettyTcpServer;
+import io.github.u2ware.integration.netty.AbstractTcpServer;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.channel.ChannelPipeline;
 import io.netty.handler.codec.LineBasedFrameDecoder;
 
-public class EchoServer extends NettyTcpServer{
+public class EchoServer extends AbstractTcpServer{
 
 	public static void main(String[] args) throws Exception{
 		int port = 10601;
