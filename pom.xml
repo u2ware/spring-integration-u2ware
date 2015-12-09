@@ -34,8 +34,12 @@
 			<version>16.0.1</version>
 			<scope>provided</scope>
 		</dependency>
-<!-- 
- -->
+		<dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-context-support</artifactId>
+			<scope>provided</scope>
+        </dependency>
+
  		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter</artifactId>
@@ -71,13 +75,7 @@
 			<artifactId>spring-boot-starter-integration</artifactId>
 			<scope>provided</scope>
 		</dependency>
-<!-- 		
-		<dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-context-support</artifactId>
-			<scope>provided</scope>
-        </dependency>
- -->
+
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>

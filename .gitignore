@@ -21,8 +21,8 @@ target/
 recycle/
 mvn-repo/
 
-spring-integration-u2ware-template/
 
+spring-integration-u2ware-template/
 spring-integration-u2ware-netty-http/
 spring-integration-u2ware-netty-hyundai-elevator/
 spring-integration-u2ware-netty-siemens-fire/
