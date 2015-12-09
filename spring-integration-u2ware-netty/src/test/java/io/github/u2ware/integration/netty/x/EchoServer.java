@@ -1,6 +1,6 @@
-package io.github.u2ware.integration.netty.test.echo;
+package io.github.u2ware.integration.netty.x;
 
-import io.github.u2ware.integration.netty.support.NettyTcpServer;
+import io.github.u2ware.integration.netty.core.NettyTcpServer;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.channel.ChannelPipeline;

@@ -15,13 +15,6 @@
 		    <artifactId>netty-all</artifactId>
 		    <version>4.0.30.Final</version>
 		</dependency>
-		
-		<dependency>
-		    <groupId>javax.servlet</groupId>
-		    <artifactId>javax.servlet-api</artifactId>
-			<scope>test</scope>
-		</dependency>
-		
 	</dependencies>
 
 </project>
