@@ -8,6 +8,8 @@ import io.netty.handler.codec.http.HttpRequestDecoder;
 import io.netty.handler.codec.http.HttpResponseEncoder;
 import io.netty.handler.stream.ChunkedWriteHandler;
 
+import java.util.Arrays;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.DisposableBean;
@@ -52,6 +54,16 @@ public class HttpServletServer extends AbstractTcpServer implements EnvironmentA
 		this.dispatcherServlet.init(servletConfig);
 
 		
+		String[] beanNames = wac.getBeanDefinitionNames();
+		Arrays.sort(beanNames);
+		for(String beanName : beanNames){
+			Object beanObject = wac.getBean(beanName);
+			if(beanObject != null){
+				nettyLogger.debug(beanName+"="+beanObject.getClass());
+			}else{
+				nettyLogger.debug(beanName+"="+null);
+			}
+		}
 		//set spring config in xml
 		//this.dispatcherServlet = new DispatcherServlet();
 		//this.dispatcherServlet.setContextConfigLocation("classpath*:/applicationContext.xml");
