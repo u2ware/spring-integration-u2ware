@@ -9,15 +9,23 @@ import io.netty.handler.codec.LineBasedFrameDecoder;
 public class EchoServer extends AbstractTcpServer{
 
 	public static void main(String[] args) throws Exception{
-		int port = 10601;
+		int port = 10900;
 		try{
 			port = Integer.parseInt(args[0]);
 		}catch(Exception e){
 		}
-
-		EchoServer s = new EchoServer();
-		s.setPort(port);
-		s.afterPropertiesSet();
+		EchoServer.startup(port);
+	}
+	
+	private static EchoServer echoServer;
+	
+	public static void startup(int port) throws Exception{
+		echoServer = new EchoServer();
+		echoServer.setPort(port);
+		echoServer.afterPropertiesSet();
+	}
+	public static void shutdown() throws Exception{
+		echoServer.destroy();
 	}
 	
 	

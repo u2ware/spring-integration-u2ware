@@ -7,8 +7,6 @@ import io.netty.util.concurrent.ScheduledFuture;
 
 import java.util.concurrent.TimeUnit;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.springframework.integration.core.MessagingTemplate;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
@@ -16,29 +14,27 @@ import org.springframework.messaging.PollableChannel;
 import org.springframework.util.Assert;
 
 @Sharable
-public class NettyMessageHandler extends ChannelDuplexHandler {
-
-	protected static Log logger = LogFactory.getLog(NettyMessageHandler.class);
+public class NettyMessagingHandler extends ChannelDuplexHandler {
 
 	private ScheduledFuture<?> scheduledFuture;
 
-	private MessagingTemplate template;
-	private MessageChannel sendChannel;
-	private PollableChannel receiveChannel;
+	private final MessagingTemplate template;
+	private final MessageChannel sendChannel;
+	private final PollableChannel receiveChannel;
 
-	public NettyMessageHandler(MessageChannel sendChannel, PollableChannel receiveChannel){
+	public NettyMessagingHandler(MessageChannel sendChannel, PollableChannel receiveChannel){
 		this.template = new MessagingTemplate();
 		this.sendChannel = sendChannel;
 		this.receiveChannel = receiveChannel;
 	}
-	public NettyMessageHandler(MessageChannel sendChannel, PollableChannel receiveChannel, long timeout){
+	public NettyMessagingHandler(MessageChannel sendChannel, PollableChannel receiveChannel, long timeout){
 		this.template = new MessagingTemplate();
 		template.setReceiveTimeout(timeout);
 		template.setSendTimeout(timeout);
 		this.sendChannel = sendChannel;
 		this.receiveChannel = receiveChannel;
 	}
-	public NettyMessageHandler(MessageChannel sendChannel, PollableChannel receiveChannel, MessagingTemplate template){
+	public NettyMessagingHandler(MessageChannel sendChannel, PollableChannel receiveChannel, MessagingTemplate template){
 		Assert.notNull(template, "template must not be null.");
 		this.template = template;
 		this.sendChannel = sendChannel;
@@ -86,7 +82,7 @@ public class NettyMessageHandler extends ChannelDuplexHandler {
 		private final PollableChannel receiveChannel;
 		private final ChannelHandlerContext ctx;
 		
-		private ReceiveChannelWorker(NettyMessageHandler handler, ChannelHandlerContext ctx){
+		private ReceiveChannelWorker(NettyMessagingHandler handler, ChannelHandlerContext ctx){
 			this.ctx = ctx;
 			this.template = handler.template;
 			this.receiveChannel = handler.receiveChannel;
@@ -98,7 +94,6 @@ public class NettyMessageHandler extends ChannelDuplexHandler {
 	    		Message<?> message = template.receive(receiveChannel);
         		if(message != null){
             		ctx.writeAndFlush(message.getPayload());
-            		logger.info("Write Netty Message: "+message);
         		}
     		}catch(Exception e){
     			e.printStackTrace();
@@ -112,7 +107,7 @@ public class NettyMessageHandler extends ChannelDuplexHandler {
 		private final MessageChannel sendChannel;
 		private final Object payload;
 		
-		private SendChannelWorker(NettyMessageHandler handler, Object payload){
+		private SendChannelWorker(NettyMessagingHandler handler, Object payload){
 			this.template = handler.template;
 			this.sendChannel = handler.sendChannel;
 			this.payload = payload;
@@ -121,7 +116,6 @@ public class NettyMessageHandler extends ChannelDuplexHandler {
 		@Override
 		public void run() {
     		try{
-    			logger.info("Read Netty Message: "+payload);
     			template.convertAndSend(sendChannel, payload);
 
     		}catch(Exception e){

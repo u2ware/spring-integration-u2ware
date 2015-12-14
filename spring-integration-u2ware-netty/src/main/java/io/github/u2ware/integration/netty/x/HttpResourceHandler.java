@@ -46,7 +46,6 @@ import java.util.TimeZone;
 import java.util.regex.Pattern;
 
 import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.mail.javamail.ConfigurableMimeFileTypeMap;
@@ -58,19 +57,20 @@ public class HttpResourceHandler extends SimpleChannelInboundHandler<FullHttpReq
     public static final String HTTP_DATE_GMT_TIMEZONE = "GMT";
     public static final int HTTP_CACHE_SECONDS = 60;
 
-    protected Log logger = LogFactory.getLog(getClass());
-    
-	public ResourceLoader resourceLoader;
-	public String resourceLocation;
+    private Log nettyLogger;
+	private ResourceLoader resourceLoader;
+	private String resourceLocation;
 
-	public HttpResourceHandler(ResourceLoader resourceLoader, String resourceLocation){
+	public HttpResourceHandler(Log nettyLogger, ResourceLoader resourceLoader, String resourceLocation){
+		this.nettyLogger = nettyLogger;
 		this.resourceLoader = resourceLoader;
 		this.resourceLocation = resourceLocation;
 	}
     
     @Override
     public void channelRead0(ChannelHandlerContext ctx, FullHttpRequest request) throws Exception {
-        if (!request.getDecoderResult().isSuccess()) {
+
+    	if (!request.getDecoderResult().isSuccess()) {
             sendError(ctx, BAD_REQUEST);
             return;
         }
@@ -80,23 +80,17 @@ public class HttpResourceHandler extends SimpleChannelInboundHandler<FullHttpReq
             return;
         }
 
+		nettyLogger.info(new StringBuilder().append(ctx.channel().toString()).append(" READ0").append("\n").append(request.toString()));
+        
         final String uri = request.getUri();
-    	//logger.info(ctx.channel() + " Request Uri: "+uri);
-        
-        
         final Resource resource = sanitizeResource(resourceLoader, resourceLocation, uri);
     	
         if (resource == null) {
             sendError(ctx, NOT_FOUND);
             return;
         }
-        //Thread.sleep(10000);
-    	//logger.info(ctx.channel() + " Request Resource: "+resource.exists());
-    	//logger.info(ctx.channel() + " Request Resource: "+resource.getClass());
-    	//logger.info(ctx.channel() + " Request Resource: "+resource.getFilename());
-    	logger.info(ctx.channel() + " Request Resource: "+resource.getURL());
-    	//logger.info(ctx.channel() + " Request Resource: "+resource.contentLength());
-    	//logger.info(ctx.channel() + " Request Resource: "+resource.lastModified());
+
+		nettyLogger.info(new StringBuilder().append(ctx.channel().toString()).append(" READ0").append("\n").append(resource.toString()));
         
     	long contentLength = resource.contentLength();
     	long lastModified = resource.lastModified();
@@ -113,7 +107,6 @@ public class HttpResourceHandler extends SimpleChannelInboundHandler<FullHttpReq
             long fileLastModifiedSeconds = lastModified / 1000;
             if (ifModifiedSinceDateSeconds == fileLastModifiedSeconds) {
                 sendNotModified(ctx);
-            	logger.info(ctx.channel() + " Response complete.");
                 return;
             }
         }
@@ -137,23 +130,24 @@ public class HttpResourceHandler extends SimpleChannelInboundHandler<FullHttpReq
         ctx.write(response);
 
         // Write the content.
-        ChannelFuture sendFileFuture = ctx.writeAndFlush(new ChunkedStream(resource.getInputStream()));
+        ChannelFuture sendFileFuture = ctx.writeAndFlush(new ChunkedStream(resource.getInputStream()), ctx.newProgressivePromise());
         sendFileFuture.addListener(new ChannelProgressiveFutureListener() {
             
         	@Override
             public void operationProgressed(ChannelProgressiveFuture future, long progress, long total) {
                 if (total < 0) { // total unknown
-                	logger.info(future.channel() + " Response progress: " + progress);
+                	//logger.info(future.channel() + " Response progress: " + progress);
                 } else {
-                	logger.info(future.channel() + " Response progress: " + progress + " / " + total);
+                	//logger.info(future.channel() + " Response progress: " + progress + " / " + total);
                 }
             }
 
             @Override
             public void operationComplete(ChannelProgressiveFuture future) {
-            	logger.info(future.channel() + " Response complete.");
+            	//logger.info(future.channel() + " Response complete.");
             }
         });
+		nettyLogger.info(new StringBuilder().append(ctx.channel().toString()).append(" READ0").append("\n").append(response.toString()));
         
         sendFileFuture.addListener(ChannelFutureListener.CLOSE);
     }

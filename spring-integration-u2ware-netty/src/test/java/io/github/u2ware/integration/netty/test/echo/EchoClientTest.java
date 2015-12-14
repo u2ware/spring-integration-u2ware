@@ -1,4 +1,6 @@
-package io.github.u2ware.integration.netty.x;
+package io.github.u2ware.integration.netty.test.echo;
+
+import io.github.u2ware.integration.netty.x.EchoServer;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -18,17 +20,13 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @ContextConfiguration
 public class EchoClientTest {
 
-	protected static EchoServer echoServer;
-	
 	@BeforeClass
 	public static void beforeClass() throws Exception{
-		echoServer = new EchoServer();
-		echoServer.setPort(10602);
-		echoServer.afterPropertiesSet();
+		EchoServer.startup(10900);
 	}
 	@AfterClass
 	public static void afterClass() throws Exception{
-		echoServer.destroy();
+		EchoServer.shutdown();
 	}
 	
 	
@@ -44,8 +42,6 @@ public class EchoClientTest {
 	@Test
 	public void testRunning() throws Exception {
 		
-		
-
 		Thread.sleep(2000);
 		echoRequest.send(MessageBuilder.withPayload("MESSAGE\n").build());
 
@@ -57,5 +53,7 @@ public class EchoClientTest {
 
 		Thread.sleep(2000);
 		Assert.assertEquals(2, echoResponse.getQueueSize());
+		
+		Thread.sleep(2000);
 	}
 }

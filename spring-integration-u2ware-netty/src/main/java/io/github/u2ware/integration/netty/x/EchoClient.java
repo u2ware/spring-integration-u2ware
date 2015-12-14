@@ -1,18 +1,22 @@
 package io.github.u2ware.integration.netty.x;
 
 import io.github.u2ware.integration.netty.core.AbstractTcpClient;
-import io.github.u2ware.integration.netty.support.NettyMessageHandler;
+import io.github.u2ware.integration.netty.support.NettyLoggingHandler;
+import io.github.u2ware.integration.netty.support.NettyMessagingHandler;
 import io.netty.channel.ChannelPipeline;
 import io.netty.handler.codec.LineBasedFrameDecoder;
 import io.netty.handler.codec.string.StringDecoder;
 import io.netty.handler.codec.string.StringEncoder;
-import io.netty.handler.logging.LoggingHandler;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.PollableChannel;
 
 public class EchoClient extends AbstractTcpClient{
 	
+	private Log nettyLogger = LogFactory.getLog(getClass());
+
 	private MessageChannel sendChannel;
 	private PollableChannel receiveChannel;
 
@@ -25,10 +29,10 @@ public class EchoClient extends AbstractTcpClient{
 
 	@Override
 	protected void initChannelPipeline(ChannelPipeline pipeline) throws Exception {		
-		pipeline.addLast(new LoggingHandler(getClass()));
+		pipeline.addLast(new NettyLoggingHandler(nettyLogger));
 		pipeline.addLast(new StringEncoder());
 		pipeline.addLast(new LineBasedFrameDecoder(256));
 		pipeline.addLast(new StringDecoder());
-		pipeline.addLast(new NettyMessageHandler(sendChannel, receiveChannel, 100));
+		pipeline.addLast(new NettyMessagingHandler(sendChannel, receiveChannel, 100));
 	}
 }

@@ -22,15 +22,11 @@ import java.util.concurrent.TimeUnit;
 
 import javax.net.ssl.SSLException;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 
 public abstract class AbstractTcpClient extends ChannelInitializer<Channel> implements InitializingBean, DisposableBean{
 	
-	protected Log logger = LogFactory.getLog(getClass());
-
 	private String host;
 	private int port;
 	private boolean ssl;
@@ -64,8 +60,6 @@ public abstract class AbstractTcpClient extends ChannelInitializer<Channel> impl
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
-    	logger.info("["+getHost()+":"+getPort()+"] is initailize. ");
-        System.out.println("["+getHost()+":"+getPort()+"] is initailize. ");
         this.group = new NioEventLoopGroup();
         connect(new Bootstrap(), group);
 	}
@@ -96,8 +90,6 @@ public abstract class AbstractTcpClient extends ChannelInitializer<Channel> impl
     	if(group != null){
             // Shut down the event loop to terminate all threads.
             group.shutdownGracefully();
-        	logger.info("["+getHost()+":"+getPort()+"] is destory. ");
-            System.out.println("["+getHost()+":"+getPort()+"] is destory. ");
     	}
 	}
 	
@@ -107,6 +99,7 @@ public abstract class AbstractTcpClient extends ChannelInitializer<Channel> impl
 	@Override
 	protected void initChannel(Channel ch) throws Exception{
 		ChannelPipeline pipeline = ch.pipeline();
+		
 		if(isAutoConnection()){
 			pipeline.addLast(new ConnectionHandler());
 		}
@@ -131,8 +124,6 @@ public abstract class AbstractTcpClient extends ChannelInitializer<Channel> impl
 		
 		@Override
 		public void channelActive(ChannelHandlerContext ctx) throws Exception {
-	    	logger.info("["+getHost()+":"+getPort()+"] is connected. ");
-	        System.out.println("["+getHost()+":"+getPort()+"] is connected. ");
 			super.channelActive(ctx);
 		}
 		

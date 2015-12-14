@@ -17,15 +17,11 @@ import java.security.cert.CertificateException;
 
 import javax.net.ssl.SSLException;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
 
 public abstract class AbstractTcpServer extends ChannelInitializer<Channel> implements InitializingBean, DisposableBean{
-
-	protected Log logger = LogFactory.getLog(getClass());
 
 	private int port;
 	private boolean ssl;
@@ -64,8 +60,6 @@ public abstract class AbstractTcpServer extends ChannelInitializer<Channel> impl
         // Start the server.
         b.bind(getPort()).sync();
         
-		logger.info("[<local>:"+getPort()+"]  is opened.");
-		System.out.println("[<local>:"+getPort()+"]  is opened. ");
 	}
 	
 	@Override
@@ -79,8 +73,6 @@ public abstract class AbstractTcpServer extends ChannelInitializer<Channel> impl
             bossGroup.shutdownGracefully();
         	if(workerGroup != null)
             workerGroup.shutdownGracefully();
-    		logger.info("[<local>:"+getPort()+"]  is closed.");
-    		System.out.println("[<local>:"+getPort()+"]  is closed. ");
 
     		bossGroup = null;
     		workerGroup = null;

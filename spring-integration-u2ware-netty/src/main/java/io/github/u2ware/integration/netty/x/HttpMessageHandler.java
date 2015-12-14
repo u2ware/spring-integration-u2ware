@@ -24,7 +24,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.springframework.http.MediaType;
 import org.springframework.integration.core.MessagingTemplate;
 import org.springframework.integration.support.MessageBuilder;
@@ -43,24 +42,26 @@ import com.google.common.collect.Maps;
 @Sharable
 public class HttpMessageHandler extends SimpleChannelInboundHandler<FullHttpRequest>{
 	
-	protected Log logger = LogFactory.getLog(getClass());
-
+	private Log nettyLogger;
 	private MessagingTemplate template;
 	private MessageChannel sendChannel;
 	private PollableChannel receiveChannel;
 
-	public HttpMessageHandler(MessageChannel sendChannel, PollableChannel receiveChannel){
-		this(sendChannel, receiveChannel, 3000);
+	public HttpMessageHandler(Log nettyLogger, MessageChannel sendChannel, PollableChannel receiveChannel){
+		this(nettyLogger, sendChannel, receiveChannel, 3000);
 	}
-	public HttpMessageHandler(MessageChannel sendChannel, PollableChannel receiveChannel, long timeout){
+	public HttpMessageHandler(Log nettyLogger, MessageChannel sendChannel, PollableChannel receiveChannel, long timeout){
+		this.nettyLogger = nettyLogger;
 		this.template = new MessagingTemplate();
 		template.setReceiveTimeout(timeout);
 		template.setSendTimeout(timeout);
+
 		this.sendChannel = sendChannel;
 		this.receiveChannel = receiveChannel;
 	}
-	public HttpMessageHandler(MessageChannel sendChannel, PollableChannel receiveChannel, MessagingTemplate template){
+	public HttpMessageHandler(Log nettyLogger, MessageChannel sendChannel, PollableChannel receiveChannel, MessagingTemplate template){
 		Assert.notNull(template, "template must not be null.");
+		this.nettyLogger = nettyLogger;
 		this.template = template;
 		this.sendChannel = sendChannel;
 		this.receiveChannel = receiveChannel;
@@ -73,14 +74,14 @@ public class HttpMessageHandler extends SimpleChannelInboundHandler<FullHttpRequ
 		
 		ByteBuf content = ByteBufUtil.encodeString(UnpooledByteBufAllocator.DEFAULT, CharBuffer.wrap(payload), Charset.defaultCharset());
 		HttpResponse err = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.INTERNAL_SERVER_ERROR, content);
-		logger.info("Send HTTP Error response:\n" + err, cause);
+		//logger.info("Send HTTP Error response:\n" + err, cause);
 		ctx.writeAndFlush(err).addListener(ChannelFutureListener.CLOSE);
     }
 	
 	@Override
 	protected void channelRead0(ChannelHandlerContext ctx, FullHttpRequest request) throws Exception {
 
-		logger.info("Received HTTP request:\n" + request);
+		nettyLogger.info(new StringBuilder().append(ctx.channel().toString()).append(" READ0").append("\n").append(request.toString()));
 		
 		Message<?> sendMessage = toMessage(ctx, request);
 		//logger.debug("Send Message Header: " + requestMessage.getHeaders());
@@ -95,7 +96,7 @@ public class HttpMessageHandler extends SimpleChannelInboundHandler<FullHttpRequ
 
 		FullHttpResponse response = fromMessage(ctx, responseMessage);
         ctx.writeAndFlush(response).addListener(ChannelFutureListener.CLOSE);
-		logger.info("Send HTTP response:\n" + response);
+        nettyLogger.info(new StringBuilder().append(ctx.channel().toString()).append(" READ0").append("\n").append(response.toString()));
     }
 
 	@Override

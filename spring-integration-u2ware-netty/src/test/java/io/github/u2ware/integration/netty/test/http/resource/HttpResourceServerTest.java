@@ -1,4 +1,4 @@
-package io.github.u2ware.integration.netty.x;
+package io.github.u2ware.integration.netty.test.http.resource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -19,7 +19,7 @@ public class HttpResourceServerTest {
 	public void test() throws Exception{
 				
 		RestTemplate restTemplate = new RestTemplate();
-		String result = restTemplate.getForObject("http://localhost:10605/foo/bar/baz.html", String.class);
+		String result = restTemplate.getForObject("http://localhost:9992/foo/bar/baz.html", String.class);
 		logger.debug(result);
 		Assert.assertEquals("<html><body><h1>Hello World!!</h1></body></html>", result);
 	}
