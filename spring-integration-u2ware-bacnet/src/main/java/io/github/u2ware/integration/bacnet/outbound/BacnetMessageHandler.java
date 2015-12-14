@@ -82,6 +82,7 @@ public class BacnetMessageHandler extends AbstractReplyProducingMessageHandler {
 			}
 
 		}catch(Exception e){
+			logger.info("BACNet LocalDevice Error", e);
 			return null;
 		}
 	}
