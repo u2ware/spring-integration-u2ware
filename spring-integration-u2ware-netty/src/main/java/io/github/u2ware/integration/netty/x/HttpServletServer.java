@@ -9,6 +9,7 @@ import io.netty.handler.codec.http.HttpResponseEncoder;
 import io.netty.handler.stream.ChunkedWriteHandler;
 
 import java.util.Arrays;
+import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -17,10 +18,15 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.EnvironmentAware;
 import org.springframework.context.ResourceLoaderAware;
 import org.springframework.core.env.Environment;
+import org.springframework.core.env.MapPropertySource;
+import org.springframework.core.env.MutablePropertySources;
+import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
+import org.springframework.core.io.support.ResourcePropertySource;
 import org.springframework.mock.web.MockServletConfig;
 import org.springframework.mock.web.MockServletContext;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
+import org.springframework.web.context.support.StandardServletEnvironment;
 import org.springframework.web.servlet.DispatcherServlet;
 
 public class HttpServletServer extends AbstractTcpServer implements EnvironmentAware, ResourceLoaderAware, InitializingBean, DisposableBean{
@@ -28,31 +34,50 @@ public class HttpServletServer extends AbstractTcpServer implements EnvironmentA
 	private final Log nettyLogger = LogFactory.getLog(getClass());
 
 	private DispatcherServlet dispatcherServlet;
+	private Map<String, Object> defaultProperties;
+	//private Environment environment;
+	private ResourceLoader resourceLoader;
 	private Class<?> configClass;
 	
 	public void setConfigClass(Class<?> configClass) {
 		this.configClass = configClass;
+	}
+	public void setDefaultProperties(Map<String, Object> defaultProperties) {
+		this.defaultProperties = defaultProperties;
 	}
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		super.afterPropertiesSet();
 		
+		StandardServletEnvironment env = new StandardServletEnvironment();
+		MutablePropertySources sources = env.getPropertySources();
+		if (this.defaultProperties != null && !this.defaultProperties.isEmpty()) {
+			sources.addLast(new MapPropertySource("defaultProperties", this.defaultProperties));
+		}
+		Resource resource1 = resourceLoader.getResource("classpath:/application.properties");
+		if(resource1.exists()){
+			sources.addLast(new ResourcePropertySource("applicationPropties", resource1));
+		}else{
+			Resource resource2 = resourceLoader.getResource("classpath:/application.yml");
+			if(resource2.exists()){
+				sources.addLast(new ResourcePropertySource("applicationYml", resource2));
+			}
+		}
 		
 		MockServletContext servletContext = new MockServletContext();
 		MockServletConfig servletConfig = new MockServletConfig(servletContext);
-
+		
 		AnnotationConfigWebApplicationContext wac = new AnnotationConfigWebApplicationContext();
 		wac.setServletContext(servletContext);
 		wac.setClassLoader(getClass().getClassLoader());
 		wac.setServletConfig(servletConfig);
-		//wac.setEnvironment((ConfigurableEnvironment) environment);
+		wac.setEnvironment(env);
 		wac.register(configClass);
 		wac.refresh();
 
 		this.dispatcherServlet = new DispatcherServlet(wac);
 		this.dispatcherServlet.init(servletConfig);
-
 		
 		String[] beanNames = wac.getBeanDefinitionNames();
 		Arrays.sort(beanNames);
@@ -78,11 +103,11 @@ public class HttpServletServer extends AbstractTcpServer implements EnvironmentA
 	
 	@Override
 	public void setResourceLoader(ResourceLoader resourceLoader) {
-		
+		this.resourceLoader = resourceLoader;
 	}
 	@Override
 	public void setEnvironment(Environment environment) {
-
+		//this.environment = environment;
 	}
 
 	@Override

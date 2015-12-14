@@ -8,6 +8,11 @@
 	<bean id="http" class="io.github.u2ware.integration.netty.x.HttpServletServer">
 		<property name="port" value="9993"/>
 		<property name="configClass" value="io.github.u2ware.integration.netty.test.http.servlet.app.Application"/>
+		<property name="defaultProperties">
+			<map>
+				<entry key="foo" value="bar"/>
+			</map>
+		</property>
 	</bean>
 
 </beans>
