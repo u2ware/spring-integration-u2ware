@@ -11,6 +11,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.util.ClassUtils;
+import org.springframework.util.StringUtils;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -59,7 +60,7 @@ import com.serotonin.bacnet4j.util.RequestUtils;
 @SuppressWarnings("serial")
 public class BacnetExecutor extends ThreadPoolTaskExecutor {
 
-	private Log logger = LogFactory.getLog(getClass());
+	private Log bacnetLogger= LogFactory.getLog(getClass());
 	
 	protected int localPort = IpNetwork.DEFAULT_PORT; //47808;
 	protected String remoteAddress;
@@ -105,17 +106,18 @@ public class BacnetExecutor extends ThreadPoolTaskExecutor {
 		try {
 			localDevice.initialize();
 	        localDevice.getEventHandler().addListener(new DeviceEventListenerImpl());
-	        logger.info("BACNet Master Initialized Port Number: "+localPort);
+	        bacnetLogger.info("BACNet LocalDevice Initialized: <localhost>:"+localPort+"["+localPort+"]");
 		
 		} catch (Exception e) {
-			throw new RuntimeException("BACNet Master Error : "+localPort +" "+e.getMessage());
+	        bacnetLogger.info("BACNet LocalDevice Initialized Error: <localhost>:"+localPort+"["+localPort+"] "+e.getMessage());
+			throw new RuntimeException("BACNet LocalDevice Initialized Error: <localhost>:"+localPort+"["+localPort+"]");
 		}
 	}
 
 	@Override
 	public void destroy()  {
 		localDevice.terminate();
-        logger.info("BACNet Master Terminated Port Number: "+localPort);
+        bacnetLogger.info("BACNet LocalDevice Terminated: <localhost>:"+localPort+"["+localPort+"]");
 		super.destroy();
 	}	
 	
@@ -134,10 +136,105 @@ public class BacnetExecutor extends ThreadPoolTaskExecutor {
 	    super.execute(new Runnable() {
 			public void run() {
 		        localDevice.sendGlobalBroadcast(new WhoIsRequest());
-		        logger.info("sendGlobalBroadcast");
 			}
 		});
 	}
+
+	
+	////////////////////////////////////
+	//
+	////////////////////////////////////
+	public List<BacnetResponse> execute(BacnetRequest request) throws Exception{
+		if(BacnetRequest.READ_TYPE.equals(request.getType())){
+
+			if(StringUtils.hasText(request.getRemoteAddress()) && request.getRemoteInstanceNumber() != 0){
+				return readValues(request.getRemoteAddress(), request.getRemoteInstanceNumber());
+			}else{
+				return readValues(getRemoteAddress(), getRemoteInstanceNumber());
+			}
+		
+		}else{
+			return null;
+		}
+	}
+
+	
+	////////////////////////////////////
+	//
+	////////////////////////////////////
+	/*
+	public List<BacnetWriteResponse> writeValue(.....) throws Exception{
+		return null;
+	}
+	*/
+	public List<BacnetResponse> readValues() throws Exception{
+		return readValues(getRemoteAddress(), getRemoteInstanceNumber());
+	}
+	public List<BacnetResponse> readValues(final String remoteAddress, final int remoteInstanceNumber) throws Exception{		
+		Address address = new Address(IpNetworkUtils.toOctetString(remoteAddress));
+		RemoteDevice remoteDevice = localDevice.getRemoteDevice(address);
+		if(remoteDevice == null){
+			remoteDevice = findRemoteDevice(address, remoteInstanceNumber);
+	        bacnetLogger.info("BACNet RemoteDevice Find: "+remoteDevice.getAddress().getDescription()+"["+remoteDevice.getInstanceNumber()+"]");
+		}
+		Collection<ObjectIdentifier> oids = sendReadPropertyAllowNull(remoteDevice);
+		PropertyReferences refs = createPropertyReferences(oids);
+		PropertyValues pvs = readProperties(remoteDevice, refs);
+		
+		List<BacnetResponse> result = readValues(pvs, remoteDevice);
+        bacnetLogger.info("BACNet RemoteDevice Read: "+remoteDevice.getAddress().getDescription()+"["+remoteDevice.getInstanceNumber()+"]");
+
+		return result;
+	}
+	
+	
+	//////////////////////////
+	//
+	//////////////////////////
+	private List<BacnetResponse> readValues(PropertyValues pvs, RemoteDevice remoteDevice){
+		Map<Object, BacnetResponse> responseMap = Maps.newHashMap();
+        
+        for (ObjectPropertyReference opr : pvs) {
+
+        	Object value = pvs.getNoErrorCheck(opr);//.toString();
+        	
+        	if(! ClassUtils.isAssignableValue(BACnetError.class, value)){
+        		ObjectIdentifier oid = opr.getObjectIdentifier();
+            	PropertyIdentifier pid = opr.getPropertyIdentifier();
+
+            	BacnetResponse obj = responseMap.get(oid);
+            	if(obj == null){
+            		obj = new BacnetResponse();
+                	
+            		obj.setId(remoteDevice.getInstanceNumber()+"_"+oid.getInstanceNumber()+"_"+oid.getObjectType().intValue());
+            		obj.setObjectIdentifier(oid.toString());
+            	}
+            	
+            	
+            	if(PropertyIdentifier.presentValue.equals(pid)){
+            		obj.setValue(value.toString());
+        		
+            	}else if(PropertyIdentifier.units.equals(pid)){
+            		obj.setUnits(value.toString());
+
+            	}else if(PropertyIdentifier.outputUnits.equals(pid)){
+            		obj.setOutputUnits(value.toString());
+            		
+            	}else if(PropertyIdentifier.inactiveText.equals(pid)){
+            		obj.setInactiveText(value.toString());
+            	
+            	}else if(PropertyIdentifier.activeText.equals(pid)){
+            		obj.setActiveText(value.toString());
+            	}
+            	responseMap.put(oid, obj);
+        	}
+        }
+        
+        List<BacnetResponse> results = Lists.newArrayList(responseMap.values().iterator());
+		return results;
+	}
+	
+	
 
 	///////////////////////
 	//
@@ -147,7 +244,6 @@ public class BacnetExecutor extends ThreadPoolTaskExecutor {
 			@Override
 			public RemoteDevice call() throws Exception {
 				RemoteDevice d = localDevice.findRemoteDevice(address, instanceNumber);
-		        logger.info("findRemoteDevice: "+d.getAddress().getDescription()+"["+d.getInstanceNumber()+"]");
 		        return d;
 			}
 	    }).get();
@@ -160,7 +256,6 @@ public class BacnetExecutor extends ThreadPoolTaskExecutor {
 				Collection<ObjectIdentifier> oids = ((SequenceOf<ObjectIdentifier>) 
 		        		RequestUtils.sendReadPropertyAllowNull(localDevice, d, d.getObjectIdentifier(), PropertyIdentifier.objectList))
 		        		.getValues(); 
-		        logger.info("sendReadPropertyAllowNull: "+d.getAddress().getDescription()+"["+d.getInstanceNumber()+"]");
 				return oids;
 			}
 	    }).get();
@@ -213,116 +308,34 @@ public class BacnetExecutor extends ThreadPoolTaskExecutor {
 			@Override
 			public PropertyValues call() throws Exception {
 				PropertyValues pvs = RequestUtils.readProperties(localDevice, d, refs, null);
-		        logger.info("readProperties: "+d.getAddress().getDescription()+"["+d.getInstanceNumber()+"]");
 				return pvs;
 			}
 	    }).get();
 	}
 	
-	////////////////////////////////////
-	//
-	////////////////////////////////////
-	public List<BacnetResponse> execute(BacnetRequest request) throws Exception{
-		if(BacnetRequest.READ_TYPE.equals(request.getType())){
-			return readValues(getRemoteAddress(), getRemoteInstanceNumber());
-		}else{
-			return null;
-		}
-	}
-	public List<BacnetResponse> readValues() throws Exception{
-		return readValues(getRemoteAddress(), getRemoteInstanceNumber());
-	}
-	public List<BacnetResponse> readValues(final String remoteAddress, final int remoteInstanceNumber) throws Exception{		
-		Address address = new Address(IpNetworkUtils.toOctetString(remoteAddress));
-		RemoteDevice remoteDevice = localDevice.getRemoteDevice(address);
-		if(remoteDevice == null){
-			remoteDevice = findRemoteDevice(address, remoteInstanceNumber);
-		}
-		Collection<ObjectIdentifier> oids = sendReadPropertyAllowNull(remoteDevice);
-		PropertyReferences refs = createPropertyReferences(oids);
-		PropertyValues pvs = readProperties(remoteDevice, refs);
-		
-		List<BacnetResponse> result = readValues(pvs, remoteDevice);
-		return result;
-	}
 	
-	
-	
-
-	//////////////////////////
-	//
-	//////////////////////////
-	private List<BacnetResponse> readValues(PropertyValues pvs, RemoteDevice remoteDevice){
-		Map<Object, BacnetResponse> responseMap = Maps.newHashMap();
-        
-        for (ObjectPropertyReference opr : pvs) {
-
-        	Object value = pvs.getNoErrorCheck(opr);//.toString();
-        	
-        	if(! ClassUtils.isAssignableValue(BACnetError.class, value)){
-        		ObjectIdentifier oid = opr.getObjectIdentifier();
-            	PropertyIdentifier pid = opr.getPropertyIdentifier();
-
-            	BacnetResponse obj = responseMap.get(oid);
-            	if(obj == null){
-            		obj = new BacnetResponse();
-                	
-            		obj.setId(remoteDevice.getInstanceNumber()+"_"+oid.getInstanceNumber()+"_"+oid.getObjectType().intValue());
-            		obj.setObjectIdentifier(oid.toString());
-            	}
-            	
-            	
-            	if(PropertyIdentifier.presentValue.equals(pid)){
-            		obj.setValue(value.toString());
-        		
-            	}else if(PropertyIdentifier.units.equals(pid)){
-            		obj.setUnits(value.toString());
-
-            	}else if(PropertyIdentifier.outputUnits.equals(pid)){
-            		obj.setOutputUnits(value.toString());
-            		
-            	}else if(PropertyIdentifier.inactiveText.equals(pid)){
-            		obj.setInactiveText(value.toString());
-            	
-            	}else if(PropertyIdentifier.activeText.equals(pid)){
-            		obj.setActiveText(value.toString());
-            	}
-            	responseMap.put(oid, obj);
-        	}
-        }
-        
-        List<BacnetResponse> results = Lists.newArrayList(responseMap.values().iterator());
-		return results;
-	}
-	
-	
-	/*
-	public List<BacnetWriteResponse> execute(BacnetWriteRequest request) throws Exception{
-		return null;
-	}
-	*/
 	private class DeviceEventListenerImpl implements DeviceEventListener{
 		@Override
 		public void iAmReceived(final RemoteDevice d) {
-			logger.info("iAmReceived: [instanceNumber="+d.getInstanceNumber()+", address="+d.getAddress().getDescription());
+	        bacnetLogger.info("BACNet iAmReceived: "+d.getAddress().getDescription()+"["+d.getInstanceNumber()+"]");
 		}
 		
 		@Override
 		public void listenerException(Throwable e) {
-			logger.info("listenerException: ");
+			bacnetLogger.info("BACNet listenerException: ");
 		}
 		@Override
 		public boolean allowPropertyWrite(Address from, BACnetObject obj, PropertyValue pv) {
-			logger.info("allowPropertyWrite: ");
+			bacnetLogger.info("BACNet allowPropertyWrite: ");
 			return true;
 		}
 		@Override
 		public void propertyWritten(Address from, BACnetObject obj, PropertyValue pv) {
-			logger.info("propertyWritten: ");
+			bacnetLogger.info("BACNet propertyWritten: ");
 		}
 		@Override
 		public void iHaveReceived(RemoteDevice d, RemoteObject o) {
-			logger.info("iHaveReceived: ");
+			bacnetLogger.info("BACNet iHaveReceived: ");
 		}
 		@Override
 		public void covNotificationReceived(
@@ -331,7 +344,7 @@ public class BacnetExecutor extends ThreadPoolTaskExecutor {
 				ObjectIdentifier monitoredObjectIdentifier,
 				UnsignedInteger timeRemaining,
 				SequenceOf<PropertyValue> listOfValues) {
-			logger.info("covNotificationReceived: ");
+			bacnetLogger.info("BACNet covNotificationReceived: ");
 		}
 		@Override
 		public void eventNotificationReceived(UnsignedInteger processIdentifier,
@@ -341,30 +354,27 @@ public class BacnetExecutor extends ThreadPoolTaskExecutor {
 				EventType eventType, CharacterString messageText,
 				NotifyType notifyType, Boolean ackRequired, EventState fromState,
 				EventState toState, NotificationParameters eventValues) {
-			logger.info("eventNotificationReceived: ");
+			bacnetLogger.info("BACNet eventNotificationReceived: ");
 		}
 		@Override
 		public void textMessageReceived(RemoteDevice textMessageSourceDevice,
 				Choice messageClass, MessagePriority messagePriority,
 				CharacterString message) {
-			logger.info("textMessageReceived: ");
+			bacnetLogger.info("BACNet textMessageReceived: ");
 		}
 		@Override
 		public void privateTransferReceived(Address from, UnsignedInteger vendorId,
 				UnsignedInteger serviceNumber, Sequence serviceParameters) {
-			logger.info("privateTransferReceived: ");
+			bacnetLogger.info("BACNet privateTransferReceived: ");
 		}
 		@Override
 		public void reinitializeDevice(Address from,
 				ReinitializedStateOfDevice reinitializedStateOfDevice) {
-			logger.info("reinitializeDevice: ");
+			bacnetLogger.info("BACNet reinitializeDevice: ");
 		}
 		@Override
 		public void synchronizeTime(Address from, DateTime dateTime, boolean utc) {
-			logger.info("synchronizeTime: ");
-			
+			bacnetLogger.info("BACNet synchronizeTime: ");
 		}
 	}
-	
-	
 }

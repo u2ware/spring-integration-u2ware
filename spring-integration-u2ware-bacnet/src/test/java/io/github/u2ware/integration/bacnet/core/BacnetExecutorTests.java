@@ -1,18 +1,14 @@
 package io.github.u2ware.integration.bacnet.core;
 
-import io.github.u2ware.integration.bacnet.core.BacnetExecutor;
-import io.github.u2ware.integration.bacnet.core.BacnetResponse;
-
-import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.junit.Before;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -23,18 +19,16 @@ import com.serotonin.bacnet4j.RemoteDevice;
 @ContextConfiguration
 public class BacnetExecutorTests {
 
-	protected @Autowired ApplicationContext applicationContext;
-
-	@Before
-	public void before() throws Exception {
-        logger.debug("===================================================");
-        String[] beanNames = applicationContext.getBeanDefinitionNames();
-        Arrays.sort(beanNames, 0, beanNames.length);
-        for(String name : beanNames){
-            logger.debug(name+"="+applicationContext.getBean(name).getClass());
-        }
-        logger.debug("===================================================");
+	@BeforeClass
+	public static void beforeClass() throws Exception {
+		BacnetSlave.startup(47808);
 	}
+
+	@AfterClass
+	public static void afterClass() throws Exception{
+		BacnetSlave.shutdown();
+	}
+	
 
 	protected Log logger = LogFactory.getLog(getClass());
 

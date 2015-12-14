@@ -22,18 +22,14 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @ContextConfiguration
 public class BacnetOutboundGatewayTests {
 
-	private static BacnetSlave bacnetSlave;
-	
 	@BeforeClass
-	public static void beforeClass() throws Exception{
-		bacnetSlave = new BacnetSlave();
-		bacnetSlave.setLocalPort(47805);
-		bacnetSlave.setLocalInstanceNumber(47805);
-		bacnetSlave.afterPropertiesSet();
+	public static void beforeClass() throws Exception {
+		BacnetSlave.startup(47805);
 	}
+
 	@AfterClass
 	public static void afterClass() throws Exception{
-		bacnetSlave.destroy();
+		BacnetSlave.shutdown();
 	}
 
 	protected Log logger = LogFactory.getLog(getClass());
@@ -47,7 +43,11 @@ public class BacnetOutboundGatewayTests {
     @Test
 	public void testRunning() throws Exception {
 
-		bacnetRequest.send(MessageBuilder.withPayload(new BacnetRequest()).build());
+    	BacnetRequest r = new BacnetRequest();
+    	r.setRemoteAddress("127.0.0.1:47805");
+    	r.setRemoteInstanceNumber(47805);
+    	
+		bacnetRequest.send(MessageBuilder.withPayload(r).build());
 
 		Object receive = bacnetResponse.receive(10000);
 		Assert.assertNotNull(receive);

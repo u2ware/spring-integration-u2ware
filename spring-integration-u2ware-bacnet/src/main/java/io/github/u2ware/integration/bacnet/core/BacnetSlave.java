@@ -24,8 +24,6 @@ package io.github.u2ware.integration.bacnet.core;
 
 import java.io.File;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
@@ -74,7 +72,7 @@ import com.serotonin.bacnet4j.type.primitive.UnsignedInteger;
 
 public class BacnetSlave implements Runnable , InitializingBean, DisposableBean{
 
-	private Log logger = LogFactory.getLog(getClass());
+	//private Log logger = LogFactory.getLog(getClass());
 
 	public static void main(String[] args) throws Exception{
 		
@@ -83,19 +81,24 @@ public class BacnetSlave implements Runnable , InitializingBean, DisposableBean{
 			port = Integer.parseInt(args[0]);
 		}catch(Exception e){
 		}
-
-		int num = port;
-		try{
-			num = Integer.parseInt(args[1]);
-		}catch(Exception e){
-		}
-		
-		BacnetSlave s = new BacnetSlave();
-		s.setLocalPort(port);
-		s.setLocalInstanceNumber(num);
-		s.afterPropertiesSet();
-		
+		BacnetSlave.startup(port);
 	}
+	
+
+	private static BacnetSlave bacnetSlave;
+	
+	public static void startup(int port) throws Exception{
+		bacnetSlave = new BacnetSlave();
+		bacnetSlave.setLocalPort(port);
+		bacnetSlave.setLocalInstanceNumber(port);
+		bacnetSlave.afterPropertiesSet();
+	}
+	public static void shutdown() throws Exception{
+		bacnetSlave.destroy();
+	}
+	
+	
+	
 	
 	protected int localPort = IpNetwork.DEFAULT_PORT;//47808
 	protected int localInstanceNumber = IpNetwork.DEFAULT_PORT;//47808
@@ -118,8 +121,7 @@ public class BacnetSlave implements Runnable , InitializingBean, DisposableBean{
 	@Override
 	public void destroy() throws Exception {
 		localDevice.terminate();
-		logger.info("BACNet Slave Terminated Port Number: "+localPort);
-        System.out.println("BACNet Slave Terminated Port Number: "+localPort);
+		System.out.println("BACNet LocalDevice Terminated: <localhost>:"+localPort+"["+localPort+"]");
 	}
 	@Override
 	public void afterPropertiesSet() throws Exception {
@@ -204,8 +206,7 @@ public class BacnetSlave implements Runnable , InitializingBean, DisposableBean{
 
 	        // Start the local device.
 	        localDevice.initialize();
-			logger.info("BACNet Slave Initialized Port Number: "+localPort);
-	        System.out.println("BACNet Slave Initialized Port Number: "+localPort);
+	        System.out.println("BACNet LocalDevice Initialized: <localhost>:"+localPort+"["+localPort+"]");
 
 	        // Send an iam.
 	        localDevice.sendGlobalBroadcast(localDevice.getIAm());
@@ -286,26 +287,29 @@ public class BacnetSlave implements Runnable , InitializingBean, DisposableBean{
     private static class Listener implements DeviceEventListener {
         @Override
         public void listenerException(Throwable e) {
-            // no op
+        	System.out.println("BACNet listenerException: ");
         }
 
         @Override
         public void iAmReceived(RemoteDevice d) {
-            // no op
+        	System.out.println("BACNet iAmReceived: "+d.getAddress().getDescription()+"["+d.getInstanceNumber()+"]");
         }
 
         @Override
         public boolean allowPropertyWrite(Address from, BACnetObject obj, PropertyValue pv) {
+        	System.out.println("BACNet listenerException: ");
             return true;
         }
 
         @Override
         public void propertyWritten(Address from, BACnetObject obj, PropertyValue pv) {
-            System.out.println("Wrote " + pv + " to " + obj.getId());
+        	System.out.println("BACNet propertyWritten: ");
+            //System.out.println("Wrote " + pv + " to " + obj.getId());
         }
 
         @Override
         public void iHaveReceived(RemoteDevice d, RemoteObject o) {
+        	System.out.println("BACNet iHaveReceived: ");
             // no op
         }
 
@@ -313,6 +317,7 @@ public class BacnetSlave implements Runnable , InitializingBean, DisposableBean{
         public void covNotificationReceived(UnsignedInteger subscriberProcessIdentifier, RemoteDevice initiatingDevice,
                 ObjectIdentifier monitoredObjectIdentifier, UnsignedInteger timeRemaining,
                 SequenceOf<PropertyValue> listOfValues) {
+        	System.out.println("BACNet covNotificationReceived: ");
             // no op
         }
 
@@ -322,6 +327,7 @@ public class BacnetSlave implements Runnable , InitializingBean, DisposableBean{
                 UnsignedInteger priority, EventType eventType, CharacterString messageText, NotifyType notifyType,
                 Boolean ackRequired, EventState fromState, EventState toState, NotificationParameters eventValues) {
             // no op
+        	System.out.println("BACNet eventNotificationReceived: ");
         }
 
         @Override
@@ -333,16 +339,19 @@ public class BacnetSlave implements Runnable , InitializingBean, DisposableBean{
         @Override
         public void privateTransferReceived(Address from, UnsignedInteger vendorId, UnsignedInteger serviceNumber,
                 Sequence serviceParameters) {
-            System.out.println("Received private transfer service with params: " + serviceParameters.getValues());
+        	System.out.println("BACNet privateTransferReceived: ");
+            //System.out.println("Received private transfer service with params: " + serviceParameters.getValues());
         }
 
         @Override
         public void reinitializeDevice(Address from, ReinitializedStateOfDevice reinitializedStateOfDevice) {
+        	System.out.println("BACNet reinitializeDevice: ");
             // no op
         }
 
         @Override
         public void synchronizeTime(Address from, DateTime dateTime, boolean utc) {
+        	System.out.println("BACNet synchronizeTime: ");
             // no op
         }
     }

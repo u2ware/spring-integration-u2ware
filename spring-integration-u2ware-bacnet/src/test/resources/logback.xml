@@ -9,7 +9,7 @@
 
 	<logger name="org.springframework.integration.channel" level="OFF" />
 	
-	<logger name="io.github.u2ware.integration.bacnet" level="INFO" />
+	<logger name="io.github.u2ware.integration.bacnet" level="DEBUG" />
 
 
 	<root level="OFF">

@@ -19,18 +19,14 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @ContextConfiguration
 public class BacnetInboundChannelAdapterTests {
 
-	private static BacnetSlave bacnetSlave;
-	
 	@BeforeClass
-	public static void beforeClass() throws Exception{
-		bacnetSlave = new BacnetSlave();
-		bacnetSlave.setLocalPort(47807);
-		bacnetSlave.setLocalInstanceNumber(47807);
-		bacnetSlave.afterPropertiesSet();
+	public static void beforeClass() throws Exception {
+		BacnetSlave.startup(47807);
 	}
+
 	@AfterClass
 	public static void afterClass() throws Exception{
-		bacnetSlave.destroy();
+		BacnetSlave.shutdown();
 	}
 	
 	protected Log logger = LogFactory.getLog(getClass());

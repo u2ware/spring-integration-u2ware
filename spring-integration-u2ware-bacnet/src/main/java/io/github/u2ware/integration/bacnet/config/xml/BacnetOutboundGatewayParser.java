@@ -3,8 +3,6 @@ package io.github.u2ware.integration.bacnet.config.xml;
 import io.github.u2ware.integration.bacnet.core.BacnetExecutor;
 import io.github.u2ware.integration.bacnet.outbound.BacnetMessageHandler;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.parsing.BeanComponentDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
@@ -24,7 +22,6 @@ import org.w3c.dom.Element;
  */
 public class BacnetOutboundGatewayParser extends AbstractConsumerEndpointParser  {
 
-	private Log logger = LogFactory.getLog(getClass());
 
 	@Override
 	protected String getInputChannelAttributeName() {
@@ -34,7 +31,6 @@ public class BacnetOutboundGatewayParser extends AbstractConsumerEndpointParser 
 	@Override
 	protected BeanDefinitionBuilder parseHandler(Element element, ParserContext parserContext) {
 
-		logger.debug("OutboundGatewayParser");
 
 		final BeanDefinitionBuilder outboundGatewayBuilder = BeanDefinitionBuilder
 				.genericBeanDefinition(BacnetMessageHandler.class);

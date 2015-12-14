@@ -4,12 +4,12 @@
 	xsi:schemaLocation="
 		http://www.springframework.org/schema/beans 
 		http://www.springframework.org/schema/beans/spring-beans.xsd">
-
+<!-- 
 	<bean class="io.github.u2ware.integration.bacnet.core.BacnetSlave">
 		<property name="localPort" value="47808"/>
 		<property name="localInstanceNumber" value="47808"/>
 	</bean>
-
+ -->
 	<bean class="io.github.u2ware.integration.bacnet.core.BacnetExecutor">
 		<property name="localPort" value="9994"/>
 	</bean>

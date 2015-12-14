@@ -6,11 +6,25 @@ public class BacnetRequest {
 	public static final String WRITE_TYPE = "write";
 	
 	private String type = READ_TYPE;
+	private String remoteAddress;
+	private int remoteInstanceNumber;
 	
 	public String getType() {
 		return type;
 	}
 	public void setType(String type) {
 		this.type = type;
+	}
+	public String getRemoteAddress() {
+		return remoteAddress;
+	}
+	public void setRemoteAddress(String remoteAddress) {
+		this.remoteAddress = remoteAddress;
+	}
+	public int getRemoteInstanceNumber() {
+		return remoteInstanceNumber;
+	}
+	public void setRemoteInstanceNumber(int remoteInstanceNumber) {
+		this.remoteInstanceNumber = remoteInstanceNumber;
 	}
 }
