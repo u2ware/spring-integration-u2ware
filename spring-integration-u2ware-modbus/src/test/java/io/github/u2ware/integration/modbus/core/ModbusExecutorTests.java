@@ -1,20 +1,16 @@
 package io.github.u2ware.integration.modbus.core;
 
-import io.github.u2ware.integration.modbus.core.ModbusExecutor;
-import io.github.u2ware.integration.modbus.core.ModbusResponse;
-
-import java.util.Arrays;
 import java.util.List;
 
 import net.wimpi.modbus.Modbus;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.junit.Before;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -23,16 +19,14 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @ContextConfiguration
 public class ModbusExecutorTests {
 
-	protected @Autowired ApplicationContext applicationContext;
-	@Before
-	public void before() throws Exception {
-		logger.warn("===================================================");
-        String[] beanNames = applicationContext.getBeanDefinitionNames();
-        Arrays.sort(beanNames, 0, beanNames.length);
-        for(String name : beanNames){
-            logger.warn(name+"="+applicationContext.getBean(name).getClass());
-        }
-        logger.warn("===================================================");
+	@BeforeClass
+	public static void beforeClass() throws Exception {
+		ModbusSlave.startup(10502);
+	}
+
+	@AfterClass
+	public static void afterClass() throws Exception{
+		ModbusSlave.shutdown();
 	}
 
 	protected Log logger = LogFactory.getLog(getClass());

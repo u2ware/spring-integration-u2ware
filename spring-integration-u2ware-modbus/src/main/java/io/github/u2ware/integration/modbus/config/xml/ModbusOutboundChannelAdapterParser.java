@@ -3,8 +3,6 @@ package io.github.u2ware.integration.modbus.config.xml;
 import io.github.u2ware.integration.modbus.core.ModbusExecutor;
 import io.github.u2ware.integration.modbus.outbound.ModbusMessageHandler;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.parsing.BeanComponentDefinition;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
@@ -23,8 +21,6 @@ import org.w3c.dom.Element;
  */
 public class ModbusOutboundChannelAdapterParser extends AbstractOutboundChannelAdapterParser {
 
-	private Log logger = LogFactory.getLog(getClass());
-
 	@Override
 	protected boolean shouldGenerateId() {
 		return false;
@@ -37,8 +33,6 @@ public class ModbusOutboundChannelAdapterParser extends AbstractOutboundChannelA
 
 	@Override
 	protected AbstractBeanDefinition parseConsumer(Element element, ParserContext parserContext) {
-
-		logger.debug("OutboundChannelAdapterParser");
 
 		final BeanDefinitionBuilder outboundChannelAdapterBuilder = BeanDefinitionBuilder
 				.genericBeanDefinition(ModbusMessageHandler.class);

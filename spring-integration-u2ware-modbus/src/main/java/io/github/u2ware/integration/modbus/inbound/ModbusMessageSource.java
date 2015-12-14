@@ -87,7 +87,7 @@ implements MessageSource<List<ModbusResponse>>{
 			return MessageBuilder.withPayload(response).copyHeaders(headers).build();
 
 		}catch(Exception e){
-			logger.debug("receive()", e);
+			logger.info("Modbus Client Error", e);
 			return null;
 		}
 	}

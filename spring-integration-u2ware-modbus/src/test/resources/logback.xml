@@ -9,7 +9,7 @@
 
 	<logger name="org.springframework.integration.channel" level="OFF" />
 
-	<logger name="io.github.u2ware.integration.modbus" level="INFO" />
+	<logger name="io.github.u2ware.integration.modbus" level="DEBUG" />
 
 
 	<root level="OFF">

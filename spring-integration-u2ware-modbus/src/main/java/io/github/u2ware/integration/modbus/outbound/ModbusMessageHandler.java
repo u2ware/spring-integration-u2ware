@@ -61,7 +61,6 @@ public class ModbusMessageHandler extends AbstractReplyProducingMessageHandler {
 	protected Object handleRequestMessage(Message<?> requestMessage) {
 
 		try{
-			logger.debug("handleRequestMessage: for controller ");
 
 			Object requestPayload = requestMessage.getPayload();
 
@@ -85,7 +84,7 @@ public class ModbusMessageHandler extends AbstractReplyProducingMessageHandler {
 			}
 
 		}catch(Exception e){
-			logger.debug("handleRequestMessage", e);
+			logger.info("Modbus Client Error", e);
 			return null;
 		}
 	}

@@ -19,20 +19,17 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @ContextConfiguration
 public class ModbusInboundChannelAdapterTests {
 
-	protected Log logger = LogFactory.getLog(getClass());
-
-	private static ModbusSlave modbusSlave;
-	
 	@BeforeClass
-	public static void beforeClass() throws Exception{
-		modbusSlave = new ModbusSlave();
-		modbusSlave.setLocalPort(10503);
-		modbusSlave.afterPropertiesSet();
+	public static void beforeClass() throws Exception {
+		ModbusSlave.startup(10503);
 	}
+
 	@AfterClass
 	public static void afterClass() throws Exception{
-		modbusSlave.destroy();
+		ModbusSlave.shutdown();
 	}
+
+	protected Log logger = LogFactory.getLog(getClass());
 	
 	@Autowired @Qualifier("modbusResponse")
 	private PollableChannel modbusResponse;

@@ -23,7 +23,6 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
-import org.springframework.util.ClassUtils;
 
 import com.google.common.collect.Lists;
 
@@ -51,11 +50,11 @@ public class ModbusExecutor implements InitializingBean, DisposableBean{
 		Assert.notNull(host, "host must not be null.");
 		Assert.notNull(port, "slaveAddress must not be null.");
 
-		logger.info("MODBUS Master Started Port Number: "+port);
+		logger.info("Mobdus Client Initialized: "+host+":"+port);
 	}
 	@Override
 	public void destroy() throws Exception {
-        logger.info("MODBUS Master Finished Port Number: "+port);
+		logger.info("Mobdus Client Terminated: "+host+":"+port);
 	}
 	
 	private InetAddress getInetAddress() throws Exception{
@@ -76,11 +75,11 @@ public class ModbusExecutor implements InitializingBean, DisposableBean{
 		ModbusTransaction trans = new ModbusTCPTransaction(con);
 		//trans.setRetries(100);
 		
-		logger.info("request["+host+":"+port+"] "+ClassUtils.getShortName(request.getClass())+" "+request.getHexMessage());
+		logger.info("Mobdus Client Request: "+host+":"+port+"\n"+request.getClass().getName()+"\n"+request.getHexMessage());
 		trans.setRequest(request);
 		trans.execute();
 		net.wimpi.modbus.msg.ModbusResponse response = trans.getResponse();
-		logger.info("response["+host+":"+port+"] "+ClassUtils.getShortName(response.getClass())+" "+response.getHexMessage());
+		logger.info("Mobdus Client Response: "+host+":"+port+"\n"+response.getClass().getName()+"\n"+response.getHexMessage());
 		
         con.close();
 

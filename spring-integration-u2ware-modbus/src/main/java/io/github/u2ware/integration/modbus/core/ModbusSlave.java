@@ -11,8 +11,6 @@ import net.wimpi.modbus.procimg.SimpleInputRegister;
 import net.wimpi.modbus.procimg.SimpleProcessImage;
 import net.wimpi.modbus.procimg.SimpleRegister;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 
@@ -26,12 +24,19 @@ public class ModbusSlave implements InitializingBean, DisposableBean{
 		}catch(Exception e){
 		}
 
-		ModbusSlave s = new ModbusSlave();
-		s.setLocalPort(port);
-		s.afterPropertiesSet();
+		ModbusSlave.startup(port);
 	}
 	
-	private Log logger = LogFactory.getLog(getClass());
+	private static ModbusSlave modbusSlave;
+	
+	public static void startup(int port) throws Exception{
+		modbusSlave = new ModbusSlave();
+		modbusSlave.setLocalPort(port);
+		modbusSlave.afterPropertiesSet();
+	}
+	public static void shutdown() throws Exception{
+		modbusSlave.destroy();
+	}
 	
 	private int localPort = 10000 + Modbus.DEFAULT_PORT; //502
     private ModbusTCPListener listener = null;
@@ -79,15 +84,13 @@ public class ModbusSlave implements InitializingBean, DisposableBean{
 	      listener.setPort(localPort);
 	      listener.start();
 
-			logger.info("MODBUS Slave Started Port Number: "+localPort);
-	        System.out.println("MODBUS Slave Started Port Number: "+localPort);
+	        System.out.println("Mobdus Slave Initialized: <localhost>:"+localPort);
 	}    		
 	
 	@Override
 	public void destroy() throws Exception {
 		listener.stop();
-		logger.info("MODBUS Slave Finished Port Number: "+localPort);
-        System.out.println("MODBUS Slave Finished Port Number: "+localPort);
+		System.out.println("Mobdus Slave Terminated: <localhost>:"+localPort);
 	}
 
 	private int randomRange(int n1, int n2) {
