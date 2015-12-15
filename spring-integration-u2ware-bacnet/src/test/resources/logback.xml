@@ -7,6 +7,8 @@
 	</appender>
 
 
+	<logger name="com.serotonin.bacnet4j" level="OFF" />
+
 	<logger name="org.springframework.integration.channel" level="OFF" />
 	
 	<logger name="io.github.u2ware.integration.bacnet" level="DEBUG" />

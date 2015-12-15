@@ -24,6 +24,23 @@ public class BacnetMessageSource extends IntegrationObjectSupport
 implements MessageSource<List<BacnetResponse>>{
 
 	private final BacnetExecutor executor;
+
+	protected String remoteAddress;
+	protected int remoteInstanceNumber;
+	
+	public String getRemoteAddress() {
+		return remoteAddress;
+	}
+	public void setRemoteAddress(String remoteAddress) {
+		this.remoteAddress = remoteAddress;
+	}
+	public int getRemoteInstanceNumber() {
+		return remoteInstanceNumber;
+	}
+	public void setRemoteInstanceNumber(int remoteInstanceNumber) {
+		this.remoteInstanceNumber = remoteInstanceNumber;
+	}
+	
 	
 	/**
 	 * Constructor taking a {@link BacnetExecutor} that provide all required Bacnet
@@ -56,14 +73,14 @@ implements MessageSource<List<BacnetResponse>>{
 	public Message<List<BacnetResponse>> receive() {
 		
 		try{
-			List<BacnetResponse> response = executor.readValues();
+			List<BacnetResponse> response = executor.readValues(remoteAddress, remoteInstanceNumber);
 			if (response == null) {
 				return null;
 			}
 
 			Map<String, Object> headers = Maps.newHashMap();
-			headers.put(BacnetHeaders.REMOTE_ADDRESS, executor.getRemoteAddress());
-			headers.put(BacnetHeaders.REMOTE_INSTANCE_NUMBER, executor.getRemoteInstanceNumber());
+			headers.put(BacnetHeaders.REMOTE_ADDRESS, remoteAddress);
+			headers.put(BacnetHeaders.REMOTE_INSTANCE_NUMBER, remoteInstanceNumber);
 
 			return MessageBuilder.withPayload(response).copyHeaders(headers).build();
 			

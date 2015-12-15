@@ -74,8 +74,8 @@ public class BacnetMessageHandler extends AbstractReplyProducingMessageHandler {
 
 			if (producesReply) {
 				Map<String, Object> headers = Maps.newHashMap();
-				headers.put(BacnetHeaders.REMOTE_ADDRESS, executor.getRemoteAddress());
-				headers.put(BacnetHeaders.REMOTE_INSTANCE_NUMBER, executor.getRemoteInstanceNumber());
+				headers.put(BacnetHeaders.REMOTE_ADDRESS, bacnetRequest.getRemoteAddress());
+				headers.put(BacnetHeaders.REMOTE_INSTANCE_NUMBER, bacnetRequest.getRemoteInstanceNumber());
 				return MessageBuilder.withPayload(response).copyHeaders(headers).build();
 			}else{
 				return null;

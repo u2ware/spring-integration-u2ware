@@ -11,7 +11,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.util.ClassUtils;
-import org.springframework.util.StringUtils;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -63,8 +62,8 @@ public class BacnetExecutor extends ThreadPoolTaskExecutor {
 	private Log bacnetLogger= LogFactory.getLog(getClass());
 	
 	protected int localPort = IpNetwork.DEFAULT_PORT; //47808;
-	protected String remoteAddress;
-	protected int remoteInstanceNumber;
+	protected int localInstanceNumber;
+	
 	private LocalDevice localDevice ;
 	private Transport transport;
 	private IpNetwork network;
@@ -75,19 +74,18 @@ public class BacnetExecutor extends ThreadPoolTaskExecutor {
 	public void setLocalPort(int localPort) {
 		this.localPort = localPort;
 	}
-	public String getRemoteAddress() {
-		return remoteAddress;
+	public int getLocalInstanceNumber() {
+		return localInstanceNumber;
 	}
-	public void setRemoteAddress(String remoteAddress) {
-		this.remoteAddress = remoteAddress;
-	}
-	public int getRemoteInstanceNumber() {
-		return remoteInstanceNumber;
-	}
-	public void setRemoteInstanceNumber(int remoteInstanceNumber) {
-		this.remoteInstanceNumber = remoteInstanceNumber;
+	public void setLocalInstanceNumber(int localInstanceNumber) {
+		this.localInstanceNumber = localInstanceNumber;
 	}
 
+	@Override
+	public String toString() {
+		return "BacnetExecutor [localPort=" + localPort
+				+ ", localInstanceNumber=" + localInstanceNumber+"]";
+	}
 	@Override
 	public void afterPropertiesSet() {
 		super.afterPropertiesSet();
@@ -95,20 +93,22 @@ public class BacnetExecutor extends ThreadPoolTaskExecutor {
 		//int localPort = IpNetwork.DEFAULT_PORT - bacnetDeviceNumber;
 		
         network = new IpNetwork(IpNetwork.DEFAULT_BROADCAST_IP, localPort);
+        
         transport = new DefaultTransport(network);
-        //        transport.setTimeout(15000);
-        //        transport.setSegTimeout(15000);
+//               transport.setTimeout(10000);
+//               transport.setSegTimeout(15000);
         
-        
-        localDevice = new LocalDevice(localPort, transport);
-        
+        localInstanceNumber = this.localInstanceNumber > 0 ? this.localInstanceNumber : localPort;
+        localDevice = new LocalDevice(localInstanceNumber, transport);
         
 		try {
 			localDevice.initialize();
 	        localDevice.getEventHandler().addListener(new DeviceEventListenerImpl());
+	        localDevice.sendGlobalBroadcast(new WhoIsRequest());
 	        bacnetLogger.info("BACNet LocalDevice Initialized: <localhost>:"+localPort+"["+localPort+"]");
 		
 		} catch (Exception e) {
+			e.printStackTrace();
 	        bacnetLogger.info("BACNet LocalDevice Initialized Error: <localhost>:"+localPort+"["+localPort+"] "+e.getMessage());
 			throw new RuntimeException("BACNet LocalDevice Initialized Error: <localhost>:"+localPort+"["+localPort+"]");
 		}
@@ -132,12 +132,16 @@ public class BacnetExecutor extends ThreadPoolTaskExecutor {
 		return result;
 	}
 
-	public void sendGlobalBroadcast(){
-	    super.execute(new Runnable() {
-			public void run() {
-		        localDevice.sendGlobalBroadcast(new WhoIsRequest());
-			}
-		});
+	public void sendGlobalBroadcast(boolean isNewThread){
+		if(isNewThread){
+		    super.execute(new Runnable() {
+				public void run() {
+			        localDevice.sendGlobalBroadcast(new WhoIsRequest());
+				}
+			});
+		}else{
+	        localDevice.sendGlobalBroadcast(new WhoIsRequest());
+		}
 	}
 
 	
@@ -146,12 +150,13 @@ public class BacnetExecutor extends ThreadPoolTaskExecutor {
 	////////////////////////////////////
 	public List<BacnetResponse> execute(BacnetRequest request) throws Exception{
 		if(BacnetRequest.READ_TYPE.equals(request.getType())){
-
-			if(StringUtils.hasText(request.getRemoteAddress()) && request.getRemoteInstanceNumber() != 0){
-				return readValues(request.getRemoteAddress(), request.getRemoteInstanceNumber());
-			}else{
-				return readValues(getRemoteAddress(), getRemoteInstanceNumber());
-			}
+			return readValues(request.getRemoteAddress(), request.getRemoteInstanceNumber());
+//
+//			if(StringUtils.hasText(request.getRemoteAddress()) && request.getRemoteInstanceNumber() != 0){
+//				return readValues(request.getRemoteAddress(), request.getRemoteInstanceNumber());
+//			}else{
+//				return readValues(getRemoteAddress(), getRemoteInstanceNumber());
+//			}
 		
 		}else{
 			return null;
@@ -166,10 +171,10 @@ public class BacnetExecutor extends ThreadPoolTaskExecutor {
 	public List<BacnetWriteResponse> writeValue(.....) throws Exception{
 		return null;
 	}
-	*/
 	public List<BacnetResponse> readValues() throws Exception{
 		return readValues(getRemoteAddress(), getRemoteInstanceNumber());
 	}
+	*/
 	public List<BacnetResponse> readValues(final String remoteAddress, final int remoteInstanceNumber) throws Exception{		
 		Address address = new Address(IpNetworkUtils.toOctetString(remoteAddress));
 		RemoteDevice remoteDevice = localDevice.getRemoteDevice(address);
@@ -239,7 +244,7 @@ public class BacnetExecutor extends ThreadPoolTaskExecutor {
 	///////////////////////
 	//
 	///////////////////////
-	private RemoteDevice findRemoteDevice(final Address address, final int instanceNumber) throws Exception{
+	public RemoteDevice findRemoteDevice(final Address address, final int instanceNumber) throws Exception{
 		return super.submit(new Callable<RemoteDevice>() {
 			@Override
 			public RemoteDevice call() throws Exception {
@@ -317,7 +322,21 @@ public class BacnetExecutor extends ThreadPoolTaskExecutor {
 	private class DeviceEventListenerImpl implements DeviceEventListener{
 		@Override
 		public void iAmReceived(final RemoteDevice d) {
-	        bacnetLogger.info("BACNet iAmReceived: "+d.getAddress().getDescription()+"["+d.getInstanceNumber()+"]");
+	        bacnetLogger.info("BACNet iAmReceived: "+d);
+	        bacnetLogger.info("                  : "+d.getName());
+	        bacnetLogger.info("                  : "+d.getModelName());
+	        bacnetLogger.info("                  : "+d.getVendorId());
+	        bacnetLogger.info("                  : "+d.getVendorName());
+	        bacnetLogger.info("                  : "+d.getInstanceNumber());
+
+	        bacnetLogger.info("                  : "+d.getAddress());
+	        bacnetLogger.info("                  : "+d.getAddress().getDescription());
+	        bacnetLogger.info("                  : "+d.getAddress().getMacAddress());
+	        bacnetLogger.info("                  : "+d.getAddress().getMacAddress().getDescription());
+	        
+	        bacnetLogger.info("                  : "+d.getObjectIdentifier());
+	        bacnetLogger.info("                  : "+d.getObjectIdentifier().getInstanceNumber());
+	        bacnetLogger.info("                  : "+d.getObjectIdentifier().getObjectType());
 		}
 		
 		@Override

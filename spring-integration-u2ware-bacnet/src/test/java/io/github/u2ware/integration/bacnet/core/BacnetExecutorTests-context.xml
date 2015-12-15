@@ -11,7 +11,7 @@
 	</bean>
  -->
 	<bean class="io.github.u2ware.integration.bacnet.core.BacnetExecutor">
-		<property name="localPort" value="9994"/>
+		<property name="localPort" value="12340"/>
 	</bean>
 
 </beans>

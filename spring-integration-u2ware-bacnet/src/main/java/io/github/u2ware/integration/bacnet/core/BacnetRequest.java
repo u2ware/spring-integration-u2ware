@@ -8,6 +8,13 @@ public class BacnetRequest {
 	private String type = READ_TYPE;
 	private String remoteAddress;
 	private int remoteInstanceNumber;
+
+	public BacnetRequest(){
+	}
+	public BacnetRequest(String remoteAddress, int remoteInstanceNumber){
+		this.remoteAddress = remoteAddress;
+		this.remoteInstanceNumber = remoteInstanceNumber;
+	}
 	
 	public String getType() {
 		return type;

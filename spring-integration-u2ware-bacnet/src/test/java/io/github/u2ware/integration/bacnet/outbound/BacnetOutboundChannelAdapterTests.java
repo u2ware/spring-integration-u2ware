@@ -38,7 +38,8 @@ public class BacnetOutboundChannelAdapterTests {
     @Test
 	public void testRunning() throws Exception {
 
-		bacnetRequest.send(MessageBuilder.withPayload(new BacnetRequest()).build());
+    	BacnetRequest payload = new BacnetRequest("127.0.0.1:47806", 47806);
+		bacnetRequest.send(MessageBuilder.withPayload(payload).build());
 		Thread.sleep(3000);
 	}
 }

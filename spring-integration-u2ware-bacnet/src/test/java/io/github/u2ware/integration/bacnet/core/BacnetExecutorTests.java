@@ -38,20 +38,14 @@ public class BacnetExecutorTests {
 	@Test
 	public void testFindDevice() throws Exception {
 		
-        logger.debug("1------------------------------------------------");
         logger.debug(bacnetExecutor);
 
-        Thread.sleep(3000);
-        bacnetExecutor.sendGlobalBroadcast();
         Thread.sleep(3000);
         for(RemoteDevice d : bacnetExecutor.getRemoteDevices()){
         	logger.debug(d.getInstanceNumber()+" "+d.getAddress().getDescription());
         }
         
-        
         List<BacnetResponse> result = bacnetExecutor.readValues("127.0.0.1:47808", 47808);
-        for(BacnetResponse r : result){
-        	logger.debug(r);
-        }
+        logger.debug(result.size());
 	}
 }

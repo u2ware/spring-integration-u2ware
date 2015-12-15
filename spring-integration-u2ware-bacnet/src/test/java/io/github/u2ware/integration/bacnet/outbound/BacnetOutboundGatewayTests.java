@@ -43,11 +43,9 @@ public class BacnetOutboundGatewayTests {
     @Test
 	public void testRunning() throws Exception {
 
-    	BacnetRequest r = new BacnetRequest();
-    	r.setRemoteAddress("127.0.0.1:47805");
-    	r.setRemoteInstanceNumber(47805);
+    	BacnetRequest payload = new BacnetRequest("127.0.0.1:47805", 47805);
     	
-		bacnetRequest.send(MessageBuilder.withPayload(r).build());
+		bacnetRequest.send(MessageBuilder.withPayload(payload).build());
 
 		Object receive = bacnetResponse.receive(10000);
 		Assert.assertNotNull(receive);

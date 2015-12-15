@@ -88,20 +88,7 @@
 					<xsd:element ref="integration:poller" minOccurs="0" maxOccurs="1" />
 				</xsd:sequence>
 				<xsd:attributeGroup ref="coreBacnetComponentAttributes"/>
-				<xsd:attribute name="remoteAddress" type="xsd:string">
-					<xsd:annotation>
-						<xsd:documentation><![CDATA[
-							Bacnet Remote Address
-						]]></xsd:documentation>
-					</xsd:annotation>
-				</xsd:attribute>
-				<xsd:attribute name="remoteInstanceNumber" type="xsd:string">
-					<xsd:annotation>
-						<xsd:documentation><![CDATA[
-							Bacnet Instance Number
-						]]></xsd:documentation>
-					</xsd:annotation>
-				</xsd:attribute>
+
 				<xsd:attribute name="channel" type="xsd:string">
 					<xsd:annotation>
 						<xsd:appinfo>
@@ -139,20 +126,7 @@
 				<xsd:element ref="integration:poller" minOccurs="0" maxOccurs="1" />
 			</xsd:sequence>
 			<xsd:attributeGroup ref="coreBacnetComponentAttributes" />
-			<xsd:attribute name="remoteAddress" type="xsd:string">
-				<xsd:annotation>
-					<xsd:documentation><![CDATA[
-						Bacnet Remote Address
-					]]></xsd:documentation>
-				</xsd:annotation>
-			</xsd:attribute>
-			<xsd:attribute name="remoteInstanceNumber" type="xsd:string">
-				<xsd:annotation>
-					<xsd:documentation><![CDATA[
-						Bacnet Instance Number
-					]]></xsd:documentation>
-				</xsd:annotation>
-			</xsd:attribute>
+
 			<xsd:attribute name="request-channel" type="xsd:string" use="required">
 				<xsd:annotation>
 					<xsd:documentation>
