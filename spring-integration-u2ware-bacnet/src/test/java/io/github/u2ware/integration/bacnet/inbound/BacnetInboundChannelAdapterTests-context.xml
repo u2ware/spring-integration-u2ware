@@ -14,9 +14,9 @@
 	<int-u2ware-bacnet:inbound-channel-adapter id="bacnetInboundChannelAdapter"
 		channel="bacnetResponse"
 
-		localPort="9995"
-		remoteAddress="127.0.0.1:47807"
-		remoteInstanceNumber="47807">
+		localPort="47807"
+		remoteAddress="127.0.0.1:37807"
+		remoteInstanceNumber="37807">
 			<int:poller fixed-rate="1000"/>
 	</int-u2ware-bacnet:inbound-channel-adapter>
 	

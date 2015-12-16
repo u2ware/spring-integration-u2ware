@@ -9,6 +9,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -21,7 +22,7 @@ public class BacnetExecutorTests {
 
 	@BeforeClass
 	public static void beforeClass() throws Exception {
-		BacnetSlave.startup(47808);
+		BacnetSlave.startup(37808);
 	}
 
 	@AfterClass
@@ -32,7 +33,7 @@ public class BacnetExecutorTests {
 
 	protected Log logger = LogFactory.getLog(getClass());
 
-	@Autowired 
+	@Autowired @Qualifier("bacnetExcutor")
 	private BacnetExecutor bacnetExecutor;
 	
 	@Test
@@ -45,7 +46,10 @@ public class BacnetExecutorTests {
         	logger.debug(d.getInstanceNumber()+" "+d.getAddress().getDescription());
         }
         
-        List<BacnetResponse> result = bacnetExecutor.readValues("127.0.0.1:47808", 47808);
+        List<BacnetResponse> result = null;
+        
+        result = bacnetExecutor.readValues("127.0.0.1:37808", 37808);
         logger.debug(result.size());
+        
 	}
 }

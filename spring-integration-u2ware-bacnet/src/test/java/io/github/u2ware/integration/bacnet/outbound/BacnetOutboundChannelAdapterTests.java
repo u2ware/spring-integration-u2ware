@@ -22,7 +22,7 @@ public class BacnetOutboundChannelAdapterTests {
 
 	@BeforeClass
 	public static void beforeClass() throws Exception {
-		BacnetSlave.startup(47806);
+		BacnetSlave.startup(37804);
 	}
 
 	@AfterClass
@@ -38,7 +38,7 @@ public class BacnetOutboundChannelAdapterTests {
     @Test
 	public void testRunning() throws Exception {
 
-    	BacnetRequest payload = new BacnetRequest("127.0.0.1:47806", 47806);
+    	BacnetRequest payload = new BacnetRequest("127.0.0.1:37804", 37804);
 		bacnetRequest.send(MessageBuilder.withPayload(payload).build());
 		Thread.sleep(3000);
 	}

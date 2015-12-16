@@ -37,7 +37,7 @@
 					]]></xsd:documentation>
 				</xsd:annotation>
 			</xsd:attribute>
-			<xsd:attribute name="remoteInstanceNumber" use="required" type="xsd:string">
+			<xsd:attribute name="remoteInstanceNumber" use="optional" type="xsd:string">
 				<xsd:annotation>
 					<xsd:documentation><![CDATA[
 						Bacnet Instance Number

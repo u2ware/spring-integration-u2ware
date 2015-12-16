@@ -67,8 +67,8 @@ public class BacnetMessageHandler extends AbstractReplyProducingMessageHandler {
 			}
 			
 			BacnetRequest bacnetRequest = (BacnetRequest)requestPayload;
-			List<BacnetResponse> response = executor.execute(bacnetRequest);
-			if (response == null) {
+			List<BacnetResponse> bacnetResponse = executor.execute(bacnetRequest);
+			if (bacnetResponse == null) {
 				return null;
 			}
 
@@ -76,7 +76,7 @@ public class BacnetMessageHandler extends AbstractReplyProducingMessageHandler {
 				Map<String, Object> headers = Maps.newHashMap();
 				headers.put(BacnetHeaders.REMOTE_ADDRESS, bacnetRequest.getRemoteAddress());
 				headers.put(BacnetHeaders.REMOTE_INSTANCE_NUMBER, bacnetRequest.getRemoteInstanceNumber());
-				return MessageBuilder.withPayload(response).copyHeaders(headers).build();
+				return MessageBuilder.withPayload(bacnetResponse).copyHeaders(headers).build();
 			}else{
 				return null;
 			}
