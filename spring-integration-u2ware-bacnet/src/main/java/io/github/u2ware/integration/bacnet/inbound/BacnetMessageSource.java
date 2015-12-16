@@ -115,7 +115,7 @@ implements MessageSource<List<BacnetResponse>>{
 				nextIndex = 0;
 				for(String itemArray : itemArrays){
 					
-					String[] item = StringUtils.delimitedListToStringArray(itemArray, "|");
+					String[] item = StringUtils.delimitedListToStringArray(itemArray, "_");
 					String address = item[0];
 					int instanceNumber = Integer.parseInt(item[1]);
 					requests.add(new BacnetRequest(address, instanceNumber));
