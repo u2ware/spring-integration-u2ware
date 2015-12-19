@@ -70,7 +70,7 @@ public class HttpServletServer extends AbstractTcpServer implements EnvironmentA
 		
 		AnnotationConfigWebApplicationContext wac = new AnnotationConfigWebApplicationContext();
 		wac.setServletContext(servletContext);
-		wac.setClassLoader(getClass().getClassLoader());
+		//wac.setClassLoader(resourceLoader.getClassLoader());
 		wac.setServletConfig(servletConfig);
 		wac.setEnvironment(env);
 		wac.register(configClass);
