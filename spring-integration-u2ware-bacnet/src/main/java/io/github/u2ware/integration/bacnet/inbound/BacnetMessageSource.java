@@ -84,7 +84,8 @@ implements MessageSource<List<BacnetResponse>>{
 			return MessageBuilder.withPayload(bacnetResponse).copyHeaders(headers).build();
 			
 		}catch(Exception e){
-			logger.info("BACNet LocalDevice Error", e);
+			if(logger.isDebugEnabled())
+				logger.debug("BACNet LocalDevice Error", e);
 			return null;
 		}
 	}
