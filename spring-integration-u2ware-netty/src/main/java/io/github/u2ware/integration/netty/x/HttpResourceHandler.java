@@ -80,7 +80,8 @@ public class HttpResourceHandler extends SimpleChannelInboundHandler<FullHttpReq
             return;
         }
 
-		nettyLogger.info(new StringBuilder().append(ctx.channel().toString()).append(" READ0").append("\n").append(request.toString()));
+		if(nettyLogger.isDebugEnabled())
+			nettyLogger.info(new StringBuilder().append(ctx.channel().toString()).append(" READ0").append("\n").append(request.toString()));
         
         final String uri = request.getUri();
         final Resource resource = sanitizeResource(resourceLoader, resourceLocation, uri);
@@ -90,7 +91,8 @@ public class HttpResourceHandler extends SimpleChannelInboundHandler<FullHttpReq
             return;
         }
 
-		nettyLogger.info(new StringBuilder().append(ctx.channel().toString()).append(" READ0").append("\n").append(resource.toString()));
+		if(nettyLogger.isDebugEnabled())
+			nettyLogger.info(new StringBuilder().append(ctx.channel().toString()).append(" READ0").append("\n").append(resource.toString()));
         
     	long contentLength = resource.contentLength();
     	long lastModified = resource.lastModified();
@@ -147,7 +149,9 @@ public class HttpResourceHandler extends SimpleChannelInboundHandler<FullHttpReq
             	//logger.info(future.channel() + " Response complete.");
             }
         });
-		nettyLogger.info(new StringBuilder().append(ctx.channel().toString()).append(" READ0").append("\n").append(response.toString()));
+        
+		if(nettyLogger.isDebugEnabled())
+			nettyLogger.info(new StringBuilder().append(ctx.channel().toString()).append(" READ0").append("\n").append(response.toString()));
         
         sendFileFuture.addListener(ChannelFutureListener.CLOSE);
     }

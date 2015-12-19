@@ -81,7 +81,8 @@ public class HttpMessageHandler extends SimpleChannelInboundHandler<FullHttpRequ
 	@Override
 	protected void channelRead0(ChannelHandlerContext ctx, FullHttpRequest request) throws Exception {
 
-		nettyLogger.info(new StringBuilder().append(ctx.channel().toString()).append(" READ0").append("\n").append(request.toString()));
+		if(nettyLogger.isDebugEnabled())
+			nettyLogger.info(new StringBuilder().append(ctx.channel().toString()).append(" READ0").append("\n").append(request.toString()));
 		
 		Message<?> sendMessage = toMessage(ctx, request);
 		//logger.debug("Send Message Header: " + requestMessage.getHeaders());
@@ -96,7 +97,9 @@ public class HttpMessageHandler extends SimpleChannelInboundHandler<FullHttpRequ
 
 		FullHttpResponse response = fromMessage(ctx, responseMessage);
         ctx.writeAndFlush(response).addListener(ChannelFutureListener.CLOSE);
-        nettyLogger.info(new StringBuilder().append(ctx.channel().toString()).append(" READ0").append("\n").append(response.toString()));
+		
+        if(nettyLogger.isDebugEnabled())
+			nettyLogger.info(new StringBuilder().append(ctx.channel().toString()).append(" READ0").append("\n").append(response.toString()));
     }
 
 	@Override

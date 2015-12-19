@@ -148,7 +148,8 @@ public class HttpServletHandler extends SimpleChannelInboundHandler<FullHttpRequ
 			sendError(ctx, BAD_REQUEST);
 			return;
 		}
-		nettyLogger.info(new StringBuilder().append(ctx.channel().toString()).append(" READ0").append("\n").append(request.toString()));
+		if(nettyLogger.isDebugEnabled())
+			nettyLogger.debug(new StringBuilder().append(ctx.channel().toString()).append(" READ0").append("\n").append(request.toString()));
 
 		MockHttpServletRequest servletRequest = createServletRequest(request);
 		MockHttpServletResponse servletResponse = new MockHttpServletResponse();
@@ -178,7 +179,8 @@ public class HttpServletHandler extends SimpleChannelInboundHandler<FullHttpRequ
 		ChannelFuture writeFuture = ctx.writeAndFlush(new ChunkedStream(contentStream));
 		writeFuture.addListener(ChannelFutureListener.CLOSE);
 
-		nettyLogger.info(new StringBuilder().append(ctx.channel().toString()).append(" READ0").append("\n").append(response.toString()));
+		if(nettyLogger.isDebugEnabled())
+			nettyLogger.debug(new StringBuilder().append(ctx.channel().toString()).append(" READ0").append("\n").append(response.toString()));
 	}
 
 }

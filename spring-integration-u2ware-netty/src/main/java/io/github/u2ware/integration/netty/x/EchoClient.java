@@ -15,7 +15,7 @@ import org.springframework.messaging.PollableChannel;
 
 public class EchoClient extends AbstractTcpClient{
 	
-	private Log nettyLogger = LogFactory.getLog(getClass());
+	private final Log nettyLogger = LogFactory.getLog(getClass());
 
 	private MessageChannel sendChannel;
 	private PollableChannel receiveChannel;
