@@ -211,7 +211,7 @@ public class BacnetExecutor extends ThreadPoolTaskExecutor {
             	if(obj == null){
             		obj = new BacnetResponse();
                 	
-            		obj.setId(remoteDevice.getInstanceNumber()+"_"+oid.getInstanceNumber()+"_"+oid.getObjectType().intValue());
+            		obj.setId(remoteDevice.getInstanceNumber()+"_"+oid.getObjectType().intValue()+"_"+oid.getInstanceNumber());
             		obj.setObjectIdentifier(oid.toString());
             	}
             	
