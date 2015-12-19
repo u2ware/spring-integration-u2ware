@@ -32,6 +32,8 @@ import io.netty.handler.codec.http.HttpResponse;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.stream.ChunkedStream;
 import io.netty.util.CharsetUtil;
+import io.netty.util.internal.logging.InternalLogger;
+import io.netty.util.internal.logging.InternalLoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -45,7 +47,6 @@ import java.util.Locale;
 import java.util.TimeZone;
 import java.util.regex.Pattern;
 
-import org.apache.commons.logging.Log;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.mail.javamail.ConfigurableMimeFileTypeMap;
@@ -57,12 +58,12 @@ public class HttpResourceHandler extends SimpleChannelInboundHandler<FullHttpReq
     public static final String HTTP_DATE_GMT_TIMEZONE = "GMT";
     public static final int HTTP_CACHE_SECONDS = 60;
 
-    private Log nettyLogger;
+    private InternalLogger nettyLogger;
 	private ResourceLoader resourceLoader;
 	private String resourceLocation;
 
-	public HttpResourceHandler(Log nettyLogger, ResourceLoader resourceLoader, String resourceLocation){
-		this.nettyLogger = nettyLogger;
+	public HttpResourceHandler(Class<?> clazz, ResourceLoader resourceLoader, String resourceLocation){
+		this.nettyLogger = InternalLoggerFactory.getInstance(clazz);
 		this.resourceLoader = resourceLoader;
 		this.resourceLocation = resourceLocation;
 	}
@@ -81,7 +82,7 @@ public class HttpResourceHandler extends SimpleChannelInboundHandler<FullHttpReq
         }
 
 		if(nettyLogger.isDebugEnabled())
-			nettyLogger.info(new StringBuilder().append(ctx.channel().toString()).append(" READ0").append("\n").append(request.toString()));
+			nettyLogger.debug(new StringBuilder().append(ctx.channel().toString()).append(" READ0").append("\n").append(request.toString()).toString());
         
         final String uri = request.getUri();
         final Resource resource = sanitizeResource(resourceLoader, resourceLocation, uri);
@@ -92,7 +93,7 @@ public class HttpResourceHandler extends SimpleChannelInboundHandler<FullHttpReq
         }
 
 		if(nettyLogger.isDebugEnabled())
-			nettyLogger.info(new StringBuilder().append(ctx.channel().toString()).append(" READ0").append("\n").append(resource.toString()));
+			nettyLogger.debug(new StringBuilder().append(ctx.channel().toString()).append(" READ0").append("\n").append(resource.toString()).toString());
         
     	long contentLength = resource.contentLength();
     	long lastModified = resource.lastModified();
@@ -151,7 +152,7 @@ public class HttpResourceHandler extends SimpleChannelInboundHandler<FullHttpReq
         });
         
 		if(nettyLogger.isDebugEnabled())
-			nettyLogger.info(new StringBuilder().append(ctx.channel().toString()).append(" READ0").append("\n").append(response.toString()));
+			nettyLogger.debug(new StringBuilder().append(ctx.channel().toString()).append(" READ0").append("\n").append(response.toString()).toString());
         
         sendFileFuture.addListener(ChannelFutureListener.CLOSE);
     }

@@ -13,10 +13,7 @@ import io.netty.channel.EventLoop;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioSocketChannel;
-import io.netty.handler.ssl.SslContext;
-import io.netty.handler.ssl.SslContextBuilder;
 import io.netty.handler.ssl.SslHandler;
-import io.netty.handler.ssl.util.InsecureTrustManagerFactory;
 
 import java.util.concurrent.TimeUnit;
 
@@ -114,8 +111,9 @@ public abstract class AbstractTcpClient extends ChannelInitializer<Channel> impl
 	protected abstract void initChannelPipeline(ChannelPipeline pipeline)throws Exception;
 
 	protected SslHandler createSslHandler(Channel channel) throws SSLException {
-		SslContext sslCtx = SslContextBuilder.forClient().trustManager(InsecureTrustManagerFactory.INSTANCE).build();
-		return sslCtx.newHandler(channel.alloc(), getHost(), getPort());
+		return null;
+		//SslContext sslCtx = SslContextBuilder.forClient().trustManager(InsecureTrustManagerFactory.INSTANCE).build();
+		//return sslCtx.newHandler(channel.alloc(), getHost(), getPort());
 	}
 	
 	

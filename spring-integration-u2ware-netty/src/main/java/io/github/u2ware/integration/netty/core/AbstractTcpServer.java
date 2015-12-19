@@ -8,10 +8,7 @@ import io.netty.channel.ChannelPipeline;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
-import io.netty.handler.ssl.SslContext;
-import io.netty.handler.ssl.SslContextBuilder;
 import io.netty.handler.ssl.SslHandler;
-import io.netty.handler.ssl.util.SelfSignedCertificate;
 
 import java.security.cert.CertificateException;
 
@@ -96,8 +93,9 @@ public abstract class AbstractTcpServer extends ChannelInitializer<Channel> impl
 	protected abstract void initChannelPipeline(ChannelPipeline pipeline)throws Exception;
 	
 	protected SslHandler createSslHandler(Channel channel) throws SSLException, CertificateException {
-        SelfSignedCertificate ssc = new SelfSignedCertificate();
-        SslContext sslCtx = SslContextBuilder.forServer(ssc.certificate(), ssc.privateKey()).build();
-		return sslCtx.newHandler(channel.alloc());
+		return null;
+//        SelfSignedCertificate ssc = new SelfSignedCertificate();
+//        SslContext sslCtx = SslContextBuilder.forServer(ssc.certificate(), ssc.privateKey()).build();
+//		return sslCtx.newHandler(channel.alloc());
 	}
 }

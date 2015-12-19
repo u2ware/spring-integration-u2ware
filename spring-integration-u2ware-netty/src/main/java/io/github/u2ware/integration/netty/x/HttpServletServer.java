@@ -31,8 +31,8 @@ import org.springframework.web.servlet.DispatcherServlet;
 
 public class HttpServletServer extends AbstractTcpServer implements EnvironmentAware, ResourceLoaderAware, InitializingBean, DisposableBean{
 
-	private final Log nettyLogger = LogFactory.getLog(getClass());
-
+	private Log logger = LogFactory.getLog(getClass());
+	
 	private DispatcherServlet dispatcherServlet;
 	private Map<String, Object> defaultProperties;
 	//private Environment environment;
@@ -84,9 +84,9 @@ public class HttpServletServer extends AbstractTcpServer implements EnvironmentA
 		for(String beanName : beanNames){
 			Object beanObject = wac.getBean(beanName);
 			if(beanObject != null){
-				nettyLogger.debug(beanName+"="+beanObject.getClass());
+				logger.debug(beanName+"="+beanObject.getClass());
 			}else{
-				nettyLogger.debug(beanName+"="+null);
+				logger.debug(beanName+"="+null);
 			}
 		}
 		//set spring config in xml
@@ -112,12 +112,12 @@ public class HttpServletServer extends AbstractTcpServer implements EnvironmentA
 
 	@Override
 	protected void initChannelPipeline(ChannelPipeline pipeline) throws Exception {
-		pipeline.addLast("logging", new NettyLoggingHandler(nettyLogger, false));
+		pipeline.addLast("logging", new NettyLoggingHandler(getClass(), false));
 		pipeline.addLast("decoder", new HttpRequestDecoder());
 		pipeline.addLast("aggregator", new HttpObjectAggregator(65536));
 		pipeline.addLast("encoder", new HttpResponseEncoder());
 		pipeline.addLast("chunkedWriter", new ChunkedWriteHandler());
-		pipeline.addLast("handler", new HttpServletHandler(nettyLogger, this.dispatcherServlet));
+		pipeline.addLast("handler", new HttpServletHandler(getClass(), this.dispatcherServlet));
 	}
 
 }

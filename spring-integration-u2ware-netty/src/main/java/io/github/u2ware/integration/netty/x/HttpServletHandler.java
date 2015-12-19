@@ -19,6 +19,8 @@ import io.netty.handler.codec.http.HttpResponse;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.stream.ChunkedStream;
 import io.netty.util.CharsetUtil;
+import io.netty.util.internal.logging.InternalLogger;
+import io.netty.util.internal.logging.InternalLoggerFactory;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -29,7 +31,6 @@ import java.util.Map.Entry;
 import javax.servlet.Servlet;
 import javax.servlet.ServletContext;
 
-import org.apache.commons.logging.Log;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.web.util.UriComponents;
@@ -39,13 +40,13 @@ import org.springframework.web.util.UriUtils;
 @Sharable
 public class HttpServletHandler extends SimpleChannelInboundHandler<FullHttpRequest> {
 
+	private final InternalLogger nettyLogger;
 	private final Servlet servlet;
-	private final Log nettyLogger;
 
 	private final ServletContext servletContext;
 
-	public HttpServletHandler(Log nettyLogger, Servlet servlet) {
-		this.nettyLogger = nettyLogger;
+	public HttpServletHandler(Class<?> clazz, Servlet servlet) {
+		this.nettyLogger = InternalLoggerFactory.getInstance(clazz);
 		this.servlet = servlet;
 		this.servletContext = servlet.getServletConfig().getServletContext();
 	}
@@ -149,7 +150,7 @@ public class HttpServletHandler extends SimpleChannelInboundHandler<FullHttpRequ
 			return;
 		}
 		if(nettyLogger.isDebugEnabled())
-			nettyLogger.debug(new StringBuilder().append(ctx.channel().toString()).append(" READ0").append("\n").append(request.toString()));
+			nettyLogger.debug(new StringBuilder().append(ctx.channel().toString()).append(" READ0").append("\n").append(request.toString()).toString());
 
 		MockHttpServletRequest servletRequest = createServletRequest(request);
 		MockHttpServletResponse servletResponse = new MockHttpServletResponse();
@@ -180,7 +181,7 @@ public class HttpServletHandler extends SimpleChannelInboundHandler<FullHttpRequ
 		writeFuture.addListener(ChannelFutureListener.CLOSE);
 
 		if(nettyLogger.isDebugEnabled())
-			nettyLogger.debug(new StringBuilder().append(ctx.channel().toString()).append(" READ0").append("\n").append(response.toString()));
+			nettyLogger.debug(new StringBuilder().append(ctx.channel().toString()).append(" READ0").append("\n").append(response.toString()).toString());
 	}
 
 }

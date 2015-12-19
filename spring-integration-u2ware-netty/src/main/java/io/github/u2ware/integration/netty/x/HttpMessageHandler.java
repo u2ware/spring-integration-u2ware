@@ -15,6 +15,8 @@ import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpResponse;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.HttpVersion;
+import io.netty.util.internal.logging.InternalLogger;
+import io.netty.util.internal.logging.InternalLoggerFactory;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -23,7 +25,6 @@ import java.nio.charset.Charset;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.apache.commons.logging.Log;
 import org.springframework.http.MediaType;
 import org.springframework.integration.core.MessagingTemplate;
 import org.springframework.integration.support.MessageBuilder;
@@ -42,16 +43,16 @@ import com.google.common.collect.Maps;
 @Sharable
 public class HttpMessageHandler extends SimpleChannelInboundHandler<FullHttpRequest>{
 	
-	private Log nettyLogger;
+	private InternalLogger nettyLogger;
 	private MessagingTemplate template;
 	private MessageChannel sendChannel;
 	private PollableChannel receiveChannel;
 
-	public HttpMessageHandler(Log nettyLogger, MessageChannel sendChannel, PollableChannel receiveChannel){
-		this(nettyLogger, sendChannel, receiveChannel, 3000);
+	public HttpMessageHandler(Class<?> clazz, MessageChannel sendChannel, PollableChannel receiveChannel){
+		this(clazz, sendChannel, receiveChannel, 3000);
 	}
-	public HttpMessageHandler(Log nettyLogger, MessageChannel sendChannel, PollableChannel receiveChannel, long timeout){
-		this.nettyLogger = nettyLogger;
+	public HttpMessageHandler(Class<?> clazz, MessageChannel sendChannel, PollableChannel receiveChannel, long timeout){
+		this.nettyLogger = InternalLoggerFactory.getInstance(clazz);
 		this.template = new MessagingTemplate();
 		template.setReceiveTimeout(timeout);
 		template.setSendTimeout(timeout);
@@ -59,9 +60,9 @@ public class HttpMessageHandler extends SimpleChannelInboundHandler<FullHttpRequ
 		this.sendChannel = sendChannel;
 		this.receiveChannel = receiveChannel;
 	}
-	public HttpMessageHandler(Log nettyLogger, MessageChannel sendChannel, PollableChannel receiveChannel, MessagingTemplate template){
+	public HttpMessageHandler(Class<?> clazz, MessageChannel sendChannel, PollableChannel receiveChannel, MessagingTemplate template){
 		Assert.notNull(template, "template must not be null.");
-		this.nettyLogger = nettyLogger;
+		this.nettyLogger = InternalLoggerFactory.getInstance(clazz);
 		this.template = template;
 		this.sendChannel = sendChannel;
 		this.receiveChannel = receiveChannel;
@@ -82,7 +83,7 @@ public class HttpMessageHandler extends SimpleChannelInboundHandler<FullHttpRequ
 	protected void channelRead0(ChannelHandlerContext ctx, FullHttpRequest request) throws Exception {
 
 		if(nettyLogger.isDebugEnabled())
-			nettyLogger.info(new StringBuilder().append(ctx.channel().toString()).append(" READ0").append("\n").append(request.toString()));
+			nettyLogger.debug(new StringBuilder().append(ctx.channel().toString()).append(" READ0").append("\n").append(request.toString()).toString());
 		
 		Message<?> sendMessage = toMessage(ctx, request);
 		//logger.debug("Send Message Header: " + requestMessage.getHeaders());
@@ -99,7 +100,7 @@ public class HttpMessageHandler extends SimpleChannelInboundHandler<FullHttpRequ
         ctx.writeAndFlush(response).addListener(ChannelFutureListener.CLOSE);
 		
         if(nettyLogger.isDebugEnabled())
-			nettyLogger.info(new StringBuilder().append(ctx.channel().toString()).append(" READ0").append("\n").append(response.toString()));
+			nettyLogger.debug(new StringBuilder().append(ctx.channel().toString()).append(" READ0").append("\n").append(response.toString()).toString());
     }
 
 	@Override

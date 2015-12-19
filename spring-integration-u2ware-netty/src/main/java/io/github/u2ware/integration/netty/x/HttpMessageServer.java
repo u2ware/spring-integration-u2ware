@@ -8,14 +8,10 @@ import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.codec.http.HttpRequestDecoder;
 import io.netty.handler.codec.http.HttpResponseEncoder;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.PollableChannel;
 
 public class HttpMessageServer extends AbstractTcpServer{
-	
-	private final Log nettyLogger = LogFactory.getLog(getClass());
 	
 	private MessageChannel sendChannel;
 	private PollableChannel receiveChannel;
@@ -36,11 +32,11 @@ public class HttpMessageServer extends AbstractTcpServer{
 	}
 	@Override
 	protected void initChannelPipeline(ChannelPipeline pipeline) throws Exception {
-		pipeline.addLast(new NettyLoggingHandler(nettyLogger, false));
+		pipeline.addLast(new NettyLoggingHandler(getClass(), false));
 		pipeline.addLast(new HttpRequestDecoder());
 	    pipeline.addLast(new HttpObjectAggregator(maxContentLength));
 		pipeline.addLast(new HttpResponseEncoder());
 	    pipeline.addLast(new HttpContentCompressor());
-		pipeline.addLast(new HttpMessageHandler(nettyLogger, sendChannel, receiveChannel, messagingTimeout));
+		pipeline.addLast(new HttpMessageHandler(getClass(), sendChannel, receiveChannel, messagingTimeout));
 	}
 }

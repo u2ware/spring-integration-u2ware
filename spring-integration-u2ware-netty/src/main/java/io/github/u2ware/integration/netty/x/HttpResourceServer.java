@@ -7,14 +7,10 @@ import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.codec.http.HttpServerCodec;
 import io.netty.handler.stream.ChunkedWriteHandler;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.springframework.context.ResourceLoaderAware;
 import org.springframework.core.io.ResourceLoader;
 
 public class HttpResourceServer extends AbstractTcpServer implements ResourceLoaderAware{
-
-	private final Log nettyLogger = LogFactory.getLog(getClass());
 
 	private String resourceLocation;
 	private ResourceLoader resourceLoader;
@@ -29,10 +25,10 @@ public class HttpResourceServer extends AbstractTcpServer implements ResourceLoa
 
 	@Override
 	protected void initChannelPipeline(ChannelPipeline pipeline) throws Exception {
-		pipeline.addLast(new NettyLoggingHandler(nettyLogger, false));
+		pipeline.addLast(new NettyLoggingHandler(getClass(), false));
         pipeline.addLast(new HttpServerCodec());
         pipeline.addLast(new HttpObjectAggregator(65536));
         pipeline.addLast(new ChunkedWriteHandler());
-        pipeline.addLast(new HttpResourceHandler(nettyLogger, resourceLoader, resourceLocation));
+        pipeline.addLast(new HttpResourceHandler(getClass(), resourceLoader, resourceLocation));
 	}
 }
