@@ -84,7 +84,8 @@ public class ModbusMessageHandler extends AbstractReplyProducingMessageHandler {
 			}
 
 		}catch(Exception e){
-			logger.info("Modbus Client Error", e);
+			if(logger.isDebugEnabled())
+				logger.debug("Modbus Client Error", e);
 			return null;
 		}
 	}
