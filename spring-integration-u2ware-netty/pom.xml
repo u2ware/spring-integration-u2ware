@@ -14,17 +14,7 @@
 		    <groupId>io.netty</groupId>
 		    <artifactId>netty-all</artifactId>
 		    <version>4.0.27.Final</version>
-		</dependency>
-		<dependency>
-			<groupId>javax.servlet</groupId>
-			<artifactId>javax.servlet-api</artifactId>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-		    <groupId>org.webjars.bower</groupId>
-		    <artifactId>angularjs</artifactId>
-		    <version>1.4.8</version>
-		    <scope>test</scope>
+		    <scope>provided</scope>
 		</dependency>
 	</dependencies>
 
