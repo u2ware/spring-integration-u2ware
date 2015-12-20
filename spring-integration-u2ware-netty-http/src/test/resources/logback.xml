@@ -6,11 +6,11 @@
 		</layout>
 	</appender>
 
- 	<logger name="org.springframework.boot.context.embedded" level="INFO" />
-<!-- 
- 	<logger name="org.springframework" level="INFO" />
- -->	
-	<logger name="io.github.u2ware.integration" level="INFO" />
+
+	<logger name="io.netty" level="OFF" />
+	<logger name="org.springframework.integration.channel" level="OFF" />
+	<logger name="io.github.u2ware.integration" level="DEBUG" />
+
 
 	<root level="OFF">
 		<appender-ref ref="STDOUT" />

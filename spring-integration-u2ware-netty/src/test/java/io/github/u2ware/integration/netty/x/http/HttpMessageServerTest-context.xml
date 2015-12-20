@@ -1,0 +1,42 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xmlns:context="http://www.springframework.org/schema/context"
+	   xmlns:util="http://www.springframework.org/schema/util"
+	   xmlns:int="http://www.springframework.org/schema/integration"
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd http://www.springframework.org/schema/integration http://www.springframework.org/schema/integration/spring-integration.xsd">
+
+
+	<bean id="echoHttp" class="io.github.u2ware.integration.netty.x.HttpMessageServer">
+		<property name="port" value="9991"/>
+		<property name="receiveChannel" ref="echoResponse"/>
+		<property name="sendChannel" ref="httpRequest"/>
+	</bean>
+
+	<int:channel id="httpRequest">
+		<int:queue/>
+	</int:channel>
+
+	<int:transformer input-channel="httpRequest"
+						output-channel="echoRequest"
+					expression="payload.toString() + T(System).getProperty('line.separator')">
+		<int:poller fixed-delay="500"/>
+	</int:transformer>
+
+	<int:channel id="echoRequest">
+		<int:queue/>
+	</int:channel>
+
+	
+	<bean id="echoClient" class="io.github.u2ware.integration.netty.x.SampleEchoClient">
+		<property name="host" value="127.0.0.1"/>
+		<property name="port" value="10901"/>
+		<property name="receiveChannel" ref="echoRequest"/>
+		<property name="sendChannel" ref="echoResponse"/>
+	</bean>
+	
+	<int:channel id="echoResponse">
+		<int:queue/>
+	</int:channel>
+	
+	
+</beans>

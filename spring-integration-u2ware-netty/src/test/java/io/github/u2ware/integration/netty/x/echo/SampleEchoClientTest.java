@@ -1,6 +1,6 @@
-package io.github.u2ware.integration.netty.x;
+package io.github.u2ware.integration.netty.x.echo;
 
-import io.github.u2ware.integration.netty.x.EchoServer;
+import io.github.u2ware.integration.netty.x.SampleEchoServer;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -18,15 +18,15 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration
-public class EchoClientTest {
+public class SampleEchoClientTest {
 
 	@BeforeClass
 	public static void beforeClass() throws Exception{
-		EchoServer.startup(10900);
+		SampleEchoServer.startup(10900);
 	}
 	@AfterClass
 	public static void afterClass() throws Exception{
-		EchoServer.shutdown();
+		SampleEchoServer.shutdown();
 	}
 	
 	

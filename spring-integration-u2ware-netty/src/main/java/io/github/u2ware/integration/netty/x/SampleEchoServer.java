@@ -6,7 +6,7 @@ import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.channel.ChannelPipeline;
 import io.netty.handler.codec.LineBasedFrameDecoder;
 
-public class EchoServer extends AbstractTcpServer{
+public class SampleEchoServer extends AbstractTcpServer{
 
 	public static void main(String[] args) throws Exception{
 		int port = 10900;
@@ -14,13 +14,13 @@ public class EchoServer extends AbstractTcpServer{
 			port = Integer.parseInt(args[0]);
 		}catch(Exception e){
 		}
-		EchoServer.startup(port);
+		SampleEchoServer.startup(port);
 	}
 	
-	private static EchoServer echoServer;
+	private static SampleEchoServer echoServer;
 	
 	public static void startup(int port) throws Exception{
-		echoServer = new EchoServer();
+		echoServer = new SampleEchoServer();
 		echoServer.setPort(port);
 		echoServer.afterPropertiesSet();
 	}

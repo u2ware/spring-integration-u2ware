@@ -11,7 +11,7 @@ import io.netty.handler.codec.string.StringEncoder;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.PollableChannel;
 
-public class EchoClient extends AbstractTcpClient{
+public class SampleEchoClient extends AbstractTcpClient{
 	
 	private MessageChannel sendChannel;
 	private PollableChannel receiveChannel;
