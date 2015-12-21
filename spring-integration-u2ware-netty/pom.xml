@@ -16,6 +16,7 @@
 		    <version>4.0.27.Final</version>
 		    <scope>provided</scope>
 		</dependency>
+		<!--  
 		<dependency>
 			<groupId>javax.servlet</groupId>
 			<artifactId>javax.servlet-api</artifactId>
@@ -32,7 +33,7 @@
 			<artifactId>spring-boot-starter-jetty</artifactId>
 		    <scope>test</scope>
 		</dependency>
- 		
+ 		-->
 	</dependencies>
 
 </project>
