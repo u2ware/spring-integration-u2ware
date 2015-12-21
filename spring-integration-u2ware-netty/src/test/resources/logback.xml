@@ -6,9 +6,9 @@
 		</layout>
 	</appender>
 
- 	<logger name="org.springframework.boot.context.embedded" level="INFO" />
-<!-- 
  	<logger name="org.springframework" level="INFO" />
+<!-- 
+ 	<logger name="org.springframework.boot.context.embedded" level="INFO" />
  -->	
 	<logger name="io.github.u2ware.integration" level="INFO" />
 

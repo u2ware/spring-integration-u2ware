@@ -49,6 +49,12 @@ public class SpringBootMockServer extends AbstractTcpServer implements Environme
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		
+		if(defaultProperties != null){
+			for(String key : defaultProperties.keySet()){
+				System.setProperty(key, defaultProperties.get(key).toString());
+			}
+		}
+
 		StandardServletEnvironment env = new StandardServletEnvironment();
 		MutablePropertySources sources = env.getPropertySources();
 		if (this.defaultProperties != null && !this.defaultProperties.isEmpty()) {
@@ -98,7 +104,7 @@ public class SpringBootMockServer extends AbstractTcpServer implements Environme
 		try{
 			port =  Integer.parseInt(env.getProperty("server.port"));
 		}catch(Exception e){
-			
+			e.printStackTrace();
 		}
 		super.setPort(port);
 		

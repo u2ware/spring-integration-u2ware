@@ -7,6 +7,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.boot.Banner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.context.ApplicationContext;
 
@@ -35,11 +36,12 @@ public class SpringBootEmbeddedServer implements InitializingBean, DisposableBea
 		
 		if(defaultProperties != null){
 			for(String key : defaultProperties.keySet()){
-				System.setProperty(getClass().getName()+"#"+key, defaultProperties.get(key).toString());
+				System.setProperty(key, defaultProperties.get(key).toString());
 			}
 		}
 		
 		SpringApplication application = new SpringApplication(configClass);
+		application.setBannerMode(Banner.Mode.OFF);
 		application.setDefaultProperties(defaultProperties);
 		context = application.run(new String[]{});
 
