@@ -7,7 +7,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.boot.Banner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.context.ApplicationContext;
 
@@ -31,6 +30,7 @@ public class SpringBootEmbeddedServer implements InitializingBean, DisposableBea
 		SpringApplication.exit(context);
 	}
 
+	@SuppressWarnings("deprecation")
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		
@@ -41,7 +41,7 @@ public class SpringBootEmbeddedServer implements InitializingBean, DisposableBea
 		}
 		
 		SpringApplication application = new SpringApplication(configClass);
-		application.setBannerMode(Banner.Mode.OFF);
+		application.setShowBanner(false);
 		application.setDefaultProperties(defaultProperties);
 		context = application.run(new String[]{});
 
