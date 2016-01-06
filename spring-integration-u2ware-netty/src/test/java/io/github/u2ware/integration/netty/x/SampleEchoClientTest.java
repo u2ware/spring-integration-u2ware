@@ -1,4 +1,4 @@
-package io.github.u2ware.integration.netty.x.echo;
+package io.github.u2ware.integration.netty.x;
 
 import io.github.u2ware.integration.netty.x.SampleEchoServer;
 

@@ -6,6 +6,7 @@
 		</layout>
 	</appender>
 
+ 	<logger name="io.netty" level="INFO" />
  	<logger name="org.springframework" level="INFO" />
 <!-- 
  	<logger name="org.springframework.boot.context.embedded" level="INFO" />
