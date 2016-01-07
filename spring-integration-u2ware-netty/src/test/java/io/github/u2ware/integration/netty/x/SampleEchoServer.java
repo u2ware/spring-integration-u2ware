@@ -36,6 +36,8 @@ public class SampleEchoServer extends AbstractTcpServer{
 		pipeline.addLast(new ChannelInboundHandlerAdapter(){
     		public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
     			ctx.writeAndFlush(msg);
+    			
+    			ctx.channel().read();
     		}
         });
 	}
