@@ -217,7 +217,11 @@ public class BacnetExecutor extends ThreadPoolTaskExecutor {
             	
             	
             	if(PropertyIdentifier.presentValue.equals(pid)){
-            		obj.setValue(value.toString());
+            		try{
+                		obj.setValue(Float.parseFloat(value.toString()));
+            		}catch(Exception e){
+                		obj.setValue(value.toString());
+            		}
         		
             	}else if(PropertyIdentifier.units.equals(pid)){
             		obj.setUnits(value.toString());
