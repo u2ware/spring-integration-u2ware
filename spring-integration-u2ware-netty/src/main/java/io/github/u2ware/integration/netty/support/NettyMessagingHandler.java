@@ -60,7 +60,7 @@ public class NettyMessagingHandler extends ChannelDuplexHandler {
 	        				}else{
 		            			template.convertAndSend(sendChannel, "{}");
 	        				}
-	    	    			logger.info("MESSAGE RECEIVED AND RELEASE");
+	    	    			logger.info("MESSAGE RECEIVED AND SEND");
 	        			}else{
 		        			logger.info("MESSAGE RECEIVED ");
 	            			ctx.writeAndFlush(message.getPayload());
@@ -83,17 +83,15 @@ public class NettyMessagingHandler extends ChannelDuplexHandler {
     public void channelRead(final ChannelHandlerContext ctx, final Object msg) throws Exception {
 
 		if(sendChannel != null){
-			if(useSendMessage){
-				this.sendMessage = msg;
-    			logger.info("MESSAGE RELEASE ");
+    		ctx.executor().submit(new Runnable() {
+				public void run() {
+	    			template.convertAndSend(sendChannel, msg);
+	    			logger.info("MESSAGE SEND ");
+				}
+			});
 
-			}else{
-	    		ctx.executor().submit(new Runnable() {
-					public void run() {
-		    			template.convertAndSend(sendChannel, msg);
-		    			logger.info("MESSAGE SEND ");
-					}
-				});
+    		if(useSendMessage){
+				this.sendMessage = msg;
 			}
     	}
 	}
@@ -101,6 +99,6 @@ public class NettyMessagingHandler extends ChannelDuplexHandler {
 	
 	@Override
 	public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-		logger.info("MESSAGE EXCEPTION ", cause);
+		logger.info("MESSAGE EXCEPTION: "+cause.getMessage());
 	}
 }
