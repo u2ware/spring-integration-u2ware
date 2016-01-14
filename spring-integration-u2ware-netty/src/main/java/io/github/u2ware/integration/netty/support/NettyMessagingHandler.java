@@ -4,6 +4,8 @@ import io.netty.channel.ChannelDuplexHandler;
 import io.netty.channel.ChannelHandler.Sharable;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.util.concurrent.ScheduledFuture;
+import io.netty.util.internal.logging.InternalLogger;
+import io.netty.util.internal.logging.InternalLoggerFactory;
 
 import java.util.concurrent.TimeUnit;
 
@@ -15,107 +17,80 @@ import org.springframework.messaging.PollableChannel;
 @Sharable
 public class NettyMessagingHandler extends ChannelDuplexHandler {
 
+	private InternalLogger logger;
 	private ScheduledFuture<?> scheduledFuture;
 
-	private final MessagingTemplate template;
-	private final MessageChannel sendChannel;
-	private final PollableChannel receiveChannel;
+	private MessagingTemplate template;
+	private PollableChannel receiveChannel;
+	private MessageChannel sendChannel;
+	private Object sendObject;
 
-	public NettyMessagingHandler(MessageChannel sendChannel){
-		this(sendChannel, null);
+	public NettyMessagingHandler(Class<?> clazz, MessageChannel sendChannel){
+		this(clazz, null, sendChannel, null);
 	}
-	public NettyMessagingHandler(PollableChannel receiveChannel){
-		this(null, receiveChannel);
+	public NettyMessagingHandler(Class<?> clazz, PollableChannel receiveChannel){
+		this(clazz, receiveChannel, null, null);
 	}
-	public NettyMessagingHandler(MessageChannel sendChannel, PollableChannel receiveChannel){
+	public NettyMessagingHandler(Class<?> clazz, PollableChannel receiveChannel, MessageChannel sendChannel){
+		this(clazz, receiveChannel, sendChannel, null);
+	}
+	public NettyMessagingHandler(Class<?> clazz, PollableChannel receiveChannel, MessageChannel sendChannel, Object sendObject){
+		
+		this.logger = InternalLoggerFactory.getInstance(clazz);
 		this.template = new MessagingTemplate();
 		template.setReceiveTimeout(1000);
 		template.setSendTimeout(1000);
-		
 		this.sendChannel = sendChannel;
+		this.sendObject = sendObject;
 		this.receiveChannel = receiveChannel;
 	}
-
+	
+	
 	@Override
-	public void handlerAdded(ChannelHandlerContext ctx) throws Exception {
+	public void handlerAdded(final ChannelHandlerContext ctx) throws Exception {
 		if(receiveChannel != null){
-			//logger.debug("handlerAdded");
-			Runnable worker = new ReceiveChannelWorker(this, ctx);
-			scheduledFuture = ctx.executor().scheduleAtFixedRate(worker, 100, 100, TimeUnit.MICROSECONDS);
+			scheduledFuture = ctx.executor().scheduleAtFixedRate(new Runnable(){
+				public void run() {
+					Message<?> message = template.receive(receiveChannel);
+	        		if(message != null){
+	        			logger.info("MESSAGE CHANNEL RECEIVED");
+	        			if(sendChannel != null && sendObject != null){
+	            			template.convertAndSend(sendChannel, sendObject);
+	    	    			logger.info("MESSAGE CHANNEL SEND");
+	        			}else{
+	            			ctx.writeAndFlush(message.getPayload());
+	        			}
+	        		}
+				}
+				
+			}, 100, 100, TimeUnit.MICROSECONDS);
 		}
-		super.handlerAdded(ctx);
 	}
 	
 	@Override
 	public void handlerRemoved(ChannelHandlerContext ctx)throws Exception {
 		if(receiveChannel != null){
-			//logger.debug("handlerRemoved");
 			scheduledFuture.cancel(true);
 		}
-		super.handlerRemoved(ctx);
 	}
 
 	@Override
-    public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
+    public void channelRead(final ChannelHandlerContext ctx, final Object msg) throws Exception {
+
 		if(sendChannel != null){
-    		Runnable worker = new SendChannelWorker(this, msg);
-    		ctx.executor().submit(worker);
+			
+    		ctx.executor().submit(new Runnable() {
+				public void run() {
+	    			template.convertAndSend(sendChannel, msg);
+	    			logger.info("MESSAGE CHANNEL SEND");
+				}
+			});
     	}
-    	super.channelRead(ctx, msg);
-    }
+	}
+
 	
 	@Override
-	public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause)
-			throws Exception {
-		//logger.debug("exceptionCaught", cause);
-		super.exceptionCaught(ctx, cause);
-	}
-	
-	private static class ReceiveChannelWorker implements Runnable{
-
-		private final MessagingTemplate template;
-		private final PollableChannel receiveChannel;
-		private final ChannelHandlerContext ctx;
-		
-		private ReceiveChannelWorker(NettyMessagingHandler handler, ChannelHandlerContext ctx){
-			this.ctx = ctx;
-			this.template = handler.template;
-			this.receiveChannel = handler.receiveChannel;
-		}
-		
-		@Override
-		public void run() {
-    		try{
-	    		Message<?> message = template.receive(receiveChannel);
-        		if(message != null){
-            		ctx.writeAndFlush(message.getPayload());
-        		}
-    		}catch(Exception e){
-    			e.printStackTrace();
-    		}
-		}
-	}
-	
-	private static class SendChannelWorker implements Runnable{
-
-		private final MessagingTemplate template;
-		private final MessageChannel sendChannel;
-		private final Object payload;
-		
-		private SendChannelWorker(NettyMessagingHandler handler, Object payload){
-			this.template = handler.template;
-			this.sendChannel = handler.sendChannel;
-			this.payload = payload;
-		}
-		
-		@Override
-		public void run() {
-    		try{
-    			template.convertAndSend(sendChannel, payload);
-
-    		}catch(Exception e){
-    			e.printStackTrace();
-    		}
-		}
+	public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+		cause.printStackTrace();
 	}
 }

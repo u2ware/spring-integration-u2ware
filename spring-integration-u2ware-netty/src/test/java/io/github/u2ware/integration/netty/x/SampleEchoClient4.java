@@ -18,10 +18,13 @@ import java.util.concurrent.TimeUnit;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.PollableChannel;
 
-public class SampleEchoClient3 extends AbstractTcpClient{
+import com.google.common.collect.Lists;
+
+public class SampleEchoClient4 extends AbstractTcpClient{
 	
 	private MessageChannel sendChannel;
 	private PollableChannel receiveChannel;
+	private List<Object> dataSet = Lists.newArrayList();
 
 	public void setSendChannel(MessageChannel sendChannel) {
 		this.sendChannel = sendChannel;
@@ -33,7 +36,7 @@ public class SampleEchoClient3 extends AbstractTcpClient{
 	@Override
 	protected void initChannelPipeline(ChannelPipeline pipeline) throws Exception {		
 
-		pipeline.addLast(new NettyLoggingHandler(getClass()));
+		pipeline.addLast(new NettyLoggingHandler(getClass(), false));
 		
 		pipeline.addLast(new IdleStateHandler(3000, 0, 0, TimeUnit.MILLISECONDS));
 		
@@ -41,24 +44,25 @@ public class SampleEchoClient3 extends AbstractTcpClient{
 			
 			@Override
 			public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
-				logger.debug("userEventTriggered ");
-				ctx.channel().writeAndFlush("Hello\n");
+				//logger.debug("userEventTriggered ");
+				ctx.channel().writeAndFlush(System.currentTimeMillis()+"\n");
 			}
 			
 			@Override
 			protected void encode(ChannelHandlerContext ctx, Object msg, List<Object> out) throws Exception {
-				logger.debug("encode "+msg.getClass());
+				//logger.debug("encode "+msg.getClass());
 				ByteBuf b = ByteBufUtil.encodeString(ctx.alloc(), CharBuffer.wrap(msg.toString()), CharsetUtil.UTF_8);
 				out.add(b);
 			}
 
 			@Override
 			protected void decode(ChannelHandlerContext ctx, ByteBuf msg, List<Object> out) throws Exception {
-				logger.debug("decode "+msg.getClass());
-				out.add(msg.toString(CharsetUtil.UTF_8));
+				//logger.debug("decode "+msg.getClass());
+				//out.add(msg.toString(CharsetUtil.UTF_8));
+				dataSet.add(msg.toString(CharsetUtil.UTF_8));
 			}
 		});
 
-		pipeline.addLast(new NettyMessagingHandler(getClass(), receiveChannel, sendChannel));
+		pipeline.addLast(new NettyMessagingHandler(getClass(), receiveChannel, sendChannel, dataSet));
 	}
 }

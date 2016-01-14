@@ -1,7 +1,5 @@
 package io.github.u2ware.integration.netty.x;
 
-import io.github.u2ware.integration.netty.x.SampleEchoServer;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.AfterClass;
@@ -45,6 +43,7 @@ public class SampleEchoClient2Test {
 		Thread.sleep(2000);
 		echoRequest.send(MessageBuilder.withPayload("MESSAGE\n").build());
 
+
 		Thread.sleep(2000);
 		Assert.assertEquals(1, echoResponse.getQueueSize());
 
@@ -54,6 +53,6 @@ public class SampleEchoClient2Test {
 		Thread.sleep(2000);
 		Assert.assertEquals(2, echoResponse.getQueueSize());
 		
-		Thread.sleep(2000);
+		
 	}
 }

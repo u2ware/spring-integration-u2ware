@@ -9,6 +9,8 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.ssl.SslHandler;
+import io.netty.util.internal.logging.InternalLogger;
+import io.netty.util.internal.logging.InternalLoggerFactory;
 
 import java.security.cert.CertificateException;
 
@@ -20,6 +22,8 @@ import org.springframework.util.Assert;
 
 public abstract class AbstractTcpServer extends ChannelInitializer<Channel> implements InitializingBean, DisposableBean{
 
+	protected InternalLogger logger = InternalLoggerFactory.getInstance(getClass());
+	
 	private int port;
 	private boolean ssl;
 	private EventLoopGroup bossGroup, workerGroup;

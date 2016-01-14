@@ -29,6 +29,9 @@ public class SampleEchoClient3Test {
 	
     protected Log logger = LogFactory.getLog(getClass());
 	
+	
+	@Autowired @Qualifier("echoRequest")
+	private QueueChannel echoRequest;
 
 	@Autowired @Qualifier("echoResponse")
 	private QueueChannel echoResponse;
@@ -37,10 +40,10 @@ public class SampleEchoClient3Test {
 	@Test
 	public void testRunning() throws Exception {
 		
-		Thread.sleep(3000);
+		Thread.sleep(5000);
 		Assert.assertEquals(1, echoResponse.getQueueSize());
 
-		Thread.sleep(3000);
+		Thread.sleep(5000);
 		Assert.assertEquals(2, echoResponse.getQueueSize());
 	}
 }

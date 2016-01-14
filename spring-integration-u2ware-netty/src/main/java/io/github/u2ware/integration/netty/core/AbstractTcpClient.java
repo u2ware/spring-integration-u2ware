@@ -14,6 +14,8 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.ssl.SslHandler;
+import io.netty.util.internal.logging.InternalLogger;
+import io.netty.util.internal.logging.InternalLoggerFactory;
 
 import java.util.concurrent.TimeUnit;
 
@@ -23,6 +25,8 @@ import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 
 public abstract class AbstractTcpClient extends ChannelInitializer<Channel> implements InitializingBean, DisposableBean{
+	
+	protected InternalLogger logger = InternalLoggerFactory.getInstance(getClass());
 	
 	private String host;
 	private int port;

@@ -21,4 +21,5 @@ public class NettyLoggingHandler extends LoggingHandler{
 		if(! printDump) return eventName;
 		return super.formatMessage(eventName, msg);
 	}
+	
 }

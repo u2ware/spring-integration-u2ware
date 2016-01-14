@@ -12,9 +12,13 @@ import io.netty.channel.rxtx.RxtxChannelConfig.Paritybit;
 import io.netty.channel.rxtx.RxtxChannelConfig.Stopbits;
 import io.netty.channel.rxtx.RxtxChannelOption;
 import io.netty.channel.rxtx.RxtxDeviceAddress;
+import io.netty.util.internal.logging.InternalLogger;
+import io.netty.util.internal.logging.InternalLoggerFactory;
 
 public abstract class AbstractSerialPort extends ChannelInitializer<Channel> {
 
+	protected InternalLogger logger = InternalLoggerFactory.getInstance(getClass());
+	
 	private String portName;
 	private int baudrate = -1;
 	private Databits databits;

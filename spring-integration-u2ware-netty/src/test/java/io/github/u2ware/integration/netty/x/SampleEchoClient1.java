@@ -24,13 +24,16 @@ public class SampleEchoClient1 extends AbstractTcpClient{
 	}
 	@Override
 	protected void initChannelPipeline(ChannelPipeline pipeline) throws Exception {		
+
+		
 		pipeline.addLast(new NettyLoggingHandler(getClass()));
 
 		pipeline.addLast(new StringEncoder());
 		pipeline.addLast(new LineBasedFrameDecoder(256));
 		pipeline.addLast(new StringDecoder());
 		
-		pipeline.addLast(new NettyMessagingHandler(sendChannel, receiveChannel));
+		
+		pipeline.addLast(new NettyMessagingHandler(getClass(), receiveChannel, sendChannel));
 	}
 
 }
