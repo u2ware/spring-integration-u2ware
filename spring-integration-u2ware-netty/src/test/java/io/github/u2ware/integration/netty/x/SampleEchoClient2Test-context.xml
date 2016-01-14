@@ -12,9 +12,9 @@
 		<int:queue/>
 	</int:channel>
 	
-	<bean id="echoClient1" class="io.github.u2ware.integration.netty.x.SampleEchoClient">
+	<bean id="echoClient1" class="io.github.u2ware.integration.netty.x.SampleEchoClient2">
 		<property name="host" value="127.0.0.1"/>
-		<property name="port" value="10900"/>
+		<property name="port" value="10902"/>
 		<property name="autoConnection" value="true"/>
 		<property name="receiveChannel" ref="echoRequest"/>
 		<property name="sendChannel" ref="echoResponse"/>

@@ -11,7 +11,7 @@ import io.netty.handler.codec.string.StringEncoder;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.PollableChannel;
 
-public class SampleEchoClient extends AbstractTcpClient{
+public class SampleEchoClient1 extends AbstractTcpClient{
 	
 	private MessageChannel sendChannel;
 	private PollableChannel receiveChannel;
@@ -22,13 +22,15 @@ public class SampleEchoClient extends AbstractTcpClient{
 	public void setReceiveChannel(PollableChannel receiveChannel) {
 		this.receiveChannel = receiveChannel;
 	}
-
 	@Override
 	protected void initChannelPipeline(ChannelPipeline pipeline) throws Exception {		
 		pipeline.addLast(new NettyLoggingHandler(getClass()));
+
 		pipeline.addLast(new StringEncoder());
 		pipeline.addLast(new LineBasedFrameDecoder(256));
 		pipeline.addLast(new StringDecoder());
-		pipeline.addLast(new NettyMessagingHandler(sendChannel, receiveChannel, 100));
+		
+		pipeline.addLast(new NettyMessagingHandler(sendChannel, receiveChannel));
 	}
+
 }

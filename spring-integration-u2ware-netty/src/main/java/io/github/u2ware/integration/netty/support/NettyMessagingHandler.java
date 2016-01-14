@@ -11,7 +11,6 @@ import org.springframework.integration.core.MessagingTemplate;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.PollableChannel;
-import org.springframework.util.Assert;
 
 @Sharable
 public class NettyMessagingHandler extends ChannelDuplexHandler {
@@ -22,21 +21,17 @@ public class NettyMessagingHandler extends ChannelDuplexHandler {
 	private final MessageChannel sendChannel;
 	private final PollableChannel receiveChannel;
 
+	public NettyMessagingHandler(MessageChannel sendChannel){
+		this(sendChannel, null);
+	}
+	public NettyMessagingHandler(PollableChannel receiveChannel){
+		this(null, receiveChannel);
+	}
 	public NettyMessagingHandler(MessageChannel sendChannel, PollableChannel receiveChannel){
 		this.template = new MessagingTemplate();
-		this.sendChannel = sendChannel;
-		this.receiveChannel = receiveChannel;
-	}
-	public NettyMessagingHandler(MessageChannel sendChannel, PollableChannel receiveChannel, long timeout){
-		this.template = new MessagingTemplate();
-		template.setReceiveTimeout(timeout);
-		template.setSendTimeout(timeout);
-		this.sendChannel = sendChannel;
-		this.receiveChannel = receiveChannel;
-	}
-	public NettyMessagingHandler(MessageChannel sendChannel, PollableChannel receiveChannel, MessagingTemplate template){
-		Assert.notNull(template, "template must not be null.");
-		this.template = template;
+		template.setReceiveTimeout(1000);
+		template.setSendTimeout(1000);
+		
 		this.sendChannel = sendChannel;
 		this.receiveChannel = receiveChannel;
 	}

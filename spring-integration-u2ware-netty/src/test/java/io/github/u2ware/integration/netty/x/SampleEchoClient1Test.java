@@ -18,11 +18,11 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration
-public class SampleEchoClientTest {
+public class SampleEchoClient1Test {
 
 	@BeforeClass
 	public static void beforeClass() throws Exception{
-		SampleEchoServer.startup(10900);
+		SampleEchoServer.startup(10901);
 	}
 	@AfterClass
 	public static void afterClass() throws Exception{
