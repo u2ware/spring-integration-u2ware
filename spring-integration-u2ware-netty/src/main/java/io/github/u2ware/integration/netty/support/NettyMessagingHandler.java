@@ -83,15 +83,16 @@ public class NettyMessagingHandler extends ChannelDuplexHandler {
     public void channelRead(final ChannelHandlerContext ctx, final Object msg) throws Exception {
 
 		if(sendChannel != null){
-    		ctx.executor().submit(new Runnable() {
-				public void run() {
-	    			template.convertAndSend(sendChannel, msg);
-	    			logger.info("MESSAGE SEND ");
-				}
-			});
 
     		if(useSendMessage){
 				this.sendMessage = msg;
+			}else{
+	    		ctx.executor().submit(new Runnable() {
+					public void run() {
+		    			template.convertAndSend(sendChannel, msg);
+		    			logger.info("MESSAGE SEND ");
+					}
+				});
 			}
     	}
 	}

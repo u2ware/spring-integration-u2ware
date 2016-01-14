@@ -1,6 +1,7 @@
 package io.github.u2ware.integration.netty.x;
 
 import io.github.u2ware.integration.netty.core.AbstractTcpClient;
+import io.github.u2ware.integration.netty.support.NettyLoggingHandler;
 import io.github.u2ware.integration.netty.support.NettyMessagingHandler;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
@@ -32,7 +33,7 @@ public class SampleEchoClient4 extends AbstractTcpClient{
 	@Override
 	protected void initChannelPipeline(ChannelPipeline pipeline) throws Exception {		
 
-		//pipeline.addLast(new NettyLoggingHandler(getClass(), false));
+		pipeline.addLast(new NettyLoggingHandler(getClass(), false));
 		
 		pipeline.addLast(new IdleStateHandler(3000, 0, 0, TimeUnit.MILLISECONDS));
 		
