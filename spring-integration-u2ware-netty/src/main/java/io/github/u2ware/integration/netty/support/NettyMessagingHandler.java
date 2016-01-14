@@ -19,30 +19,31 @@ public class NettyMessagingHandler extends ChannelDuplexHandler {
 
 	private InternalLogger logger;
 	private ScheduledFuture<?> scheduledFuture;
+	private Object sendMessage;
 
-	private MessagingTemplate template;
-	private PollableChannel receiveChannel;
-	private MessageChannel sendChannel;
-	private Object sendObject;
+	private final MessagingTemplate template;
+	private final PollableChannel receiveChannel;
+	private final MessageChannel sendChannel;
+	private final boolean useSendMessage;
 
 	public NettyMessagingHandler(Class<?> clazz, MessageChannel sendChannel){
-		this(clazz, null, sendChannel, null);
+		this(clazz, null, sendChannel, false);
 	}
 	public NettyMessagingHandler(Class<?> clazz, PollableChannel receiveChannel){
-		this(clazz, receiveChannel, null, null);
+		this(clazz, receiveChannel, null, false);
 	}
 	public NettyMessagingHandler(Class<?> clazz, PollableChannel receiveChannel, MessageChannel sendChannel){
-		this(clazz, receiveChannel, sendChannel, null);
+		this(clazz, receiveChannel, sendChannel, false);
 	}
-	public NettyMessagingHandler(Class<?> clazz, PollableChannel receiveChannel, MessageChannel sendChannel, Object sendObject){
+	public NettyMessagingHandler(Class<?> clazz, PollableChannel receiveChannel, MessageChannel sendChannel, boolean useSendMessage){
 		
 		this.logger = InternalLoggerFactory.getInstance(clazz);
 		this.template = new MessagingTemplate();
 		template.setReceiveTimeout(1000);
 		template.setSendTimeout(1000);
-		this.sendChannel = sendChannel;
-		this.sendObject = sendObject;
 		this.receiveChannel = receiveChannel;
+		this.sendChannel = sendChannel;
+		this.useSendMessage = useSendMessage;
 	}
 	
 	
@@ -53,11 +54,15 @@ public class NettyMessagingHandler extends ChannelDuplexHandler {
 				public void run() {
 					Message<?> message = template.receive(receiveChannel);
 	        		if(message != null){
-	        			logger.info("MESSAGE CHANNEL RECEIVED");
-	        			if(sendChannel != null && sendObject != null){
-	            			template.convertAndSend(sendChannel, sendObject);
-	    	    			logger.info("MESSAGE CHANNEL SEND");
+	        			if( useSendMessage ){
+	        				if(sendChannel != null && sendMessage != null){
+		            			template.convertAndSend(sendChannel, sendMessage);
+	        				}else{
+		            			template.convertAndSend(sendChannel, "{}");
+	        				}
+	    	    			logger.info("MESSAGE RECEIVED AND RELEASE");
 	        			}else{
+		        			logger.info("MESSAGE RECEIVED ");
 	            			ctx.writeAndFlush(message.getPayload());
 	        			}
 	        		}
@@ -78,19 +83,24 @@ public class NettyMessagingHandler extends ChannelDuplexHandler {
     public void channelRead(final ChannelHandlerContext ctx, final Object msg) throws Exception {
 
 		if(sendChannel != null){
-			
-    		ctx.executor().submit(new Runnable() {
-				public void run() {
-	    			template.convertAndSend(sendChannel, msg);
-	    			logger.info("MESSAGE CHANNEL SEND");
-				}
-			});
+			if(useSendMessage){
+				this.sendMessage = msg;
+    			logger.info("MESSAGE RELEASE ");
+
+			}else{
+	    		ctx.executor().submit(new Runnable() {
+					public void run() {
+		    			template.convertAndSend(sendChannel, msg);
+		    			logger.info("MESSAGE SEND ");
+					}
+				});
+			}
     	}
 	}
 
 	
 	@Override
 	public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-		cause.printStackTrace();
+		logger.info("MESSAGE EXCEPTION ", cause);
 	}
 }
