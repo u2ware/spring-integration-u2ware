@@ -42,7 +42,7 @@ public class SampleEchoClient4Test {
 	public void testRunning() throws Exception {
 
 		
-		for(int i=0 ; i< 10; i++){
+		for(int i=0 ; i< 4; i++){
 			Thread.sleep(1000);
 			echoRequest.send(MessageBuilder.withPayload(new Integer(1)).build());
 

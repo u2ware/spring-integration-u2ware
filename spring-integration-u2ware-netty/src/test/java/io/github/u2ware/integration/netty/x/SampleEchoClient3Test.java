@@ -40,10 +40,10 @@ public class SampleEchoClient3Test {
 	@Test
 	public void testRunning() throws Exception {
 		
-		Thread.sleep(5000);
+		Thread.sleep(6000);
 		Assert.assertEquals(1, echoResponse.getQueueSize());
 
-		Thread.sleep(5000);
+		Thread.sleep(6000);
 		Assert.assertEquals(2, echoResponse.getQueueSize());
 	}
 }
