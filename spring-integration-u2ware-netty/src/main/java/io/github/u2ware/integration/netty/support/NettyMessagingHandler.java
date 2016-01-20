@@ -86,6 +86,7 @@ public class NettyMessagingHandler extends ChannelDuplexHandler {
 
     		if(useSendMessage){
 				this.sendMessage = msg;
+    			logger.info("MESSAGE SAVED ");
 			}else{
 	    		ctx.executor().submit(new Runnable() {
 					public void run() {
