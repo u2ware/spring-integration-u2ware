@@ -1,0 +1,2 @@
+http\://u2ware.github.io/schema/integration/snmp/spring-integration-snmp-1.0.xsd=io/github/u2ware/integration/snmp/config/xml/spring-integration-snmp-1.0.xsd
+http\://u2ware.github.io/schema/integration/snmp/spring-integration-snmp.xsd=io/github/u2ware/integration/snmp/config/xml/spring-integration-snmp-1.0.xsd

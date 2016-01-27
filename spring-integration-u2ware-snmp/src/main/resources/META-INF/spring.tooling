@@ -1,0 +1,4 @@
+# Tooling related information for the integration SNMP namespace
+http\://u2ware.github.io/schema/integration/snmp@name=integration SNMP Namespace
+http\://u2ware.github.io/schema/integration/snmp@prefix=int-u2ware-snmp
+http\://u2ware.github.io/schema/integration/snmp@icon=org/springframework/integration/u2ware/snmp/config/xml/spring-integration-u2ware-snmp.gif

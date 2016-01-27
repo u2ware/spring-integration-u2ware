@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+		http://www.springframework.org/schema/beans 
+		http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<bean id="snmpManager" class="io.github.u2ware.integration.snmp.core.SnmpManager">
+		<property name="localPort" value="10612"/>
+		<property name="localMib" value="/Users/U2ware/Dropbox/Develop/u2ware/spring-integration-u2ware/spring-integration-u2ware-snmp/src/test/java/io/github/u2ware/integration/snmp/core/SnmpExecutorTests.mib"/>
+	</bean>
+</beans>
