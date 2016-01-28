@@ -5,6 +5,7 @@ import java.util.Collection;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.AfterClass;
+import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -20,7 +21,7 @@ public class SnmpExecutorTests {
 
 	@BeforeClass
 	public static void beforeClass() throws Exception {
-		SnmpAgent.startup(10162);
+		SnmpAgent.startup(10161);
 	}
 
 	@AfterClass
@@ -37,13 +38,11 @@ public class SnmpExecutorTests {
 	@Test
 	public void testFindDevice() throws Exception {
 		
-        logger.debug(snmpManager);
-
-        SnmpRequest request = new SnmpRequest("127.0.0.1:10162:1.3.6");
+        SnmpRequest request = new SnmpRequest("127.0.0.1:10161:1.3.6");
+        //SnmpRequest request = new SnmpRequest("192.168.245.181:161:1.3.6.1.4.1.318");
         
         Collection<SnmpResponse> response = snmpManager.execute(request);
-        
-        logger.debug(response.size());
+        Assert.assertNotNull(response);
         
         for(SnmpResponse r : response){
             logger.debug(r);

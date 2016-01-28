@@ -115,7 +115,6 @@ public class SnmpManager implements CommandResponder, InitializingBean, Disposab
 
 		logger.info("SNMP Request: "+snmpRequest);		
 		
-		
 		Map<String, SnmpResponse> result = new HashMap<String, SnmpResponse>();
 		
 	    CommunityTarget communityTarget = new CommunityTarget();
@@ -124,8 +123,8 @@ public class SnmpManager implements CommandResponder, InitializingBean, Disposab
 		communityTarget.setVersion(SnmpConstants.version1);
 		communityTarget.setAddress(new UdpAddress(InetAddress.getByName(snmpRequest.getHost()), snmpRequest.getPort()));
 
-		OID communityOid = new OID(snmpRequest.getRootOid());
 		
+		OID communityOid = new OID(snmpRequest.getRootOid());
 		
 	    PDU request=new PDU();
 	    request.setType(PDU.GETNEXT);
@@ -133,6 +132,7 @@ public class SnmpManager implements CommandResponder, InitializingBean, Disposab
 	    request.setNonRepeaters(0);
 
 	    OID rootOID = request.get(0).getOid();
+
 	    
 	    PDU response = null;
 	    int objects = 0;
@@ -151,16 +151,16 @@ public class SnmpManager implements CommandResponder, InitializingBean, Disposab
 
 	    }while (!process(snmpRequest, result, response, request, rootOID));
 	    
-		logger.info("SNMP Response: objects="+objects
+	    logger.info("SNMP Response: SnmpResponse["+result.size()+"] objects="+objects
 								+", requests="+requests
-								+", counts="+result.size()
 								+", timeInMillis="+(System.currentTimeMillis()-startTime));		
 
 	    return result.values();
 	}
 	
 	private boolean process(SnmpRequest snmpRequest, Map<String, SnmpResponse> snmpResponse, PDU response, PDU request, OID rootOID) throws Exception {
-	    if ((response == null) || (response.getErrorStatus() != 0) || (response.getType() == PDU.REPORT)) {
+
+		if ((response == null) || (response.getErrorStatus() != 0) || (response.getType() == PDU.REPORT)) {
 	    	return true;
 	    }
         boolean finished = false;
