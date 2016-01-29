@@ -26,7 +26,7 @@ public class SnmpExecutorTests {
 
 	@AfterClass
 	public static void afterClass() throws Exception{
-		SnmpAgent.shutdown();
+		SnmpAgent.shutdown(10161);
 	}
 	
 
@@ -38,8 +38,8 @@ public class SnmpExecutorTests {
 	@Test
 	public void testFindDevice() throws Exception {
 		
-        SnmpRequest request = new SnmpRequest("127.0.0.1:10161:1.3.6");
-        //SnmpRequest request = new SnmpRequest("192.168.245.181:161:1.3.6.1.4.1.318");
+        SnmpRequest request = new SnmpRequest("127.0.0.1", 10161, "1.3.6");
+        //SnmpRequest request = new SnmpRequest("192.168.245.181", 161, "1.3.6.1.4.1.318");
         
         Collection<SnmpResponse> response = snmpManager.execute(request);
         Assert.assertNotNull(response);

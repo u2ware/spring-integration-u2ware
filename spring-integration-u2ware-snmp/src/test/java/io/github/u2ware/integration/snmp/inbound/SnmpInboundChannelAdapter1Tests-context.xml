@@ -1,38 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xmlns:util="http://www.springframework.org/schema/util"
 	xmlns:int="http://www.springframework.org/schema/integration"
 	xmlns:int-u2ware-snmp="http://u2ware.github.io/schema/integration/snmp"
 	xsi:schemaLocation="
 		http://www.springframework.org/schema/beans 
 		http://www.springframework.org/schema/beans/spring-beans.xsd
-		http://www.springframework.org/schema/util 
-		http://www.springframework.org/schema/util/spring-util.xsd
 		http://www.springframework.org/schema/integration 
 		http://www.springframework.org/schema/integration/spring-integration.xsd
 		http://u2ware.github.io/schema/integration/snmp 
 		http://u2ware.github.io/schema/integration/snmp/spring-integration-snmp.xsd">
 
-
 	<bean id="snmpRequest" class="io.github.u2ware.integration.snmp.core.SnmpRequest">
 		<property name="host" value="127.0.0.1"/>
-		<property name="port" value="10614"/>
+		<property name="port" value="10163"/>
 		<property name="rootOid" value="1.3.6"/>
 	</bean>
 
-
 	<int-u2ware-snmp:inbound-channel-adapter id="snmpInboundChannelAdapter"
-		localPort="10613"
+		channel="snmpResponse"
+		localPort="10164"
 		snmpRequest="snmpRequest"
-		channel="snmpResponse">
-		<int:poller fixed-rate="3000"/>
+	>
+			<int:poller fixed-rate="3000"/>
 	</int-u2ware-snmp:inbound-channel-adapter>
-	
-	
 	
 	<int:channel id="snmpResponse">
 		<int:queue/>
 	</int:channel>
-	
+
 </beans>

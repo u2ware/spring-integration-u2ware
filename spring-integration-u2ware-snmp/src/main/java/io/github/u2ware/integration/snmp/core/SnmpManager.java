@@ -85,7 +85,7 @@ public class SnmpManager implements CommandResponder, InitializingBean, Disposab
 			File file = new File(localMib);
 
 			if(file.exists()){
-				logger.info("SNMP Manager Initialized: "+localMib);		
+				logger.info("Initialized: "+localMib);		
 
 				MibLoader mibLoader = new MibLoader();
 				mibLoader.addDir(file.getParentFile());
@@ -94,7 +94,7 @@ public class SnmpManager implements CommandResponder, InitializingBean, Disposab
 				mibNames = new HashMap<String,String>();
 			}
 	    }
-		logger.info("SNMP Manager Initialized: <localhost>:"+localPort);		
+		logger.info("Initialized: <localhost>:"+localPort);		
 	}
 	
 	@Override
@@ -103,17 +103,17 @@ public class SnmpManager implements CommandResponder, InitializingBean, Disposab
 	    transport.close();
 		threadPool.stop();
 
-		logger.info("SNMP Manager Destroyed: <localhost>:"+localPort);		
+		logger.info("Destroyed: <localhost>:"+localPort);		
 	}
 	
 	@Override
 	public void processPdu(CommandResponderEvent event) {
-		logger.info("SNMP PDU Event: "+event);		
+		logger.info("Event: "+event);		
 	}
 	
 	public Collection<SnmpResponse> execute(SnmpRequest snmpRequest) throws Exception {
 
-		logger.info("SNMP Request: "+snmpRequest);		
+		logger.info(snmpRequest);		
 		
 		Map<String, SnmpResponse> result = new HashMap<String, SnmpResponse>();
 		
@@ -151,9 +151,11 @@ public class SnmpManager implements CommandResponder, InitializingBean, Disposab
 
 	    }while (!process(snmpRequest, result, response, request, rootOID));
 	    
-	    logger.info("SNMP Response: SnmpResponse["+result.size()+"] objects="+objects
+	    logger.info("SnmpResponse [count="+result.size()
+	    						+", objects="+objects
 								+", requests="+requests
-								+", timeInMillis="+(System.currentTimeMillis()-startTime));		
+								+", timeInMillis="+ (System.currentTimeMillis()-startTime)
+								+"]");
 
 	    return result.values();
 	}

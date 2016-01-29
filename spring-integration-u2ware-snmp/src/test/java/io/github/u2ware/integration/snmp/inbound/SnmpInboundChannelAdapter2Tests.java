@@ -1,11 +1,10 @@
-package io.github.u2ware.integration.bacnet.inbound;
+package io.github.u2ware.integration.snmp.inbound;
 
-import io.github.u2ware.integration.snmp.core.BacnetSlave;
+import io.github.u2ware.integration.snmp.core.SnmpAgent;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.AfterClass;
-import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -17,28 +16,29 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration
-public class BacnetInboundChannelAdapterTests {
+public class SnmpInboundChannelAdapter2Tests {
 
 	@BeforeClass
 	public static void beforeClass() throws Exception {
-		BacnetSlave.startup(37807);
+		SnmpAgent.startup(10165);
+		SnmpAgent.startup(10166);
 	}
 
 	@AfterClass
 	public static void afterClass() throws Exception{
-		BacnetSlave.shutdown();
+		SnmpAgent.shutdown(10165);
+		SnmpAgent.shutdown(10166);
 	}
 	
 	protected Log logger = LogFactory.getLog(getClass());
 
-	@Autowired @Qualifier("bacnetResponse")
-	private PollableChannel bacnetResponse;
+	@Autowired @Qualifier("snmpResponse")
+	private PollableChannel snmpResponse;
 	
 	
 	
 	@Test
 	public void testRunning() throws Exception {
-		Object receive = bacnetResponse.receive(10000);
-		Assert.assertNotNull(receive);
+		Thread.sleep(10000);
 	}
 }

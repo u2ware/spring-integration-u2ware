@@ -1,6 +1,7 @@
 package io.github.u2ware.integration.snmp.core;
 
 import java.io.File;
+import java.util.Map;
 
 import org.snmp4j.agent.example.SampleAgent;
 import org.snmp4j.security.SecurityProtocols;
@@ -9,18 +10,22 @@ import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.StringUtils;
 
+import com.google.common.collect.Maps;
+
 public class SnmpAgent extends SampleAgent implements InitializingBean, DisposableBean{
 
-	private static SnmpAgent instance;
+	private static Map<Object, SnmpAgent> instance = Maps.newHashMap();
 	
 	public static void startup(int port) throws Exception{
-		instance = new SnmpAgent(port);
-		instance.afterPropertiesSet();
+		SnmpAgent value = new SnmpAgent(port);
+		value.afterPropertiesSet();
+		instance.put(port, value);
 	}
-	public static void shutdown() throws Exception{
-		instance.destroy();
+	public static void shutdown(int port) throws Exception{
+		instance.get(port).destroy();
 	}
-
+	
+	
 	/////////////
 	//
 	/////////////

@@ -6,7 +6,6 @@ import io.github.u2ware.integration.snmp.core.SnmpResponse;
 import io.github.u2ware.integration.snmp.support.SnmpHeaders;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 
 import org.springframework.integration.context.IntegrationObjectSupport;
@@ -15,7 +14,6 @@ import org.springframework.integration.support.MessageBuilder;
 import org.springframework.messaging.Message;
 import org.springframework.util.Assert;
 
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 /**
@@ -26,8 +24,7 @@ import com.google.common.collect.Maps;
 public class SnmpMessageSource extends IntegrationObjectSupport 
 implements MessageSource<Collection<SnmpResponse>>{
 
-	private SnmpRequestSupport snmpRequestSupport = new SnmpRequestSupport();
-	private String[] snmpRequests;
+	private SnmpRequest snmpRequest;
 	private final SnmpManager executor;
 	
 	public SnmpMessageSource(SnmpManager executor){
@@ -35,14 +32,8 @@ implements MessageSource<Collection<SnmpResponse>>{
 		this.executor = executor;
 	}
 
-	public void setSnmpRequests(String... snmpRequests) {
-		this.snmpRequests = snmpRequests;
-	}
-
-	@Override
-	protected void onInit() throws Exception {
-		super.onInit();
-		snmpRequestSupport.set(snmpRequests);
+	public void setSnmpRequest(SnmpRequest snmpRequest) {
+		this.snmpRequest = snmpRequest;
 	}
 
 	@Override
@@ -54,7 +45,7 @@ implements MessageSource<Collection<SnmpResponse>>{
 	public Message<Collection<SnmpResponse>> receive() {
 		
 		try{
-			SnmpRequest request = snmpRequestSupport.next();
+			SnmpRequest request = snmpRequest.next();
 			if(request == null) return null;
 			
 			Collection<SnmpResponse> response = executor.execute(request);
@@ -71,31 +62,6 @@ implements MessageSource<Collection<SnmpResponse>>{
 			if(logger.isDebugEnabled())
 				logger.debug("SnmpMessageSource Error", e);
 			return null;
-		}
-	}
-	
-	private static class SnmpRequestSupport{
-
-		private List<SnmpRequest> requests = Lists.newArrayList();
-		private int nextIndex = 0;
-		
-		private void set(String... values) throws Exception{
-			for(String value : values){
-				requests.add(new SnmpRequest(value));
-			}
-		}
-
-		private SnmpRequest next(){
-			if(requests.size() == 1){
-				return requests.get(0);
-			}
-			
-			SnmpRequest result = requests.get(nextIndex);
-			nextIndex++;
-			if(requests.size() == nextIndex){
-				nextIndex = 0;
-			}
-			return result;
 		}
 	}
 }

@@ -18,7 +18,7 @@
 			Defines the configuration elements for the Spring Integration SNMP Adapter.
 		]]></xsd:documentation>
 	</xsd:annotation>
-
+ 
 	<xsd:element name="inbound-channel-adapter">
 		<xsd:annotation>
 			<xsd:documentation>
@@ -29,12 +29,16 @@
 			<xsd:sequence>
 				<xsd:element ref="integration:poller" minOccurs="0" maxOccurs="1"/>
 			</xsd:sequence>
+
 			<xsd:attributeGroup ref="coreSnmpComponentAttributes"/>
-			<xsd:attribute name="snmpRequests" use="required" type="xsd:string">
+			
+			<xsd:attribute name="snmpRequest" use="required" type="xsd:string">
 				<xsd:annotation>
-					<xsd:documentation><![CDATA[
-						[<agentIp>:<agentPort>:<rootOid>,...]
-					]]></xsd:documentation>
+					<xsd:appinfo>
+						<tool:annotation kind="ref">
+							<tool:expected-type type="io.github.u2ware.integration.snmp.core.SnmpRequest" />
+						</tool:annotation>
+					</xsd:appinfo>
 				</xsd:annotation>
 			</xsd:attribute>
 
@@ -67,7 +71,7 @@
 			
 		</xsd:complexType>
 	</xsd:element>
-
+	
 
 	<xsd:element name="outbound-channel-adapter">
 			<xsd:annotation>

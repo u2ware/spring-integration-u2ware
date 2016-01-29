@@ -1,10 +1,11 @@
-package io.github.u2ware.integration.bacnet.inbound;
+package io.github.u2ware.integration.snmp.inbound;
 
-import io.github.u2ware.integration.snmp.core.BacnetSlave;
+import io.github.u2ware.integration.snmp.core.SnmpAgent;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.AfterClass;
+import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -16,39 +17,29 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration
-public class BacnetInboundChannelAdapterMultiTests {
+public class SnmpInboundChannelAdapter1Tests {
 
-	private static BacnetSlave bacnetSlave1;
-	private static BacnetSlave bacnetSlave2;
-	
 	@BeforeClass
 	public static void beforeClass() throws Exception {
-		bacnetSlave1 = new BacnetSlave();
-		bacnetSlave1.setLocalPort(37806);
-		bacnetSlave1.setLocalInstanceNumber(37806);
-		bacnetSlave1.afterPropertiesSet();
-
-		bacnetSlave2 = new BacnetSlave();
-		bacnetSlave2.setLocalPort(37805);
-		bacnetSlave2.setLocalInstanceNumber(37805);
-		bacnetSlave2.afterPropertiesSet();
+		SnmpAgent.startup(10163);
 	}
 
 	@AfterClass
 	public static void afterClass() throws Exception{
-		bacnetSlave1.destroy();
-		bacnetSlave2.destroy();
+		SnmpAgent.shutdown(10163);
 	}
 	
 	protected Log logger = LogFactory.getLog(getClass());
 
-	@Autowired @Qualifier("bacnetResponse")
-	private PollableChannel bacnetResponse;
+	@Autowired @Qualifier("snmpResponse")
+	private PollableChannel snmpResponse;
 	
 	
 	
 	@Test
 	public void testRunning() throws Exception {
-		Thread.sleep(5000);
+		Object receive = snmpResponse.receive(10000);
+		Assert.assertNotNull(receive);
+		logger.debug(receive);
 	}
 }
