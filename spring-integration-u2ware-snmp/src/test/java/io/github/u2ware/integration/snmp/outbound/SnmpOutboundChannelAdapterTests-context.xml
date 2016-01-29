@@ -2,22 +2,23 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xmlns:int="http://www.springframework.org/schema/integration"
-	xmlns:int-u2ware-bacnet="http://u2ware.github.io/schema/integration/bacnet"
+	xmlns:int-u2ware-snmp="http://u2ware.github.io/schema/integration/snmp"
 	xsi:schemaLocation="
 		http://www.springframework.org/schema/beans 
 		http://www.springframework.org/schema/beans/spring-beans.xsd
 		http://www.springframework.org/schema/integration 
 		http://www.springframework.org/schema/integration/spring-integration.xsd
-		http://u2ware.github.io/schema/integration/bacnet 
-		http://u2ware.github.io/schema/integration/bacnet/spring-integration-bacnet.xsd">
+		http://u2ware.github.io/schema/integration/snmp 
+		http://u2ware.github.io/schema/integration/snmp/spring-integration-snmp.xsd">
 
-	<int:channel id="bacnetRequest">
+
+	<int:channel id="snmpRequest">
 	</int:channel>
 		
-	<int-u2ware-bacnet:outbound-channel-adapter id="bacnetInboundChannelAdapter" 
-		localPort="47805"
+	<int-u2ware-snmp:outbound-channel-adapter id="snmpInboundChannelAdapter" 
+		localPort="10172"
 		
-		channel="bacnetRequest">
-	</int-u2ware-bacnet:outbound-channel-adapter>
+		channel="snmpRequest">
+	</int-u2ware-snmp:outbound-channel-adapter>
 
 </beans>

@@ -2,26 +2,26 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xmlns:int="http://www.springframework.org/schema/integration"
-	xmlns:int-u2ware-bacnet="http://u2ware.github.io/schema/integration/bacnet"
+	xmlns:int-u2ware-snmp="http://u2ware.github.io/schema/integration/snmp"
 	xsi:schemaLocation="
 		http://www.springframework.org/schema/beans 
 		http://www.springframework.org/schema/beans/spring-beans.xsd
 		http://www.springframework.org/schema/integration 
 		http://www.springframework.org/schema/integration/spring-integration.xsd
-		http://u2ware.github.io/schema/integration/bacnet 
-		http://u2ware.github.io/schema/integration/bacnet/spring-integration-bacnet.xsd">
+		http://u2ware.github.io/schema/integration/snmp 
+		http://u2ware.github.io/schema/integration/snmp/spring-integration-snmp.xsd">
 
 
-	<int:channel id="bacnetRequest">
+	<int:channel id="snmpRequest">
 	</int:channel>
 	
-	<int-u2ware-bacnet:outbound-gateway id="bacnetOutboundGateway" 
-		localPort="47804"
-		request-channel="bacnetRequest"
-		reply-channel="bacnetResponse">
-	</int-u2ware-bacnet:outbound-gateway>
+	<int-u2ware-snmp:outbound-gateway id="snmpOutboundGateway" 
+		localPort="10704"
+		request-channel="snmpRequest"
+		reply-channel="snmpResponse">
+	</int-u2ware-snmp:outbound-gateway>
 
-	<int:channel id="bacnetResponse">
+	<int:channel id="snmpResponse">
 		<int:queue/>
 	</int:channel>
 	
