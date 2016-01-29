@@ -15,13 +15,11 @@
 		<constructor-arg>
 			<array>
 				<bean class="io.github.u2ware.integration.snmp.core.SnmpRequest">
-					<property name="host" value="127.0.0.1"/>
-					<property name="port" value="10165"/>
+					<property name="address" value="127.0.0.1:10165"/>
 					<property name="rootOid" value="1.3.6"/>
 				</bean>
 				<bean class="io.github.u2ware.integration.snmp.core.SnmpRequest">
-					<property name="host" value="127.0.0.1"/>
-					<property name="port" value="10166"/>
+					<property name="address" value="127.0.0.1:10166"/>
 					<property name="rootOid" value="1.3.6.1"/>
 				</bean>
 			</array>

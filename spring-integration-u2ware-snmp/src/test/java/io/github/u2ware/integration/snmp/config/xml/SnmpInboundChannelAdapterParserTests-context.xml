@@ -16,11 +16,9 @@
 
 
 	<bean id="snmpRequest" class="io.github.u2ware.integration.snmp.core.SnmpRequest">
-		<property name="host" value="127.0.0.1"/>
-		<property name="port" value="10614"/>
+		<property name="address" value="127.0.0.1:10614"/>
 		<property name="rootOid" value="1.3.6"/>
 	</bean>
-
 
 	<int-u2ware-snmp:inbound-channel-adapter id="snmpInboundChannelAdapter"
 		localPort="10613"

@@ -121,7 +121,7 @@ public class SnmpManager implements CommandResponder, InitializingBean, Disposab
 		communityTarget.setCommunity(new OctetString("public"));
 		communityTarget.setRetries(3);
 		communityTarget.setVersion(SnmpConstants.version1);
-		communityTarget.setAddress(new UdpAddress(InetAddress.getByName(snmpRequest.getHost()), snmpRequest.getPort()));
+		communityTarget.setAddress(new UdpAddress(InetAddress.getByName(snmpRequest.host()), snmpRequest.port()));
 
 		
 		OID communityOid = new OID(snmpRequest.getRootOid());

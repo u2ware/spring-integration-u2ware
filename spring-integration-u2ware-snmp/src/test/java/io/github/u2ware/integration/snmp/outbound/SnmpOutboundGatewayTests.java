@@ -43,7 +43,7 @@ public class SnmpOutboundGatewayTests {
     @Test
 	public void testRunning() throws Exception {
 
-    	SnmpRequest payload = new SnmpRequest("127.0.0.1", 10173, "1.3.6");
+    	SnmpRequest payload = new SnmpRequest("127.0.0.1:10173", "1.3.6");
     	snmpRequest.send(MessageBuilder.withPayload(payload).build());
 
 		Object receive = snmpResponse.receive(10000);

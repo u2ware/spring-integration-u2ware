@@ -1,23 +1,25 @@
 package io.github.u2ware.integration.snmp.core;
 
+import org.springframework.util.StringUtils;
+
 
 
 public class SnmpRequest {
 
+	private String address;
 	private String host;
-	private Integer port;
+	private int port;
 	private String rootOid = "1.3.6";
-
+	
 	private SnmpRequest[] request;
 	private int requestIndex;
 
 	public SnmpRequest(){
 	
 	}
-	public SnmpRequest(String host, int port, String rootOid){
-		this.host = host;
-		this.port = port;
-		this.rootOid = rootOid;
+	public SnmpRequest(String address, String rootOid){
+		setAddress(address);
+		setRootOid(rootOid);
 	}
 	
 	public SnmpRequest(SnmpRequest... request){
@@ -34,17 +36,21 @@ public class SnmpRequest {
 		}
 		return result;
 	}
-	public String getHost() {
+	public String host() {
 		return host;
 	}
-	public void setHost(String host) {
-		this.host = host;
-	}
-	public Integer getPort() {
+	public Integer port() {
 		return port;
 	}
-	public void setPort(Integer port) {
-		this.port = port;
+	
+	public String getAddress() {
+		return address;
+	}
+	public void setAddress(String address) {
+		String[] addr = StringUtils.delimitedListToStringArray(address, ":");
+		this.host = addr[0];
+		this.port = Integer.parseInt(addr[1]);
+		this.address = address;
 	}
 	public String getRootOid() {
 		return rootOid;
@@ -54,7 +60,6 @@ public class SnmpRequest {
 	}
 	@Override
 	public String toString() {
-		return "SnmpRequest [host=" + host + ", port=" + port + ", rootOid="
-				+ rootOid + "]";
+		return "SnmpRequest [address=" + address + ", rootOid=" + rootOid + "]";
 	}
 }
