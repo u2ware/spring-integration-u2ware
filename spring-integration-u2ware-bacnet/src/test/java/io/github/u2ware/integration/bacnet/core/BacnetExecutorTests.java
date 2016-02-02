@@ -5,6 +5,7 @@ import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.AfterClass;
+import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -22,12 +23,12 @@ public class BacnetExecutorTests {
 
 	@BeforeClass
 	public static void beforeClass() throws Exception {
-		BacnetSlave.startup(37808);
+		BacnetDevice.startup(37808);
 	}
 
 	@AfterClass
 	public static void afterClass() throws Exception{
-		BacnetSlave.shutdown();
+		BacnetDevice.shutdown(37808);
 	}
 	
 
@@ -45,11 +46,15 @@ public class BacnetExecutorTests {
         for(RemoteDevice d : bacnetExecutor.getRemoteDevices()){
         	logger.debug(d.getInstanceNumber()+" "+d.getAddress().getDescription());
         }
+        Thread.sleep(3000);
         
-        List<BacnetResponse> result = null;
-        
-        result = bacnetExecutor.readValues("127.0.0.1:37808", 37808);
-        logger.debug(result.size());
+        BacnetRequest request = new BacnetRequest("127.0.0.1", 37808, 37808);
+
+        List<BacnetResponse> response  = bacnetExecutor.readValues(request);
+        Assert.assertNotNull(response);
+        for(BacnetResponse r : response){
+            logger.debug(r);
+        }
         
 	}
 }

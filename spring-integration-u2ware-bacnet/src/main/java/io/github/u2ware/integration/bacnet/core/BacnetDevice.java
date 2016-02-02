@@ -23,11 +23,13 @@
 package io.github.u2ware.integration.bacnet.core;
 
 import java.io.File;
+import java.util.Map;
 
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
 
+import com.google.common.collect.Maps;
 import com.serotonin.bacnet4j.LocalDevice;
 import com.serotonin.bacnet4j.RemoteDevice;
 import com.serotonin.bacnet4j.RemoteObject;
@@ -70,7 +72,7 @@ import com.serotonin.bacnet4j.type.primitive.ObjectIdentifier;
 import com.serotonin.bacnet4j.type.primitive.Real;
 import com.serotonin.bacnet4j.type.primitive.UnsignedInteger;
 
-public class BacnetSlave implements Runnable , InitializingBean, DisposableBean{
+public class BacnetDevice implements Runnable , InitializingBean, DisposableBean{
 
 	//private Log logger = LogFactory.getLog(getClass());
 
@@ -81,19 +83,22 @@ public class BacnetSlave implements Runnable , InitializingBean, DisposableBean{
 			port = Integer.parseInt(args[0]);
 		}catch(Exception e){
 		}
-		BacnetSlave.startup(port);
+		BacnetDevice.startup(port);
 	}
 	
 
-	private static BacnetSlave bacnetSlave;
+	private static Map<Integer, BacnetDevice> instance = Maps.newHashMap();
 	
 	public static void startup(int port) throws Exception{
-		bacnetSlave = new BacnetSlave();
+		BacnetDevice bacnetSlave = new BacnetDevice();
 		bacnetSlave.setLocalPort(port);
 		bacnetSlave.setLocalInstanceNumber(port);
 		bacnetSlave.afterPropertiesSet();
+		
+		instance.put(port, bacnetSlave);
 	}
-	public static void shutdown() throws Exception{
+	public static void shutdown(int port) throws Exception{
+		BacnetDevice bacnetSlave = instance.get(port);
 		bacnetSlave.destroy();
 	}
 	
@@ -121,7 +126,7 @@ public class BacnetSlave implements Runnable , InitializingBean, DisposableBean{
 	@Override
 	public void destroy() throws Exception {
 		localDevice.terminate();
-		System.out.println("BACNet Slave Terminated: <localhost>:"+localPort+"["+localPort+"]");
+		System.err.println("BACNet Device Terminated: <localhost>:"+localPort+"["+localPort+"]");
 	}
 	@Override
 	public void afterPropertiesSet() throws Exception {
@@ -206,7 +211,7 @@ public class BacnetSlave implements Runnable , InitializingBean, DisposableBean{
 
 	        // Start the local device.
 	        localDevice.initialize();
-	        System.out.println("BACNet Slave Initialized: <localhost>:"+localPort+"["+localPort+"]");
+	        System.err.println("BACNet Device Initialized: <localhost>:"+localPort+"["+localPort+"]");
 
 	        // Send an iam.
 	        localDevice.sendGlobalBroadcast(localDevice.getIAm());

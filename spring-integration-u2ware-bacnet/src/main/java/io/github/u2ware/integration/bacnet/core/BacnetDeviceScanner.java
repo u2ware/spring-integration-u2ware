@@ -27,7 +27,7 @@ import com.serotonin.bacnet4j.type.primitive.CharacterString;
 import com.serotonin.bacnet4j.type.primitive.ObjectIdentifier;
 import com.serotonin.bacnet4j.type.primitive.UnsignedInteger;
 
-public class BacnetScanner implements DeviceEventListener{
+public class BacnetDeviceScanner implements DeviceEventListener{
 
 	//private Log logger = LogFactory.getLog(getClass());
 	
@@ -39,7 +39,7 @@ public class BacnetScanner implements DeviceEventListener{
         LocalDevice localDevice = new LocalDevice(1234, transport);
         try {
             localDevice.initialize();
-            localDevice.getEventHandler().addListener(new BacnetScanner());
+            localDevice.getEventHandler().addListener(new BacnetDeviceScanner());
             localDevice.sendGlobalBroadcast(new WhoIsRequest());
 
             //localDevice.findRemoteDevice(address, deviceId)

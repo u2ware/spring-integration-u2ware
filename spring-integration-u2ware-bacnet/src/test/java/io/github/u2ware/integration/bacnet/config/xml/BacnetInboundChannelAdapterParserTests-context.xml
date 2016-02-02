@@ -11,12 +11,23 @@
 		http://u2ware.github.io/schema/integration/bacnet 
 		http://u2ware.github.io/schema/integration/bacnet/spring-integration-bacnet.xsd">
 
-	<int-u2ware-bacnet:inbound-channel-adapter id="bacnetInboundChannelAdapter"
 
+	<bean id="bacnetRequest" class="io.github.u2ware.integration.bacnet.inbound.BacnetRequestSupport">
+		<constructor-arg>
+			<array>
+				<bean class="io.github.u2ware.integration.bacnet.core.BacnetRequest">
+					<property name="host" value="127.0.0.1"/>				
+					<property name="port" value="47808"/>				
+					<property name="instanceNumber" value="47808"/>				
+				</bean>
+			</array>
+		</constructor-arg>
+	</bean>
+
+
+	<int-u2ware-bacnet:inbound-channel-adapter id="bacnetInboundChannelAdapter"
 		localPort="9991"
-		remoteAddress="127.0.0.1:47808"
-		remoteInstanceNumber="47808"
-		
+		request-support="bacnetRequest"		
 		channel="bacnetResponse">
 		<int:poller fixed-rate="3000"/>
 	</int-u2ware-bacnet:inbound-channel-adapter>

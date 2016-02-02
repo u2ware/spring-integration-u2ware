@@ -1,7 +1,7 @@
 package io.github.u2ware.integration.bacnet.outbound;
 
 import io.github.u2ware.integration.bacnet.core.BacnetRequest;
-import io.github.u2ware.integration.bacnet.core.BacnetSlave;
+import io.github.u2ware.integration.bacnet.core.BacnetDevice;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -24,12 +24,12 @@ public class BacnetOutboundGatewayTests {
 
 	@BeforeClass
 	public static void beforeClass() throws Exception {
-		BacnetSlave.startup(37803);
+		BacnetDevice.startup(37803);
 	}
 
 	@AfterClass
 	public static void afterClass() throws Exception{
-		BacnetSlave.shutdown();
+		BacnetDevice.shutdown(37803);
 	}
 
 	protected Log logger = LogFactory.getLog(getClass());
@@ -43,7 +43,7 @@ public class BacnetOutboundGatewayTests {
     @Test
 	public void testRunning() throws Exception {
 
-    	BacnetRequest payload = new BacnetRequest("127.0.0.1:37803", 37803);
+    	BacnetRequest payload = new BacnetRequest("127.0.0.1",37803, 37803);
 		bacnetRequest.send(MessageBuilder.withPayload(payload).build());
 
 		Object receive = bacnetResponse.receive(10000);

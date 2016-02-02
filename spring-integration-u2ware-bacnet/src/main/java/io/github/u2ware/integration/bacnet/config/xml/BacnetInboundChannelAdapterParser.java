@@ -39,12 +39,10 @@ public class BacnetInboundChannelAdapterParser extends AbstractPollingInboundCha
 
 	protected BeanMetadataElement parseSource(Element element, ParserContext parserContext) {
 		
-		BeanDefinitionBuilder pollingChannelAdapterBuilder = BeanDefinitionBuilder
-				.genericBeanDefinition(BacnetMessageSource.class);		
+		BeanDefinitionBuilder pollingChannelAdapterBuilder = BeanDefinitionBuilder.genericBeanDefinition(BacnetMessageSource.class);		
+		IntegrationNamespaceUtils.setReferenceIfAttributeDefined(pollingChannelAdapterBuilder, element, "request-support", "requestSupport");
+		
 		String channelAdapterId = this.resolveId(element, pollingChannelAdapterBuilder.getRawBeanDefinition(), parserContext);
-
-		IntegrationNamespaceUtils.setValueIfAttributeDefined(pollingChannelAdapterBuilder, element, "remoteAddress");
-		IntegrationNamespaceUtils.setValueIfAttributeDefined(pollingChannelAdapterBuilder, element, "remoteInstanceNumber");
 
 		////////
 		final BeanDefinitionBuilder executorBuilder = BeanDefinitionBuilder.genericBeanDefinition(BacnetExecutor.class);

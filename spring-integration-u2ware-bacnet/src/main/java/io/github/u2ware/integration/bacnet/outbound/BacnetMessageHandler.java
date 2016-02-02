@@ -2,10 +2,8 @@ package io.github.u2ware.integration.bacnet.outbound;
 
 import io.github.u2ware.integration.bacnet.core.BacnetExecutor;
 import io.github.u2ware.integration.bacnet.core.BacnetRequest;
-import io.github.u2ware.integration.bacnet.core.BacnetResponse;
 import io.github.u2ware.integration.bacnet.support.BacnetHeaders;
 
-import java.util.List;
 import java.util.Map;
 
 import org.springframework.integration.handler.AbstractReplyProducingMessageHandler;
@@ -61,29 +59,27 @@ public class BacnetMessageHandler extends AbstractReplyProducingMessageHandler {
 
 		try{
 			Object requestPayload = requestMessage.getPayload();
-
 			if(! (requestPayload instanceof BacnetRequest)) {
 				return null;
 			}
 			
-			BacnetRequest bacnetRequest = (BacnetRequest)requestPayload;
-			List<BacnetResponse> bacnetResponse = executor.execute(bacnetRequest);
-			if (bacnetResponse == null) {
+			BacnetRequest request = (BacnetRequest)requestPayload;
+			Object response = executor.execute(request);
+			if (response == null) {
 				return null;
 			}
 
 			if (producesReply) {
 				Map<String, Object> headers = Maps.newHashMap();
-				headers.put(BacnetHeaders.REMOTE_ADDRESS, bacnetRequest.getRemoteAddress());
-				headers.put(BacnetHeaders.REMOTE_INSTANCE_NUMBER, bacnetRequest.getRemoteInstanceNumber());
-				return MessageBuilder.withPayload(bacnetResponse).copyHeaders(headers).build();
+				headers.put(BacnetHeaders.REQUEST, request.toString());
+				return MessageBuilder.withPayload(response).copyHeaders(headers).build();
 			}else{
 				return null;
 			}
 
 		}catch(Exception e){
 			if(logger.isDebugEnabled())
-				logger.debug("BACNet LocalDevice Error", e);
+				logger.debug("BacnetMessageHandler Error", e);
 			return null;
 		}
 	}

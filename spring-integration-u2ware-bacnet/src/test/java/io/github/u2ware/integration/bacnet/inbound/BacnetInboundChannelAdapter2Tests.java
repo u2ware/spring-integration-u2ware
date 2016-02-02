@@ -1,11 +1,10 @@
 package io.github.u2ware.integration.bacnet.inbound;
 
-import io.github.u2ware.integration.bacnet.core.BacnetSlave;
+import io.github.u2ware.integration.bacnet.core.BacnetDevice;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.AfterClass;
-import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -17,16 +16,19 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration
-public class BacnetInboundChannelAdapterTests {
+public class BacnetInboundChannelAdapter2Tests {
 
+	
 	@BeforeClass
 	public static void beforeClass() throws Exception {
-		BacnetSlave.startup(37807);
+		BacnetDevice.startup(37805);
+		BacnetDevice.startup(37806);
 	}
 
 	@AfterClass
 	public static void afterClass() throws Exception{
-		BacnetSlave.shutdown();
+		BacnetDevice.shutdown(37805);
+		BacnetDevice.shutdown(37806);
 	}
 	
 	protected Log logger = LogFactory.getLog(getClass());
@@ -38,7 +40,6 @@ public class BacnetInboundChannelAdapterTests {
 	
 	@Test
 	public void testRunning() throws Exception {
-		Object receive = bacnetResponse.receive(10000);
-		Assert.assertNotNull(receive);
+		Thread.sleep(10000);
 	}
 }

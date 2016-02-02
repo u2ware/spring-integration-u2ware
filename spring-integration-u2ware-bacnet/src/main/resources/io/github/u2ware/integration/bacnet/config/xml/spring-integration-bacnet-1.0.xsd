@@ -29,22 +29,18 @@
 			<xsd:sequence>
 				<xsd:element ref="integration:poller" minOccurs="0" maxOccurs="1"/>
 			</xsd:sequence>
-			<xsd:attributeGroup ref="coreBacnetComponentAttributes"/>
-			<xsd:attribute name="remoteAddress" use="required" type="xsd:string">
-				<xsd:annotation>
-					<xsd:documentation><![CDATA[
-						Bacnet Remote Address
-					]]></xsd:documentation>
-				</xsd:annotation>
-			</xsd:attribute>
-			<xsd:attribute name="remoteInstanceNumber" use="optional" type="xsd:string">
-				<xsd:annotation>
-					<xsd:documentation><![CDATA[
-						Bacnet Instance Number
-					]]></xsd:documentation>
-				</xsd:annotation>
-			</xsd:attribute>
 
+			<xsd:attributeGroup ref="coreBacnetComponentAttributes"/>
+
+			<xsd:attribute name="request-support" use="required" type="xsd:string">
+				<xsd:annotation>
+					<xsd:appinfo>
+						<tool:annotation kind="ref">
+							<tool:expected-type type="io.github.u2ware.integration.bacnet.inbound.BacnetRequestSupport" />
+						</tool:annotation>
+					</xsd:appinfo>
+				</xsd:annotation>
+			</xsd:attribute>
 
 			<xsd:attribute name="channel" type="xsd:string">
 				<xsd:annotation>

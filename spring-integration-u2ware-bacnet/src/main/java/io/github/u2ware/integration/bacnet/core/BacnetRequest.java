@@ -2,36 +2,41 @@ package io.github.u2ware.integration.bacnet.core;
 
 public class BacnetRequest {
 
-	public static final String READ_TYPE = "read";
-	public static final String WRITE_TYPE = "write";
-	
-	private String type = READ_TYPE;
-	private String remoteAddress;
-	private int remoteInstanceNumber;
+	private String host;
+	private int port;
+	private int instanceNumber;
 
 	public BacnetRequest(){
+		
 	}
-	public BacnetRequest(String remoteAddress, int remoteInstanceNumber){
-		this.remoteAddress = remoteAddress;
-		this.remoteInstanceNumber = remoteInstanceNumber;
+	public BacnetRequest(String host, int port, int instanceNumber){
+		this.host = host;
+		this.port = port;
+		this.instanceNumber = instanceNumber;
 	}
-	
-	public String getType() {
-		return type;
+	public String getHost() {
+		return host;
 	}
-	public void setType(String type) {
-		this.type = type;
+	public void setHost(String host) {
+		this.host = host;
 	}
-	public String getRemoteAddress() {
-		return remoteAddress;
+	public int getPort() {
+		return port;
 	}
-	public void setRemoteAddress(String remoteAddress) {
-		this.remoteAddress = remoteAddress;
+	public void setPort(int port) {
+		this.port = port;
 	}
-	public int getRemoteInstanceNumber() {
-		return remoteInstanceNumber;
+	public int getInstanceNumber() {
+		return instanceNumber;
 	}
-	public void setRemoteInstanceNumber(int remoteInstanceNumber) {
-		this.remoteInstanceNumber = remoteInstanceNumber;
+	public void setInstanceNumber(int instanceNumber) {
+		this.instanceNumber = instanceNumber;
 	}
+	@Override
+	public String toString() {
+		return "BacnetRequest [host=" + host + ", port=" + port
+				+ ", instanceNumber=" + instanceNumber + "]";
+	}
+
+
 }

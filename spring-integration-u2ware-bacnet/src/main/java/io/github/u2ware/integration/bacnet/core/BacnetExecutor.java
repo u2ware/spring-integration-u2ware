@@ -59,7 +59,7 @@ import com.serotonin.bacnet4j.util.RequestUtils;
 @SuppressWarnings("serial")
 public class BacnetExecutor extends ThreadPoolTaskExecutor {
 
-	private Log bacnetLogger= LogFactory.getLog(getClass());
+	private Log logger = LogFactory.getLog(getClass());
 	
 	protected int localPort = IpNetwork.DEFAULT_PORT; //47808;
 	protected int localInstanceNumber;
@@ -90,34 +90,32 @@ public class BacnetExecutor extends ThreadPoolTaskExecutor {
 	public void afterPropertiesSet() {
 		super.afterPropertiesSet();
 		
-		//int localPort = IpNetwork.DEFAULT_PORT - bacnetDeviceNumber;
-		
-        network = new IpNetwork(IpNetwork.DEFAULT_BROADCAST_IP, localPort);
-        
-        transport = new DefaultTransport(network);
-//               transport.setTimeout(10000);
-//               transport.setSegTimeout(15000);
-        
-        localInstanceNumber = this.localInstanceNumber > 0 ? this.localInstanceNumber : localPort;
-        localDevice = new LocalDevice(localInstanceNumber, transport);
-        
 		try {
+	        network = new IpNetwork(IpNetwork.DEFAULT_BROADCAST_IP, localPort);
+	        
+	        transport = new DefaultTransport(network);
+//	               transport.setTimeout(10000);
+//	               transport.setSegTimeout(15000);
+	        
+	        localInstanceNumber = this.localInstanceNumber > 0 ? this.localInstanceNumber : localPort;
+	        localDevice = new LocalDevice(localInstanceNumber, transport);
+
+			
 			localDevice.initialize();
 	        localDevice.getEventHandler().addListener(new DeviceEventListenerImpl());
 	        localDevice.sendGlobalBroadcast(new WhoIsRequest());
-	        bacnetLogger.info("BACNet LocalDevice Initialized: <localhost>:"+localPort+"["+localPort+"]");
+	        logger .info("BACNet LocalDevice Initialized: <localhost>:"+localPort);
 		
 		} catch (Exception e) {
-			e.printStackTrace();
-	        bacnetLogger.info("BACNet LocalDevice Initialized Error: <localhost>:"+localPort+"["+localPort+"] "+e.getMessage());
-			throw new RuntimeException("BACNet LocalDevice Initialized Error: <localhost>:"+localPort+"["+localPort+"]");
+	        logger .info("BACNet LocalDevice Initialized Error: <localhost>:"+localPort+""+e.getMessage());
+			throw new RuntimeException("BACNet LocalDevice Initialized Error: <localhost>:"+localPort);
 		}
 	}
 
 	@Override
 	public void destroy()  {
 		localDevice.terminate();
-        bacnetLogger.info("BACNet LocalDevice Terminated: <localhost>:"+localPort+"["+localPort+"]");
+        logger .info("BACNet LocalDevice Terminated: <localhost>:"+localPort+"["+localPort+"]");
 		super.destroy();
 	}	
 	
@@ -148,47 +146,34 @@ public class BacnetExecutor extends ThreadPoolTaskExecutor {
 	////////////////////////////////////
 	//
 	////////////////////////////////////
-	public List<BacnetResponse> execute(BacnetRequest request) throws Exception{
-		if(BacnetRequest.READ_TYPE.equals(request.getType())){
-			return readValues(request.getRemoteAddress(), request.getRemoteInstanceNumber());
-//
-//			if(StringUtils.hasText(request.getRemoteAddress()) && request.getRemoteInstanceNumber() != 0){
-//				return readValues(request.getRemoteAddress(), request.getRemoteInstanceNumber());
-//			}else{
-//				return readValues(getRemoteAddress(), getRemoteInstanceNumber());
-//			}
-		
-		}else{
-			return null;
-		}
+	public Object execute(BacnetRequest request) throws Exception{
+		return readValues(request);
 	}
 
 	
 	////////////////////////////////////
 	//
 	////////////////////////////////////
-	/*
-	public List<BacnetWriteResponse> writeValue(.....) throws Exception{
-		return null;
-	}
-	public List<BacnetResponse> readValues() throws Exception{
-		return readValues(getRemoteAddress(), getRemoteInstanceNumber());
-	}
-	*/
-	public List<BacnetResponse> readValues(final String remoteAddress, final int remoteInstanceNumber) throws Exception{		
-		Address address = new Address(IpNetworkUtils.toOctetString(remoteAddress));
+	public List<BacnetResponse> readValues(BacnetRequest request) throws Exception{		
+
+	    long startTime = System.currentTimeMillis();
+		
+		Address address = new Address(IpNetworkUtils.toOctetString(request.getHost()+":"+request.getPort()));
 		RemoteDevice remoteDevice = localDevice.getRemoteDevice(address);
 		if(remoteDevice == null){
-			remoteDevice = findRemoteDevice(address, remoteInstanceNumber);
-	        bacnetLogger.info("BACNet RemoteDevice Find: "+remoteDevice.getAddress().getDescription()+"["+remoteDevice.getInstanceNumber()+"]");
+			remoteDevice = findRemoteDevice(address, request.getInstanceNumber());
+	        logger .info("BACNet RemoteDevice Find: "+remoteDevice.getAddress().getDescription()+"["+remoteDevice.getInstanceNumber()+"]");
 		}
 		Collection<ObjectIdentifier> oids = sendReadPropertyAllowNull(remoteDevice);
 		PropertyReferences refs = createPropertyReferences(oids);
 		PropertyValues pvs = readProperties(remoteDevice, refs);
 		
-		List<BacnetResponse> result = readValues(pvs, remoteDevice);
-        bacnetLogger.info("BACNet RemoteDevice Read: "+remoteDevice.getAddress().getDescription()+"["+remoteDevice.getInstanceNumber()+"]");
-
+		List<BacnetResponse> result = readProcess(pvs, remoteDevice);
+		
+	    logger.info(request+", BacnetResponse [count="+result.size()
+				+", timeInMillis="+ (System.currentTimeMillis()-startTime)
+				+"]");
+		
 		return result;
 	}
 	
@@ -196,7 +181,7 @@ public class BacnetExecutor extends ThreadPoolTaskExecutor {
 	//////////////////////////
 	//
 	//////////////////////////
-	private List<BacnetResponse> readValues(PropertyValues pvs, RemoteDevice remoteDevice){
+	private List<BacnetResponse> readProcess(PropertyValues pvs, RemoteDevice remoteDevice){
 		Map<Object, BacnetResponse> responseMap = Maps.newHashMap();
         
         for (ObjectPropertyReference opr : pvs) {
@@ -326,39 +311,39 @@ public class BacnetExecutor extends ThreadPoolTaskExecutor {
 	private class DeviceEventListenerImpl implements DeviceEventListener{
 		@Override
 		public void iAmReceived(final RemoteDevice d) {
-	        bacnetLogger.info("BACNet iAmReceived: "+d);
-	        bacnetLogger.info("                  : "+d.getName());
-	        bacnetLogger.info("                  : "+d.getModelName());
-	        bacnetLogger.info("                  : "+d.getVendorId());
-	        bacnetLogger.info("                  : "+d.getVendorName());
-	        bacnetLogger.info("                  : "+d.getInstanceNumber());
+	        logger .info("BACNet iAmReceived: "+d);
+	        logger .info("                  : "+d.getName());
+	        logger .info("                  : "+d.getModelName());
+	        logger .info("                  : "+d.getVendorId());
+	        logger .info("                  : "+d.getVendorName());
+	        logger .info("                  : "+d.getInstanceNumber());
 
-	        bacnetLogger.info("                  : "+d.getAddress());
-	        bacnetLogger.info("                  : "+d.getAddress().getDescription());
-	        bacnetLogger.info("                  : "+d.getAddress().getMacAddress());
-	        bacnetLogger.info("                  : "+d.getAddress().getMacAddress().getDescription());
+	        logger .info("                  : "+d.getAddress());
+	        logger .info("                  : "+d.getAddress().getDescription());
+	        logger .info("                  : "+d.getAddress().getMacAddress());
+	        logger .info("                  : "+d.getAddress().getMacAddress().getDescription());
 	        
-	        bacnetLogger.info("                  : "+d.getObjectIdentifier());
-	        bacnetLogger.info("                  : "+d.getObjectIdentifier().getInstanceNumber());
-	        bacnetLogger.info("                  : "+d.getObjectIdentifier().getObjectType());
+	        logger .info("                  : "+d.getObjectIdentifier());
+	        logger .info("                  : "+d.getObjectIdentifier().getInstanceNumber());
+	        logger .info("                  : "+d.getObjectIdentifier().getObjectType());
 		}
 		
 		@Override
 		public void listenerException(Throwable e) {
-			bacnetLogger.info("BACNet listenerException: ");
+			logger .info("BACNet listenerException: ");
 		}
 		@Override
 		public boolean allowPropertyWrite(Address from, BACnetObject obj, PropertyValue pv) {
-			bacnetLogger.info("BACNet allowPropertyWrite: ");
+			logger .info("BACNet allowPropertyWrite: ");
 			return true;
 		}
 		@Override
 		public void propertyWritten(Address from, BACnetObject obj, PropertyValue pv) {
-			bacnetLogger.info("BACNet propertyWritten: ");
+			logger .info("BACNet propertyWritten: ");
 		}
 		@Override
 		public void iHaveReceived(RemoteDevice d, RemoteObject o) {
-			bacnetLogger.info("BACNet iHaveReceived: ");
+			logger .info("BACNet iHaveReceived: ");
 		}
 		@Override
 		public void covNotificationReceived(
@@ -367,7 +352,7 @@ public class BacnetExecutor extends ThreadPoolTaskExecutor {
 				ObjectIdentifier monitoredObjectIdentifier,
 				UnsignedInteger timeRemaining,
 				SequenceOf<PropertyValue> listOfValues) {
-			bacnetLogger.info("BACNet covNotificationReceived: ");
+			logger .info("BACNet covNotificationReceived: ");
 		}
 		@Override
 		public void eventNotificationReceived(UnsignedInteger processIdentifier,
@@ -377,27 +362,27 @@ public class BacnetExecutor extends ThreadPoolTaskExecutor {
 				EventType eventType, CharacterString messageText,
 				NotifyType notifyType, Boolean ackRequired, EventState fromState,
 				EventState toState, NotificationParameters eventValues) {
-			bacnetLogger.info("BACNet eventNotificationReceived: ");
+			logger .info("BACNet eventNotificationReceived: ");
 		}
 		@Override
 		public void textMessageReceived(RemoteDevice textMessageSourceDevice,
 				Choice messageClass, MessagePriority messagePriority,
 				CharacterString message) {
-			bacnetLogger.info("BACNet textMessageReceived: ");
+			logger .info("BACNet textMessageReceived: ");
 		}
 		@Override
 		public void privateTransferReceived(Address from, UnsignedInteger vendorId,
 				UnsignedInteger serviceNumber, Sequence serviceParameters) {
-			bacnetLogger.info("BACNet privateTransferReceived: ");
+			logger .info("BACNet privateTransferReceived: ");
 		}
 		@Override
 		public void reinitializeDevice(Address from,
 				ReinitializedStateOfDevice reinitializedStateOfDevice) {
-			bacnetLogger.info("BACNet reinitializeDevice: ");
+			logger .info("BACNet reinitializeDevice: ");
 		}
 		@Override
 		public void synchronizeTime(Address from, DateTime dateTime, boolean utc) {
-			bacnetLogger.info("BACNet synchronizeTime: ");
+			logger .info("BACNet synchronizeTime: ");
 		}
 	}
 }
