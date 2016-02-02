@@ -7,13 +7,6 @@ public class SnmpResponse {
 	private Object value;
 	private String name;
 	
-	public SnmpResponse(){
-		
-	}
-	SnmpResponse(String id, Object value){
-		this.id = id;
-		this.value = value;		
-	}
 	public String getId() {
 		return id;
 	}
