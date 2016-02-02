@@ -125,8 +125,6 @@ public class SnmpExecutor implements CommandResponder, InitializingBean, Disposa
 	////////////////////////////////////
 	public Collection<SnmpResponse> readValue(SnmpRequest snmpRequest) throws Exception {
 
-		logger.info(snmpRequest);
-		
 		List<SnmpResponse> result = Lists.newArrayList();
 		
 	    CommunityTarget communityTarget = new CommunityTarget();
@@ -163,10 +161,10 @@ public class SnmpExecutor implements CommandResponder, InitializingBean, Disposa
 
 	    }while (!readProcess(snmpRequest, result, response, request, rootOID));
 	    
-	    logger.info("SnmpResponse [count="+result.size()
+	    logger.info(snmpRequest+", SnmpResponse [count="+result.size()
+								+", timeInMillis="+ (System.currentTimeMillis()-startTime)
 	    						+", objects="+objects
 								+", requests="+requests
-								+", timeInMillis="+ (System.currentTimeMillis()-startTime)
 								+"]");
 
 	    return result;
