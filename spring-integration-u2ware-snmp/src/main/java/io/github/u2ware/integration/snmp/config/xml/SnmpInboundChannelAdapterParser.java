@@ -15,7 +15,7 @@
  */
 package io.github.u2ware.integration.snmp.config.xml;
 
-import io.github.u2ware.integration.snmp.core.SnmpManager;
+import io.github.u2ware.integration.snmp.core.SnmpExecutor;
 import io.github.u2ware.integration.snmp.inbound.SnmpMessageSource;
 
 import org.springframework.beans.BeanMetadataElement;
@@ -47,7 +47,7 @@ public class SnmpInboundChannelAdapterParser extends AbstractPollingInboundChann
 		String channelAdapterId = this.resolveId(element, pollingChannelAdapterBuilder.getRawBeanDefinition(), parserContext);
 
 		////////
-		final BeanDefinitionBuilder executorBuilder = BeanDefinitionBuilder.genericBeanDefinition(SnmpManager.class);
+		final BeanDefinitionBuilder executorBuilder = BeanDefinitionBuilder.genericBeanDefinition(SnmpExecutor.class);
 		IntegrationNamespaceUtils.setValueIfAttributeDefined(executorBuilder, element, "localPort");
 		IntegrationNamespaceUtils.setValueIfAttributeDefined(executorBuilder, element, "LocalMib");
 		

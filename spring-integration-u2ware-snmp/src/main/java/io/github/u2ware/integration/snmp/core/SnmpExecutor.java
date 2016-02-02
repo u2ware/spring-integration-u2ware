@@ -41,7 +41,7 @@ import org.springframework.beans.factory.InitializingBean;
 
 import com.google.common.collect.Lists;
 
-public class SnmpManager implements CommandResponder, InitializingBean, DisposableBean{
+public class SnmpExecutor implements CommandResponder, InitializingBean, DisposableBean{
 
 	private Log logger = LogFactory.getLog(getClass());
 	
@@ -88,7 +88,6 @@ public class SnmpManager implements CommandResponder, InitializingBean, Disposab
 			File file = new File(localMib);
 
 			if(file.exists()){
-				logger.info("Initialized: "+localMib);		
 
 				MibLoader mibLoader = new MibLoader();
 				mibLoader.addDir(file.getParentFile());
@@ -97,7 +96,7 @@ public class SnmpManager implements CommandResponder, InitializingBean, Disposab
 				mibNames = new HashMap<String,String>();
 			}
 	    }
-		logger.info("Initialized: <localhost>:"+localPort);		
+		logger.info("SNMP Manager Initialized: <localhost>:"+localPort+",  localMib="+localMib);		
 	}
 	
 	@Override
@@ -106,17 +105,27 @@ public class SnmpManager implements CommandResponder, InitializingBean, Disposab
 	    transport.close();
 		threadPool.stop();
 
-		logger.info("Destroyed: <localhost>:"+localPort);		
+		logger.info("SNMP Manager Terminated: <localhost>:"+localPort);		
 	}
 	
 	@Override
 	public void processPdu(CommandResponderEvent event) {
 		logger.info("Event: "+event);		
 	}
-	
-	public Collection<SnmpResponse> execute(SnmpRequest snmpRequest) throws Exception {
 
-		logger.info(snmpRequest);		
+	////////////////////////////////////
+	//
+	////////////////////////////////////
+	public Object execute(SnmpRequest snmpRequest) throws Exception {
+		return readValue(snmpRequest);
+	}
+	
+	////////////////////////////////////
+	//
+	////////////////////////////////////
+	public Collection<SnmpResponse> readValue(SnmpRequest snmpRequest) throws Exception {
+
+		logger.info(snmpRequest);
 		
 		List<SnmpResponse> result = Lists.newArrayList();
 		
@@ -152,7 +161,7 @@ public class SnmpManager implements CommandResponder, InitializingBean, Disposab
 	          objects += response.size();
 	        }
 
-	    }while (!process(snmpRequest, result, response, request, rootOID));
+	    }while (!readProcess(snmpRequest, result, response, request, rootOID));
 	    
 	    logger.info("SnmpResponse [count="+result.size()
 	    						+", objects="+objects
@@ -163,7 +172,7 @@ public class SnmpManager implements CommandResponder, InitializingBean, Disposab
 	    return result;
 	}
 	
-	private boolean process(SnmpRequest snmpRequest, List<SnmpResponse> snmpResponse, PDU response, PDU request, OID rootOID) throws Exception {
+	private boolean readProcess(SnmpRequest snmpRequest, List<SnmpResponse> snmpResponse, PDU response, PDU request, OID rootOID) throws Exception {
 
 		if ((response == null) || (response.getErrorStatus() != 0) || (response.getType() == PDU.REPORT)) {
 	    	return true;
@@ -179,14 +188,14 @@ public class SnmpManager implements CommandResponder, InitializingBean, Disposab
             	finished = true;
             
             }else if (Null.isExceptionSyntax(vb.getVariable().getSyntax())) {
-            	process(snmpRequest, snmpResponse, vb);
+            	readProcess(snmpRequest, snmpResponse, vb);
 				finished = true;
             
             }else if (vb.getOid().compareTo(lastOID) <= 0) {
             	throw new Exception("Variable received is not lexicographic successor of requested one:" + vb.toString() + " <= "+lastOID);
             
             }else {
-            	process(snmpRequest, snmpResponse, vb);
+            	readProcess(snmpRequest, snmpResponse, vb);
 				lastOID = vb.getOid();
             }
         }
@@ -202,7 +211,7 @@ public class SnmpManager implements CommandResponder, InitializingBean, Disposab
         return finished;
 	}
 	
-	private void process(SnmpRequest req, List<SnmpResponse> res, VariableBinding vb) throws Exception {
+	private void readProcess(SnmpRequest req, List<SnmpResponse> res, VariableBinding vb) throws Exception {
 		
 		String id = vb.getOid().toString();
 		Object value = getResponseValue(req, vb.getVariable());

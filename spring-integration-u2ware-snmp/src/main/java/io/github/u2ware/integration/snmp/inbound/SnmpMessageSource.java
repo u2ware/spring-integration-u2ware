@@ -1,11 +1,9 @@
 package io.github.u2ware.integration.snmp.inbound;
 
-import io.github.u2ware.integration.snmp.core.SnmpManager;
+import io.github.u2ware.integration.snmp.core.SnmpExecutor;
 import io.github.u2ware.integration.snmp.core.SnmpRequest;
-import io.github.u2ware.integration.snmp.core.SnmpResponse;
 import io.github.u2ware.integration.snmp.support.SnmpHeaders;
 
-import java.util.Collection;
 import java.util.Map;
 
 import org.springframework.integration.context.IntegrationObjectSupport;
@@ -22,12 +20,12 @@ import com.google.common.collect.Maps;
  * @since 1.0.0
  */
 public class SnmpMessageSource extends IntegrationObjectSupport 
-implements MessageSource<Collection<SnmpResponse>>{
+implements MessageSource<Object>{
 
 	private SnmpRequestSupport requestSupport;
-	private final SnmpManager executor;
+	private final SnmpExecutor executor;
 	
-	public SnmpMessageSource(SnmpManager executor){
+	public SnmpMessageSource(SnmpExecutor executor){
 		Assert.notNull(executor, "bacnetExecutor must not be null.");
 		this.executor = executor;
 	}
@@ -42,13 +40,13 @@ implements MessageSource<Collection<SnmpResponse>>{
 	}
 	
 	@Override
-	public Message<Collection<SnmpResponse>> receive() {
+	public Message<Object> receive() {
 		
 		try{
 			SnmpRequest request = requestSupport.next();
 			if(request == null) return null;
 			
-			Collection<SnmpResponse> response = executor.execute(request);
+			Object response = executor.execute(request);
 			if (response == null) {
 				return null;
 			}

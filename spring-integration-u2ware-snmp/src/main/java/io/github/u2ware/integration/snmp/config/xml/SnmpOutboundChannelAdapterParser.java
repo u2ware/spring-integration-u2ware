@@ -1,6 +1,6 @@
 package io.github.u2ware.integration.snmp.config.xml;
 
-import io.github.u2ware.integration.snmp.core.SnmpManager;
+import io.github.u2ware.integration.snmp.core.SnmpExecutor;
 import io.github.u2ware.integration.snmp.outbound.SnmpMessageHandler;
 
 import org.springframework.beans.factory.config.BeanDefinition;
@@ -39,7 +39,7 @@ public class SnmpOutboundChannelAdapterParser extends AbstractOutboundChannelAda
 		String channelAdapterId = this.resolveId(element, outboundChannelAdapterBuilder.getRawBeanDefinition(), parserContext);
 
 		////////
-		final BeanDefinitionBuilder executorBuilder = BeanDefinitionBuilder.genericBeanDefinition(SnmpManager.class);
+		final BeanDefinitionBuilder executorBuilder = BeanDefinitionBuilder.genericBeanDefinition(SnmpExecutor.class);
 		IntegrationNamespaceUtils.setValueIfAttributeDefined(executorBuilder, element, "localPort");
 		IntegrationNamespaceUtils.setValueIfAttributeDefined(executorBuilder, element, "LocalMib");
 

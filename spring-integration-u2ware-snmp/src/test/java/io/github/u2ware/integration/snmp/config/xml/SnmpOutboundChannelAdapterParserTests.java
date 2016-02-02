@@ -1,6 +1,6 @@
 package io.github.u2ware.integration.snmp.config.xml;
 
-import io.github.u2ware.integration.snmp.core.SnmpManager;
+import io.github.u2ware.integration.snmp.core.SnmpExecutor;
 
 import java.util.Arrays;
 
@@ -43,7 +43,7 @@ public class SnmpOutboundChannelAdapterParserTests {
 	private AbstractMessageChannel snmpRequest;
 
 	@Autowired
-	private SnmpManager snmpManager;
+	private SnmpExecutor snmpManager;
 
 	@Autowired @Qualifier("snmpOutboundChannelAdapter")
 	private EventDrivenConsumer consumer;

@@ -33,7 +33,7 @@ public class SnmpExecutorTests {
 	protected Log logger = LogFactory.getLog(getClass());
 
 	@Autowired @Qualifier("snmpManager")
-	private SnmpManager snmpManager;
+	private SnmpExecutor snmpManager;
 	
 	@Test
 	public void testFindDevice() throws Exception {
@@ -41,8 +41,10 @@ public class SnmpExecutorTests {
         SnmpRequest request = new SnmpRequest("127.0.0.1", 10161, "1.3.6");
         //SnmpRequest request = new SnmpRequest("192.168.245.181", 161, "1.3.6.1.4.1.318");
         
-        Collection<SnmpResponse> response = snmpManager.execute(request);
+        Collection<SnmpResponse> response = snmpManager.readValue(request);
         Assert.assertNotNull(response);
-        logger.debug(response);
+        for(SnmpResponse r : response){
+            logger.debug(r);
+        }
 	}
 }

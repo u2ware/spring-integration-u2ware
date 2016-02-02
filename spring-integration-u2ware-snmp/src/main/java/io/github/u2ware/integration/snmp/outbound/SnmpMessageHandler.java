@@ -1,11 +1,9 @@
 package io.github.u2ware.integration.snmp.outbound;
 
-import io.github.u2ware.integration.snmp.core.SnmpManager;
+import io.github.u2ware.integration.snmp.core.SnmpExecutor;
 import io.github.u2ware.integration.snmp.core.SnmpRequest;
-import io.github.u2ware.integration.snmp.core.SnmpResponse;
 import io.github.u2ware.integration.snmp.support.SnmpHeaders;
 
-import java.util.Collection;
 import java.util.Map;
 
 import org.springframework.integration.handler.AbstractReplyProducingMessageHandler;
@@ -23,17 +21,17 @@ import com.google.common.collect.Maps;
  */
 public class SnmpMessageHandler extends AbstractReplyProducingMessageHandler {
 
-	private final SnmpManager executor;
+	private final SnmpExecutor executor;
 	private boolean producesReply = true;	//false for outbound-channel-adapter, true for outbound-gateway
 
 	/**
-	 * Constructor taking an {@link SnmpManager} that wraps common
+	 * Constructor taking an {@link SnmpExecutor} that wraps common
 	 * Bacnet Operations.
 	 *
 	 * @param executor Must not be null
 	 *
 	 */
-	public SnmpMessageHandler(SnmpManager executor) {
+	public SnmpMessageHandler(SnmpExecutor executor) {
 		Assert.notNull(executor, "executor must not be null.");
 		this.executor = executor;
 	}
@@ -65,7 +63,7 @@ public class SnmpMessageHandler extends AbstractReplyProducingMessageHandler {
 			}
 			
 			SnmpRequest request = (SnmpRequest)requestPayload;
-			Collection<SnmpResponse> response = executor.execute(request);
+			Object response = executor.execute(request);
 			if (response == null) {
 				return null;
 			}
