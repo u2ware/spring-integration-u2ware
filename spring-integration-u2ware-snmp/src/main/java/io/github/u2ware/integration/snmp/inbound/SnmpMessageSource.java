@@ -25,8 +25,14 @@ implements MessageSource<Object>{
 	private SnmpRequestSupport requestSupport;
 	private final SnmpExecutor executor;
 	
+	/**
+	 * Constructor taking a {@link SnmpExecutor} that provide all required SNMP
+	 * functionality.
+	 *
+	 * @param executor Must not be null.
+	 */
 	public SnmpMessageSource(SnmpExecutor executor){
-		Assert.notNull(executor, "bacnetExecutor must not be null.");
+		Assert.notNull(executor, "snmpExecutor must not be null.");
 		this.executor = executor;
 	}
 
@@ -39,6 +45,12 @@ implements MessageSource<Object>{
 		return "snmp:inbound-channel-adapter";
 	}
 	
+	/**
+	 * Uses {@link SnmpExecutor#execute()} to executes the SMMP operation.
+	 *
+	 * If {@link SnmpExecutor#execute()} returns null, this method will return
+	 * <code>null</code>. Otherwise, a new {@link Message} is constructed and returned.
+	 */
 	@Override
 	public Message<Object> receive() {
 		
@@ -47,9 +59,7 @@ implements MessageSource<Object>{
 			if(request == null) return null;
 			
 			Object response = executor.execute(request);
-			if (response == null) {
-				return null;
-			}
+			if(response == null) return null;
 
 			Map<String, Object> headers = Maps.newHashMap();
 			headers.put(SnmpHeaders.REQUEST, request.toString());

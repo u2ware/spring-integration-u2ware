@@ -41,7 +41,7 @@ public class SnmpOutboundGatewayParser extends AbstractConsumerEndpointParser  {
 		IntegrationNamespaceUtils.setValueIfAttributeDefined(executorBuilder, element, "LocalMib");
 
 		final BeanDefinition executorBuilderBeanDefinition = executorBuilder.getBeanDefinition();
-		final String executorBeanName = channelAdapterId + ".snmpManager";
+		final String executorBeanName = channelAdapterId + ".snmpExecutor";
 		parserContext.registerBeanComponent(new BeanComponentDefinition(executorBuilderBeanDefinition, executorBeanName));
 		////////
 		

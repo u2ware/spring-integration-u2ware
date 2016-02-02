@@ -41,8 +41,6 @@ public class SnmpInboundChannelAdapterParser extends AbstractPollingInboundChann
 		
 		BeanDefinitionBuilder pollingChannelAdapterBuilder = BeanDefinitionBuilder.genericBeanDefinition(SnmpMessageSource.class);		
 		IntegrationNamespaceUtils.setReferenceIfAttributeDefined(pollingChannelAdapterBuilder, element, "request-support", "requestSupport");
-
-		
 		
 		String channelAdapterId = this.resolveId(element, pollingChannelAdapterBuilder.getRawBeanDefinition(), parserContext);
 
@@ -53,7 +51,7 @@ public class SnmpInboundChannelAdapterParser extends AbstractPollingInboundChann
 		
 
 		final BeanDefinition executorBuilderBeanDefinition = executorBuilder.getBeanDefinition();
-		final String executorBeanName = channelAdapterId + ".snmpManager";
+		final String executorBeanName = channelAdapterId + ".snmpExecutor";
 		parserContext.registerBeanComponent(new BeanComponentDefinition(executorBuilderBeanDefinition, executorBeanName));
 		////////
 		
