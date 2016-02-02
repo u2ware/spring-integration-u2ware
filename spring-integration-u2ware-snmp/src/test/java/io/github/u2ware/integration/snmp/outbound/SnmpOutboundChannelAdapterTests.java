@@ -38,7 +38,7 @@ public class SnmpOutboundChannelAdapterTests {
     @Test
 	public void testRunning() throws Exception {
 
-    	SnmpRequest payload = new SnmpRequest("127.0.0.1:10171", "1.3.6");
+    	SnmpRequest payload = new SnmpRequest("127.0.0.1", 10171, "1.3.6");
     	snmpRequest.send(MessageBuilder.withPayload(payload).build());
 		Thread.sleep(3000);
 	}

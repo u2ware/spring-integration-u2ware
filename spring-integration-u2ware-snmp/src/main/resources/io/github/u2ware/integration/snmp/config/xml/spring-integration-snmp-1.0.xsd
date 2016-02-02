@@ -32,11 +32,11 @@
 
 			<xsd:attributeGroup ref="coreSnmpComponentAttributes"/>
 			
-			<xsd:attribute name="snmpRequest" use="required" type="xsd:string">
+			<xsd:attribute name="request-support" use="required" type="xsd:string">
 				<xsd:annotation>
 					<xsd:appinfo>
 						<tool:annotation kind="ref">
-							<tool:expected-type type="io.github.u2ware.integration.snmp.core.SnmpRequest" />
+							<tool:expected-type type="io.github.u2ware.integration.snmp.inbound.SnmpRequestSupport" />
 						</tool:annotation>
 					</xsd:appinfo>
 				</xsd:annotation>

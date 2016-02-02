@@ -40,9 +40,10 @@ public class SnmpInboundChannelAdapterParser extends AbstractPollingInboundChann
 	protected BeanMetadataElement parseSource(Element element, ParserContext parserContext) {
 		
 		BeanDefinitionBuilder pollingChannelAdapterBuilder = BeanDefinitionBuilder.genericBeanDefinition(SnmpMessageSource.class);		
-		IntegrationNamespaceUtils.setReferenceIfAttributeDefined(pollingChannelAdapterBuilder, element, "snmpRequest");
-		
+		IntegrationNamespaceUtils.setReferenceIfAttributeDefined(pollingChannelAdapterBuilder, element, "request-support", "requestSupport");
 
+		
+		
 		String channelAdapterId = this.resolveId(element, pollingChannelAdapterBuilder.getRawBeanDefinition(), parserContext);
 
 		////////

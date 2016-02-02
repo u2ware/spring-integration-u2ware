@@ -4,6 +4,7 @@ import java.io.File;
 import java.net.InetAddress;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import net.percederberg.mibble.Mib;
@@ -37,6 +38,8 @@ import org.snmp4j.util.MultiThreadedMessageDispatcher;
 import org.snmp4j.util.ThreadPool;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
+
+import com.google.common.collect.Lists;
 
 public class SnmpManager implements CommandResponder, InitializingBean, DisposableBean{
 
@@ -115,13 +118,13 @@ public class SnmpManager implements CommandResponder, InitializingBean, Disposab
 
 		logger.info(snmpRequest);		
 		
-		Map<String, SnmpResponse> result = new HashMap<String, SnmpResponse>();
+		List<SnmpResponse> result = Lists.newArrayList();
 		
 	    CommunityTarget communityTarget = new CommunityTarget();
 		communityTarget.setCommunity(new OctetString("public"));
 		communityTarget.setRetries(3);
 		communityTarget.setVersion(SnmpConstants.version1);
-		communityTarget.setAddress(new UdpAddress(InetAddress.getByName(snmpRequest.host()), snmpRequest.port()));
+		communityTarget.setAddress(new UdpAddress(InetAddress.getByName(snmpRequest.getHost()), snmpRequest.getPort()));
 
 		
 		OID communityOid = new OID(snmpRequest.getRootOid());
@@ -157,10 +160,10 @@ public class SnmpManager implements CommandResponder, InitializingBean, Disposab
 								+", timeInMillis="+ (System.currentTimeMillis()-startTime)
 								+"]");
 
-	    return result.values();
+	    return result;
 	}
 	
-	private boolean process(SnmpRequest snmpRequest, Map<String, SnmpResponse> snmpResponse, PDU response, PDU request, OID rootOID) throws Exception {
+	private boolean process(SnmpRequest snmpRequest, List<SnmpResponse> snmpResponse, PDU response, PDU request, OID rootOID) throws Exception {
 
 		if ((response == null) || (response.getErrorStatus() != 0) || (response.getType() == PDU.REPORT)) {
 	    	return true;
@@ -199,27 +202,27 @@ public class SnmpManager implements CommandResponder, InitializingBean, Disposab
         return finished;
 	}
 	
-	private void process(SnmpRequest req, Map<String, SnmpResponse> res, VariableBinding vb) throws Exception {
+	private void process(SnmpRequest req, List<SnmpResponse> res, VariableBinding vb) throws Exception {
 		
-		String name = getResponseName(req, vb.getOid());
+		String id = vb.getOid().toString();
 		Object value = getResponseValue(req, vb.getVariable());
+		String name = getResponseName(req, vb.getOid());
 
-		if(res.containsKey(name)){
-			res.get(name).addValue(value);
-			
-		}else{
-			res.put(name, new SnmpResponse(name, value));
-		}
+		SnmpResponse e = new SnmpResponse();
+		e.setId(id);
+		e.setValue(value);
+		e.setName(name);
+		
+		res.add(e);
 	}
 	
 	private String getResponseName(SnmpRequest snmpRequest, OID oid) {
 		
-		String oidText = oid.toString().replace('.', '_');
-
 		if(mibNames == null){
-			return oidText;
+			return null;
 		}
 		
+		String oidText = oid.toString();//.replace('.', '_');
 		if(mibNames.containsKey(oidText)){
 			return mibNames.get(oidText);
 		}
@@ -228,7 +231,7 @@ public class SnmpManager implements CommandResponder, InitializingBean, Disposab
 		String newOid = oid.toString();
 		while(true){
 			MibSymbol s = mib.getSymbolByOid(newOid);
-			name.insert(0, "_"+s.getName());
+			name.insert(0, "."+s.getName());
 
 			if(newOid.lastIndexOf(".") > 0){
 				newOid = newOid.substring(0, newOid.lastIndexOf("."));

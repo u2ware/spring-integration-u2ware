@@ -24,7 +24,7 @@ import com.google.common.collect.Maps;
 public class SnmpMessageSource extends IntegrationObjectSupport 
 implements MessageSource<Collection<SnmpResponse>>{
 
-	private SnmpRequest snmpRequest;
+	private SnmpRequestSupport requestSupport;
 	private final SnmpManager executor;
 	
 	public SnmpMessageSource(SnmpManager executor){
@@ -32,8 +32,8 @@ implements MessageSource<Collection<SnmpResponse>>{
 		this.executor = executor;
 	}
 
-	public void setSnmpRequest(SnmpRequest snmpRequest) {
-		this.snmpRequest = snmpRequest;
+	public void setRequestSupport(SnmpRequestSupport requestSupport) {
+		this.requestSupport = requestSupport;
 	}
 
 	@Override
@@ -45,7 +45,7 @@ implements MessageSource<Collection<SnmpResponse>>{
 	public Message<Collection<SnmpResponse>> receive() {
 		
 		try{
-			SnmpRequest request = snmpRequest.next();
+			SnmpRequest request = requestSupport.next();
 			if(request == null) return null;
 			
 			Collection<SnmpResponse> response = executor.execute(request);
@@ -63,5 +63,5 @@ implements MessageSource<Collection<SnmpResponse>>{
 				logger.debug("SnmpMessageSource Error", e);
 			return null;
 		}
-	}
+	}	
 }
