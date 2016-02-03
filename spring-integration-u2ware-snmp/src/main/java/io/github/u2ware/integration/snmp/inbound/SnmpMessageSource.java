@@ -22,8 +22,8 @@ import com.google.common.collect.Maps;
 public class SnmpMessageSource extends IntegrationObjectSupport 
 implements MessageSource<Object>{
 
-	private SnmpRequestSupport requestSupport;
 	private final SnmpExecutor executor;
+	private SnmpRequestSupport requestSupport;
 	
 	/**
 	 * Constructor taking a {@link SnmpExecutor} that provide all required SNMP
@@ -63,7 +63,9 @@ implements MessageSource<Object>{
 
 			Map<String, Object> headers = Maps.newHashMap();
 			headers.put(SnmpHeaders.REQUEST, request.toString());
-
+			headers.put(SnmpHeaders.LOCAL_PORT, executor.getLocalPort());
+			headers.put(SnmpHeaders.LOCAL_MIB, executor.getLocalMib());
+			
 			return MessageBuilder.withPayload(response).copyHeaders(headers).build();
 			
 		}catch(Exception e){

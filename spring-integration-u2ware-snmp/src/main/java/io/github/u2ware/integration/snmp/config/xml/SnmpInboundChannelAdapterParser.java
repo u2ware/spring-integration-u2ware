@@ -29,7 +29,7 @@ import org.w3c.dom.Element;
 
 
 /**
- * The Snmp inbound channel adapter parser
+ * The SNMP inbound channel adapter parser
  *
  * @author kslee@u2ware.com
  * @since 1.0.0

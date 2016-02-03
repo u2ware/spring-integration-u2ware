@@ -54,8 +54,15 @@ public class SnmpExecutor implements CommandResponder, InitializingBean, Disposa
 	private Integer localPort;
 	private String localMib;
 	
+	
+	public Integer getLocalPort() {
+		return localPort;
+	}
 	public void setLocalPort(Integer localPort) {
 		this.localPort = localPort;
+	}
+	public String getLocalMib() {
+		return localMib;
 	}
 	public void setLocalMib(String localMib) {
 		this.localMib = localMib;
@@ -123,7 +130,7 @@ public class SnmpExecutor implements CommandResponder, InitializingBean, Disposa
 	////////////////////////////////////
 	//
 	////////////////////////////////////
-	public Collection<SnmpResponse> readValue(SnmpRequest snmpRequest) throws Exception {
+	public synchronized Collection<SnmpResponse> readValue(SnmpRequest snmpRequest) throws Exception {
 
 		List<SnmpResponse> result = Lists.newArrayList();
 		
@@ -159,9 +166,9 @@ public class SnmpExecutor implements CommandResponder, InitializingBean, Disposa
 	          objects += response.size();
 	        }
 
-	    }while (!readProcess(snmpRequest, result, response, request, rootOID));
+	    }while (!readValueProcess(snmpRequest, result, response, request, rootOID));
 	    
-	    logger.info(snmpRequest+", SnmpResponse [count="+result.size()
+	    logger.info(snmpRequest+", SnmpResponse [size="+result.size()
 								+", timeInMillis="+ (System.currentTimeMillis()-startTime)
 	    						+", objects="+objects
 								+", requests="+requests
@@ -170,7 +177,7 @@ public class SnmpExecutor implements CommandResponder, InitializingBean, Disposa
 	    return result;
 	}
 	
-	private boolean readProcess(SnmpRequest snmpRequest, List<SnmpResponse> snmpResponse, PDU response, PDU request, OID rootOID) throws Exception {
+	private synchronized boolean readValueProcess(SnmpRequest snmpRequest, List<SnmpResponse> snmpResponse, PDU response, PDU request, OID rootOID) throws Exception {
 
 		if ((response == null) || (response.getErrorStatus() != 0) || (response.getType() == PDU.REPORT)) {
 	    	return true;
@@ -186,14 +193,14 @@ public class SnmpExecutor implements CommandResponder, InitializingBean, Disposa
             	finished = true;
             
             }else if (Null.isExceptionSyntax(vb.getVariable().getSyntax())) {
-            	readProcess(snmpRequest, snmpResponse, vb);
+            	readValueProcess(snmpRequest, snmpResponse, vb);
 				finished = true;
             
             }else if (vb.getOid().compareTo(lastOID) <= 0) {
             	throw new Exception("Variable received is not lexicographic successor of requested one:" + vb.toString() + " <= "+lastOID);
             
             }else {
-            	readProcess(snmpRequest, snmpResponse, vb);
+            	readValueProcess(snmpRequest, snmpResponse, vb);
 				lastOID = vb.getOid();
             }
         }
@@ -209,7 +216,7 @@ public class SnmpExecutor implements CommandResponder, InitializingBean, Disposa
         return finished;
 	}
 	
-	private void readProcess(SnmpRequest req, List<SnmpResponse> res, VariableBinding vb) throws Exception {
+	private synchronized void readValueProcess(SnmpRequest req, List<SnmpResponse> res, VariableBinding vb) throws Exception {
 		
 		String id = vb.getOid().toString();
 		Object value = getResponseValue(req, vb.getVariable());
