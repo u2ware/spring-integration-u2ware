@@ -11,16 +11,27 @@
 		http://u2ware.github.io/schema/integration/modbus 
 		http://u2ware.github.io/schema/integration/modbus/spring-integration-modbus.xsd">
 	
+	<bean id="modbusRequest" class="io.github.u2ware.integration.modbus.inbound.ModbusRequestSupport">
+		<constructor-arg>
+			<array>
+				<bean class="io.github.u2ware.integration.modbus.core.ModbusRequest">
+					<property name="unitId" value="0"/>
+					<property name="functionCode" value="1"/>
+					<property name="offset" value="0"/>
+					<property name="count" value="255"/>
+				</bean>			
+			</array>
+		</constructor-arg>
+	</bean>
+	
+	
 	<int-u2ware-modbus:inbound-channel-adapter id="modbusInboundChannelAdapter" 
-			channel="modbusResponse"
-
 			host="127.0.0.1"
 			port="10503"
-			
-			unitId="0"
-			functionCode="1"
-			offset="0"
-			count="255"> 
+
+			request-support="modbusRequest"
+			channel="modbusResponse">
+			 
 		<int:poller fixed-delay="10000"/>
 	</int-u2ware-modbus:inbound-channel-adapter>
 

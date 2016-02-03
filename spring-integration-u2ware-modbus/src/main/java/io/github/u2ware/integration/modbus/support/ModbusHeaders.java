@@ -26,8 +26,10 @@ public class ModbusHeaders {
 
 	private static final String PREFIX = "modbus_";
 
-	public static final String HOST_ADDRESS = PREFIX + "address";
-	public static final String HOST_PORT = PREFIX + "port";
+	public static final String HOST = PREFIX + "host";
+	public static final String PORT = PREFIX + "port";
+
+	public static final String REQUEST = PREFIX + "request";
 
 	
 	/*

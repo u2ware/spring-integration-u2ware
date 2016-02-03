@@ -39,26 +39,23 @@ public class ModbusInboundChannelAdapterParser extends AbstractPollingInboundCha
 
 	protected BeanMetadataElement parseSource(Element element, ParserContext parserContext) {
 
-		final BeanDefinitionBuilder pollingChannelAdapterBuilder = BeanDefinitionBuilder
-				.genericBeanDefinition(ModbusMessageSource.class);
+		final BeanDefinitionBuilder pollingChannelAdapterBuilder = BeanDefinitionBuilder.genericBeanDefinition(ModbusMessageSource.class);
+		IntegrationNamespaceUtils.setReferenceIfAttributeDefined(pollingChannelAdapterBuilder, element, "request-support", "requestSupport");
+
 		String channelAdapterId = this.resolveId(element, pollingChannelAdapterBuilder.getRawBeanDefinition(), parserContext);
 
 		////////
 		final BeanDefinitionBuilder executorBuilder = BeanDefinitionBuilder.genericBeanDefinition(ModbusExecutor.class);
-		IntegrationNamespaceUtils.setValueIfAttributeDefined(executorBuilder, element, "componentName");
 		IntegrationNamespaceUtils.setValueIfAttributeDefined(executorBuilder, element, "host");
 		IntegrationNamespaceUtils.setValueIfAttributeDefined(executorBuilder, element, "port");
 
+		
 		final BeanDefinition executorBuilderBeanDefinition = executorBuilder.getBeanDefinition();
 		final String executorBeanName = channelAdapterId + ".modbusExecutor";
 		parserContext.registerBeanComponent(new BeanComponentDefinition(executorBuilderBeanDefinition, executorBeanName));
 		////////
 		
 		pollingChannelAdapterBuilder.addConstructorArgReference(executorBeanName);
-		IntegrationNamespaceUtils.setValueIfAttributeDefined(pollingChannelAdapterBuilder, element, "unitId");
-		IntegrationNamespaceUtils.setValueIfAttributeDefined(pollingChannelAdapterBuilder, element, "functionCode");
-		IntegrationNamespaceUtils.setValueIfAttributeDefined(pollingChannelAdapterBuilder, element, "offset");
-		IntegrationNamespaceUtils.setValueIfAttributeDefined(pollingChannelAdapterBuilder, element, "count");
 
 		return pollingChannelAdapterBuilder.getBeanDefinition();
 	}

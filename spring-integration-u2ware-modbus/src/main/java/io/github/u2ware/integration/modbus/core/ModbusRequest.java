@@ -42,7 +42,8 @@ public class ModbusRequest {
 	}
 	@Override
 	public String toString() {
-		return "ModbusReq [unitId=" + unitId + ", functionCode=" + functionCode
-				+ ", offset=" + offset + ", count=" + count + "]";
+		return "ModbusRequest [unitId=" + unitId + ", functionCode="
+				+ functionCode + ", offset=" + offset + ", count=" + count
+				+ "]";
 	}
 }

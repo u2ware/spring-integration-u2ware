@@ -2,10 +2,8 @@ package io.github.u2ware.integration.modbus.outbound;
 
 import io.github.u2ware.integration.modbus.core.ModbusExecutor;
 import io.github.u2ware.integration.modbus.core.ModbusRequest;
-import io.github.u2ware.integration.modbus.core.ModbusResponse;
 import io.github.u2ware.integration.modbus.support.ModbusHeaders;
 
-import java.util.List;
 import java.util.Map;
 
 import org.springframework.integration.handler.AbstractReplyProducingMessageHandler;
@@ -27,7 +25,7 @@ public class ModbusMessageHandler extends AbstractReplyProducingMessageHandler {
 	private boolean producesReply = true;	//false for outbound-channel-adapter, true for outbound-gateway
 
 	/**
-	 * Constructor taking an {@link AbstractModbusExecutor} that wraps common
+	 * Constructor taking an {@link ModbusExecutor} that wraps common
 	 * Modbus Operations.
 	 *
 	 * @param executor Must not be null
@@ -63,21 +61,22 @@ public class ModbusMessageHandler extends AbstractReplyProducingMessageHandler {
 		try{
 
 			Object requestPayload = requestMessage.getPayload();
-
 			if(! (requestPayload instanceof ModbusRequest)) {
 				return null;
 			}
 
-			ModbusRequest bacnetRequest = (ModbusRequest)requestPayload;
-			List<ModbusResponse> response = executor.readValues(bacnetRequest);
+			ModbusRequest request = (ModbusRequest)requestPayload;
+			Object response = executor.readValues(request);
 			if (response == null) {
 				return null;
 			}
 
 			if (producesReply) {
 				Map<String, Object> headers = Maps.newHashMap();
-				headers.put(ModbusHeaders.HOST_ADDRESS, executor.getHost());
-				headers.put(ModbusHeaders.HOST_PORT, executor.getPort());
+				headers.put(ModbusHeaders.REQUEST, request.toString());
+				headers.put(ModbusHeaders.HOST, executor.getHost());
+				headers.put(ModbusHeaders.PORT, executor.getPort());
+
 				return MessageBuilder.withPayload(response).copyHeaders(headers).build();
 			}else{
 				return null;
@@ -85,7 +84,7 @@ public class ModbusMessageHandler extends AbstractReplyProducingMessageHandler {
 
 		}catch(Exception e){
 			if(logger.isDebugEnabled())
-				logger.debug("Modbus Client Error", e);
+				logger.debug("ModbusMessageHandler Error", e);
 			return null;
 		}
 	}

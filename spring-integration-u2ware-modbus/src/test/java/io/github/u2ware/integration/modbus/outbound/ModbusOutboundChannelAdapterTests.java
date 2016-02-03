@@ -27,7 +27,7 @@ public class ModbusOutboundChannelAdapterTests {
 
 	@AfterClass
 	public static void afterClass() throws Exception{
-		ModbusSlave.shutdown();
+		ModbusSlave.shutdown(10504);
 	}
 
 	protected Log logger = LogFactory.getLog(getClass());

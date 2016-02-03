@@ -45,6 +45,7 @@ public class ModbusExecutor implements InitializingBean, DisposableBean{
 	public void setPort(int port) {
 		this.port = port;
 	}
+
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(host, "host must not be null.");
@@ -64,7 +65,26 @@ public class ModbusExecutor implements InitializingBean, DisposableBean{
 			return InetAddress.getByName(host); 
 		}
 	}
+	
+	public Object execute(ModbusRequest request) throws Exception{
+		return readValues(request);
+	}
+	
+	public synchronized List<ModbusResponse> readValues(ModbusRequest request) throws Exception{
+	    long startTime = System.currentTimeMillis();
 
+	    net.wimpi.modbus.msg.ModbusRequest modbusRequest = convertRequest(request);
+		net.wimpi.modbus.msg.ModbusResponse modbusResponse = execute(modbusRequest);
+		List<ModbusResponse> response = convertResponse(modbusResponse);
+
+	    logger.info(request+", ModbusResponse [size="+response.size()
+				+", timeInMillis="+ (System.currentTimeMillis()-startTime)
+				+"]");
+		
+		return response;
+	}
+	
+	
 	@SuppressWarnings("unchecked")
 	public synchronized <Q extends net.wimpi.modbus.msg.ModbusRequest, A extends net.wimpi.modbus.msg.ModbusResponse> A execute(Q request) throws Exception{
 
@@ -75,60 +95,51 @@ public class ModbusExecutor implements InitializingBean, DisposableBean{
 		ModbusTransaction trans = new ModbusTCPTransaction(con);
 		//trans.setRetries(100);
 		
-		logger.info("Mobdus Client Request: "+host+":"+port+"\n"+request.getClass().getName()+"\n"+request.getHexMessage());
+		//logger.debug("Mobdus Client Request: "+host+":"+port+"\n"+request.getClass().getName()+"\n"+request.getHexMessage());
 		trans.setRequest(request);
 		trans.execute();
 		net.wimpi.modbus.msg.ModbusResponse response = trans.getResponse();
-		logger.info("Mobdus Client Response: "+host+":"+port+"\n"+response.getClass().getName()+"\n"+response.getHexMessage());
+		//logger.debug("Mobdus Client Response: "+host+":"+port+"\n"+response.getClass().getName()+"\n"+response.getHexMessage());
 		
         con.close();
 
 		return (A)response;
 	}
 
-	public synchronized List<ModbusResponse> readValues(int unitId, int function, int offset, int count) throws Exception{
-		net.wimpi.modbus.msg.ModbusRequest request = createRequest(unitId, function, offset, count);
-		net.wimpi.modbus.msg.ModbusResponse response = execute(request);
-		List<ModbusResponse> result = readValues(response);
-		return result;
-	}
-	public synchronized List<ModbusResponse> readValues(ModbusRequest modbusReq) throws Exception{
-		return readValues(modbusReq.getUnitId(), modbusReq.getFunctionCode(), modbusReq.getOffset(), modbusReq.getCount());
-	}
 	
 	//0x01	//Read Coils              //read-write   //ReadCoils 
 	//0x02	//Read Discrete Inputs    //read-only    //ReadInputDiscretes
 	//0x03	//Read Holding Registers  //read-write   //ReadMultipleRegisters
 	//0x04	//Read Input Registers    //read-only    //ReadInputRegister
-	private net.wimpi.modbus.msg.ModbusRequest createRequest(int unitId, int function, int offset, int count){
+	private net.wimpi.modbus.msg.ModbusRequest convertRequest(ModbusRequest request){
 
 		//System.err.println(function+" "+unitId+" "+ref+" "+count);
 
-		if(Modbus.READ_COILS == function){ //0x01
-			if(count > 2000) return null;
-			ReadCoilsRequest request = new ReadCoilsRequest(offset, count);
-			request.setUnitID(unitId);
-			return request;
-		}else if(Modbus.READ_INPUT_DISCRETES == function){ //0x02
-			if(count > 2000) return null;
-			ReadInputDiscretesRequest request = new ReadInputDiscretesRequest(offset, count);
-			request.setUnitID(unitId);
-			return request;
-		}else if(Modbus.READ_MULTIPLE_REGISTERS == function){ //0x03
-			if(count > 125) return null;
-			ReadMultipleRegistersRequest request = new ReadMultipleRegistersRequest(offset, count);
-			request.setUnitID(unitId);
-			return request;
-		}else if(Modbus.READ_INPUT_REGISTERS == function){
-			if(count > 125) return null;
-			ReadInputRegistersRequest request = new ReadInputRegistersRequest(offset, count);
-			request.setUnitID(unitId);
-			return request;
+		if(Modbus.READ_COILS == request.getFunctionCode()){ //0x01
+			if(request.getCount() > 2000) return null;
+			ReadCoilsRequest modbusRequest = new ReadCoilsRequest(request.getOffset(), request.getCount());
+			modbusRequest.setUnitID(request.getUnitId());
+			return modbusRequest;
+		}else if(Modbus.READ_INPUT_DISCRETES == request.getFunctionCode()){ //0x02
+			if(request.getCount() > 2000) return null;
+			ReadInputDiscretesRequest modbusRequest = new ReadInputDiscretesRequest(request.getOffset(), request.getCount());
+			modbusRequest.setUnitID(request.getUnitId());
+			return modbusRequest;
+		}else if(Modbus.READ_MULTIPLE_REGISTERS == request.getFunctionCode()){ //0x03
+			if(request.getCount() > 125) return null;
+			ReadMultipleRegistersRequest modbusRequest = new ReadMultipleRegistersRequest(request.getOffset(), request.getCount());
+			modbusRequest.setUnitID(request.getUnitId());
+			return modbusRequest;
+		}else if(Modbus.READ_INPUT_REGISTERS == request.getFunctionCode()){
+			if(request.getCount() > 125) return null;
+			ReadInputRegistersRequest modbusRequest = new ReadInputRegistersRequest(request.getOffset(), request.getCount());
+			modbusRequest.setUnitID(request.getUnitId());
+			return modbusRequest;
 		}		
 		return null;
 	}
 	
-	private List<ModbusResponse> readValues(net.wimpi.modbus.msg.ModbusResponse response) {
+	private List<ModbusResponse> convertResponse(net.wimpi.modbus.msg.ModbusResponse response) {
 		
 		List<ModbusResponse> results = Lists.newArrayList();
 		

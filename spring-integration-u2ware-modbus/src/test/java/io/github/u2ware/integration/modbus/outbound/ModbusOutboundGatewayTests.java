@@ -29,7 +29,7 @@ public class ModbusOutboundGatewayTests {
 
 	@AfterClass
 	public static void afterClass() throws Exception{
-		ModbusSlave.shutdown();
+		ModbusSlave.shutdown(10505);
 	}
 
 	protected Log logger = LogFactory.getLog(getClass());

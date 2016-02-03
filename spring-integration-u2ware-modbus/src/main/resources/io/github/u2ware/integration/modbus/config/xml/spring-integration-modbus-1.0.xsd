@@ -29,7 +29,19 @@
 			<xsd:sequence>
 				<xsd:element ref="integration:poller" minOccurs="0" maxOccurs="1"/>
 			</xsd:sequence>
+			
 			<xsd:attributeGroup ref="coreModbusComponentAttributes"/>
+			
+			<xsd:attribute name="request-support" use="required" type="xsd:string">
+				<xsd:annotation>
+					<xsd:appinfo>
+						<tool:annotation kind="ref">
+							<tool:expected-type type="io.github.u2ware.integration.modbus.inbound.ModbusRequestSupport" />
+						</tool:annotation>
+					</xsd:appinfo>
+				</xsd:annotation>
+			</xsd:attribute>
+
 			<xsd:attribute name="channel" type="xsd:string">
 				<xsd:annotation>
 					<xsd:appinfo>
@@ -54,35 +66,6 @@
 						will wait indefinitely. The value is specified in milliseconds.
 					]]>
 					</xsd:documentation>
-				</xsd:annotation>
-			</xsd:attribute>
-			
-			<xsd:attribute name="unitId" use="required" type="xsd:string">
-				<xsd:annotation>
-					<xsd:documentation><![CDATA[
-						Modbus Request unitId
-					]]></xsd:documentation>
-				</xsd:annotation>
-			</xsd:attribute>
-			<xsd:attribute name="functionCode" use="required" type="xsd:string">
-				<xsd:annotation>
-					<xsd:documentation><![CDATA[
-						Modbus Request functionCode
-					]]></xsd:documentation>
-				</xsd:annotation>
-			</xsd:attribute>
-			<xsd:attribute name="offset" use="required" type="xsd:string">
-				<xsd:annotation>
-					<xsd:documentation><![CDATA[
-						Modbus Request ref
-					]]></xsd:documentation>
-				</xsd:annotation>
-			</xsd:attribute>
-			<xsd:attribute name="count" use="required" type="xsd:string">
-				<xsd:annotation>
-					<xsd:documentation><![CDATA[
-						Modbus Request count
-					]]></xsd:documentation>
 				</xsd:annotation>
 			</xsd:attribute>
 

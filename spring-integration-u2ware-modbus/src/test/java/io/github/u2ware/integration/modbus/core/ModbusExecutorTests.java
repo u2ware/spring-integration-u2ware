@@ -7,6 +7,7 @@ import net.wimpi.modbus.Modbus;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.AfterClass;
+import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -26,7 +27,7 @@ public class ModbusExecutorTests {
 
 	@AfterClass
 	public static void afterClass() throws Exception{
-		ModbusSlave.shutdown();
+		ModbusSlave.shutdown(10502);
 	}
 
 	protected Log logger = LogFactory.getLog(getClass());
@@ -38,12 +39,9 @@ public class ModbusExecutorTests {
 	@Test
 	public void testReadCoils() throws Exception {
 
-		int unitId = 0;
-		int function = Modbus.READ_COILS;
-		int ref = 0;
-		int count = 24;
-		
-	    List<ModbusResponse> response = modbusExecutor.readValues(unitId, function, ref, count);
+        ModbusRequest request = new ModbusRequest(0, Modbus.READ_COILS, 0, 24);
+	    List<ModbusResponse> response = modbusExecutor.readValues(request);
+        Assert.assertNotNull(response);
 	    for(ModbusResponse r : response){
 	    	logger.debug(r);
 	    }
@@ -52,12 +50,9 @@ public class ModbusExecutorTests {
 	@Test
 	public void testReadInputDiscretes() throws Exception {
 
-		int unitId = 0;
-		int function = Modbus.READ_INPUT_DISCRETES;
-		int ref = 0;
-		int count = 16;
-		
-	    List<ModbusResponse> response = modbusExecutor.readValues(unitId, function, ref, count);
+        ModbusRequest request = new ModbusRequest(0, Modbus.READ_INPUT_DISCRETES, 0, 16);
+	    List<ModbusResponse> response = modbusExecutor.readValues(request);
+        Assert.assertNotNull(response);
 	    for(ModbusResponse r : response){
 	    	logger.debug(r);
 	    }
@@ -66,12 +61,9 @@ public class ModbusExecutorTests {
 	@Test
 	public void testReadMultipleRegisters() throws Exception {
 
-		int unitId = 0;
-		int function = Modbus.READ_MULTIPLE_REGISTERS;
-		int ref = 0;
-		int count = 12;
-		
-	    List<ModbusResponse> response = modbusExecutor.readValues(unitId, function, ref, count);
+        ModbusRequest request = new ModbusRequest(0, Modbus.READ_MULTIPLE_REGISTERS, 0, 12);
+	    List<ModbusResponse> response = modbusExecutor.readValues(request);
+        Assert.assertNotNull(response);
 	    for(ModbusResponse r : response){
 	    	logger.debug(r);
 	    }
@@ -80,12 +72,9 @@ public class ModbusExecutorTests {
 	@Test
 	public void testReadInputRegisters() throws Exception {
 
-		int unitId = 0;
-		int function = Modbus.READ_INPUT_REGISTERS;
-		int ref = 0;
-		int count = 6;
-		
-	    List<ModbusResponse> response = modbusExecutor.readValues(unitId, function, ref, count);
+        ModbusRequest request = new ModbusRequest(0, Modbus.READ_INPUT_REGISTERS, 0, 6);
+	    List<ModbusResponse> response = modbusExecutor.readValues(request);
+        Assert.assertNotNull(response);
 	    for(ModbusResponse r : response){
 	    	logger.debug(r);
 	    }

@@ -7,11 +7,6 @@
 		http://www.springframework.org/schema/beans 
 		http://www.springframework.org/schema/beans/spring-beans.xsd">
 
-<!-- 
-	<bean class="io.github.u2ware.integration.modbus.core.ModbusSlave">
-		<property name="localPort" value="10502"/>
-	</bean>
- -->
  	<bean id="modebusExecutor" class="io.github.u2ware.integration.modbus.core.ModbusExecutor">
 		<property name="host" value="127.0.0.1"/>
 		<property name="port" value="10502"/>
