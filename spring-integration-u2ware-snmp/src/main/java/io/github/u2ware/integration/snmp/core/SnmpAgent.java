@@ -14,6 +14,24 @@ import com.google.common.collect.Maps;
 
 public class SnmpAgent extends SampleAgent implements InitializingBean, DisposableBean{
 
+	
+	public static void main(String[] args) {
+		
+		int port = 10162;
+		try{
+			port = Integer.parseInt(args[0]);
+		}catch(Exception e){
+		}
+
+		try {
+			SnmpAgent.startup(port);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+	}
+	
+	
 	private static Map<Object, SnmpAgent> instance = Maps.newHashMap();
 	
 	public static void startup(int port) throws Exception{
