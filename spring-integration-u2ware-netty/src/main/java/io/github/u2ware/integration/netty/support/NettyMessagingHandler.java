@@ -19,12 +19,12 @@ public class NettyMessagingHandler extends ChannelDuplexHandler {
 
 	private InternalLogger logger;
 	private ScheduledFuture<?> scheduledFuture;
-	private Object sendMessage;
 
 	private final MessagingTemplate template;
 	private final PollableChannel receiveChannel;
 	private final MessageChannel sendChannel;
-	private final boolean useSendMessage;
+	private final boolean useSavedMessage;
+	private Object savedMessage;
 
 	public NettyMessagingHandler(Class<?> clazz, MessageChannel sendChannel){
 		this(clazz, null, sendChannel, false);
@@ -35,7 +35,7 @@ public class NettyMessagingHandler extends ChannelDuplexHandler {
 	public NettyMessagingHandler(Class<?> clazz, PollableChannel receiveChannel, MessageChannel sendChannel){
 		this(clazz, receiveChannel, sendChannel, false);
 	}
-	public NettyMessagingHandler(Class<?> clazz, PollableChannel receiveChannel, MessageChannel sendChannel, boolean useSendMessage){
+	public NettyMessagingHandler(Class<?> clazz, PollableChannel receiveChannel, MessageChannel sendChannel, boolean useSavedMessage){
 		
 		this.logger = InternalLoggerFactory.getInstance(clazz);
 		this.template = new MessagingTemplate();
@@ -43,7 +43,7 @@ public class NettyMessagingHandler extends ChannelDuplexHandler {
 		template.setSendTimeout(1000);
 		this.receiveChannel = receiveChannel;
 		this.sendChannel = sendChannel;
-		this.useSendMessage = useSendMessage;
+		this.useSavedMessage = useSavedMessage;
 	}
 	
 	
@@ -54,12 +54,8 @@ public class NettyMessagingHandler extends ChannelDuplexHandler {
 				public void run() {
 					Message<?> message = template.receive(receiveChannel);
 	        		if(message != null){
-	        			if( useSendMessage ){
-	        				if(sendChannel != null && sendMessage != null){
-		            			template.convertAndSend(sendChannel, sendMessage);
-	        				}else{
-		            			template.convertAndSend(sendChannel, "{}");
-	        				}
+	        			if( sendChannel != null && useSavedMessage){
+	            			template.convertAndSend(sendChannel, (savedMessage != null) ? savedMessage : "{}");
 	    	    			logger.info("MESSAGE RECEIVED AND SEND");
 	        			}else{
 		        			logger.info("MESSAGE RECEIVED ");
@@ -84,8 +80,8 @@ public class NettyMessagingHandler extends ChannelDuplexHandler {
 
 		if(sendChannel != null){
 
-    		if(useSendMessage){
-				this.sendMessage = msg;
+    		if(useSavedMessage){
+				this.savedMessage = msg;
     			logger.info("MESSAGE SAVED ");
 			}else{
 	    		ctx.executor().submit(new Runnable() {
