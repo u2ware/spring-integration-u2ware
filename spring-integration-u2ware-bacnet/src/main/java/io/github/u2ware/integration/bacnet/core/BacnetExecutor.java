@@ -154,7 +154,7 @@ public class BacnetExecutor extends ThreadPoolTaskExecutor {
 	////////////////////////////////////
 	//
 	////////////////////////////////////
-	public List<BacnetResponse> readValues(BacnetRequest request) throws Exception{		
+	public synchronized List<BacnetResponse> readValues(BacnetRequest request) throws Exception{		
 
 	    long startTime = System.currentTimeMillis();
 		
@@ -168,9 +168,9 @@ public class BacnetExecutor extends ThreadPoolTaskExecutor {
 		PropertyReferences refs = createPropertyReferences(oids);
 		PropertyValues pvs = readProperties(remoteDevice, refs);
 		
-		List<BacnetResponse> result = readProcess(pvs, remoteDevice);
+		List<BacnetResponse> result = readValueProcess(pvs, remoteDevice);
 		
-	    logger.info(request+", BacnetResponse [count="+result.size()
+	    logger.info(request+", BacnetResponse [size="+result.size()
 				+", timeInMillis="+ (System.currentTimeMillis()-startTime)
 				+"]");
 		
@@ -181,7 +181,7 @@ public class BacnetExecutor extends ThreadPoolTaskExecutor {
 	//////////////////////////
 	//
 	//////////////////////////
-	private List<BacnetResponse> readProcess(PropertyValues pvs, RemoteDevice remoteDevice){
+	private List<BacnetResponse> readValueProcess(PropertyValues pvs, RemoteDevice remoteDevice){
 		Map<Object, BacnetResponse> responseMap = Maps.newHashMap();
         
         for (ObjectPropertyReference opr : pvs) {

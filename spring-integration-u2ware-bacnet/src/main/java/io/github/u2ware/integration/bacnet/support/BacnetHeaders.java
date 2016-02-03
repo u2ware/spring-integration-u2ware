@@ -26,8 +26,12 @@ package io.github.u2ware.integration.bacnet.support;
 public class BacnetHeaders {
 	
 	private static final String PREFIX = "bacnet_";
-	public static final String REQUEST =  PREFIX + "request";
 
+	public static final String LOCAL_PORT =  PREFIX + "localPort";
+	public static final String LOCAL_INSTANCE_NUMBER =  PREFIX + "localInstanceNumber";
+
+	public static final String REQUEST =  PREFIX + "request";
+	
 	//public static final String OBJECT_NUMBER = "bacnet_ObjectNumber";
 	//public static final String TYPE_NUMBER = "bacnet_TypeNumber";
 
