@@ -46,66 +46,69 @@ Spring Context 설정에서 Namespace 선언이 필요합니다.
 미리 정의된 요청 객체 ([SnmpRequest](src/main/java/io/github/u2ware/integration/snmp/core/SnmpRequest.java)) 를 이용하여 [SNMP Agent](https://en.wikipedia.org/wiki/Simple_Network_Management_Protocol) 와 통신하고, 그 응답 객체 ([SnmpResponse](src/main/java/io/github/u2ware/integration/snmp/core/SnmpResponse.java)) 를 [MessageChannel](http://docs.spring.io/spring-integration/docs/4.2.4.RELEASE/reference/html/messaging-channels-section.html#channel) 에 전송합니다. 통신을 위해  [SNMP Manager](https://en.wikipedia.org/wiki/Simple_Network_Management_Protocol) 가 생성됩니다.
 
 ```xml
-	<int-u2ware-bacnet:inbound-channel-adapter 
-				id="bacnetInboundChannelAdapter" --(1)
-				local-port="9995"                --(2)
-				request-support="bacnetRequest"  --(3)
-				channel="bacnetResponse">        --(4)
+	<int-u2ware-snmp:inbound-channel-adapter 
+				id="snmpInboundChannelAdapter" --(1)
+				local-port="9995"              --(2)
+				mib-file="/Users/my.mib"       --(3)
+				request-support="snmpRequest"  --(3)
+				channel="snmpResponse">        --(4)
 			<int:poller fixed-rate="1000"/>             <!-- 설정에 따라 통신을 반복 합니다.(polling) -->
 	</int-u2ware-bacnet:inbound-channel-adapter >
 	
-	<bean id="bacnetRequest" class="io.github.u2ware.integration.bacnet.inbound.BacnetRequestSupport">
+	<bean id="snmpRequest" class="io.github.u2ware.integration.snmp.inbound.SnmpRequestSupport">
 	 <constructor-arg>
 	  <array>
-	   <bean class="io.github.u2ware.integration.bacnet.core.BacnetRequest">
-	    <property name="host" value="127.0.0.1"/>       <!--Remote BACNet Device 의 ip -->
-		<property name="port" value="37807"/>           <!--Remote BACNet Device 의 port -->
-		<property name="instanceNumber" value="37807"/> <!--Remote BACNet Device 의 instance number-->
+	   <bean class="io.github.u2ware.integration.snmp.core.SnmpRequest">
+	    <property name="host" value="127.0.0.1"/>   <!--SNMP Agent 의 ip -->
+		<property name="port" value="37807"/>       <!--SNMP Agent 의 port -->
+		<property name="rootOid" value="1.3.6"/>    <!--SNMP Agent 의 rootOid-->
 	   </bean>
 	  </array>
 	 </constructor-arg>
 	</bean>
 	
-	<int:channel id="bacnetResponse">   
+	<int:channel id="snmpResponse">   
 		<int:queue/>
 	</int:channel>
 	              
 ```
 1. **id**:	Unique ID.  Optianal
-2. **local-port**: 생성되는 [Local BACNet Device](http://www.bacnet.org/) 의 로컬 포트 번호 입니다.
-3. **request-support**:  [BacnetRequestSupport](src/main/java/io/github/u2ware/integration/bacnet/inbound/BacnetRequestSupport.java)의 참조(reference)입니다. 한 개 혹은 다수의 [BacnetRequest](src/main/java/io/github/u2ware/integration/core/inbound/BacnetRequest.java) 를 설정 할 수 있습니다.
-4. **channel**: [MessageChannel](http://docs.spring.io/spring-integration/docs/4.2.4.RELEASE/reference/html/messaging-channels-section.html#channel) 의 참조(reference)입니다. 
+2. **local-port**: 생성되는 [SNMP Manager](https://en.wikipedia.org/wiki/Simple_Network_Management_Protocol) 의 로컬 포트 번호 입니다.
+3. **mib-file**: [Management information base (MIB)](https://en.wikipedia.org/wiki/Simple_Network_Management_Protocol#Management_information_base_.28MIB.29) 파일 경로 입니다.
+4. **request-support**:  [SnmpRequestSupport](src/main/java/io/github/u2ware/integration/snmp/inbound/SnRequempstSupport.java)의 참조(reference)입니다. 한 개 혹은 다수의 [SnmpRequest](src/main/java/io/github/u2ware/integration/snmp/core/BacnetRequest.java) 를 설정 할 수 있습니다.
+5. **channel**: [MessageChannel](http://docs.spring.io/spring-integration/docs/4.2.4.RELEASE/reference/html/messaging-channels-section.html#channel) 의 참조(reference)입니다. 
 
 
 ##Outbound Gateway
 
-RequestMessageChannel 로 부터 요청 객체 ([BacnetRequest](src/main/java/io/github/u2ware/integration/core/inbound/BacnetRequest.java)) 를 수신 하여, 이를 이용하여 [Remote BACNet Device](http://www.bacnet.org/) 와 통신하고, 그 응답 객체 ([BacnetResponse](src/main/java/io/github/u2ware/integration/core/inbound/BacnetResponse.java)) 를 ReplyMessageChannel 에 전송합니다. 통신을 위해  [Local BACNet Device](http://www.bacnet.org/) 가 생성됩니다.
+RequestMessageChannel 로 부터 요청 객체 ([SnmpRequest](src/main/java/io/github/u2ware/integration/snmp/core/BacnetRequest.java)) 를 수신 하여, 이를 이용하여 [SNMP Agent](https://en.wikipedia.org/wiki/Simple_Network_Management_Protocol) 와 통신하고, 그 응답 객체 ([SnmpResponse](src/main/java/io/github/u2ware/integration/snmp/core/SnmpResponse.java)) 를 ReplyMessageChannel 에 전송합니다. 통신을 위해  [SNMP Manager](https://en.wikipedia.org/wiki/Simple_Network_Management_Protocol) 가 생성됩니다.
 
 ```xml
-	<int-u2ware-bacnet:outbound-gateway 
-				id="bacnetOutboundGateway"       --(1)      
-				local-port="9997"                --(2)           
-				request-channel="bacnetRequest"  --(3)
-				reply-channel="bacnetResponse"   --(4)
+	<int-u2ware-snmp:outbound-gateway 
+				id="snmpOutboundGateway"       --(1)      
+				local-port="9997"              --(2)           
+				mib-file="9997"                --(3)           
+				request-channel="snmpRequest"  --(4)
+				reply-channel="snmpResponse"   --(5)
 	/>
 
-	<int:channel id="bacnetRequest"> <!-- RequestMessageChannel -->
+	<int:channel id="snmpRequest"> <!-- RequestMessageChannel -->
 	</int:channel>
 
-	<int:channel id="bacnetResponse"> <!-- ReplyMessageChannel -->
+	<int:channel id="snmpResponse"> <!-- ReplyMessageChannel -->
 		<int:queue/>
 	</int:channel>
 	
 ```
 1. **id**:	Unique ID.  Optianal
-2. **local-port**: 생성되는 [Local BACNet Device](http://www.bacnet.org/) 의 로컬 포트 번호 입니다.
-3. **request-channel**: [MessageChannel](http://docs.spring.io/spring-integration/docs/4.2.4.RELEASE/reference/html/messaging-channels-section.html#channel) 의 참조(reference)입니다. [BacnetRequest](src/main/java/io/github/u2ware/integration/bacnet/core/BacnetRequest.java)를 처리합니다.
-4. **reply-channel**: [MessageChannel](http://docs.spring.io/spring-integration/docs/4.2.4.RELEASE/reference/html/messaging-channels-section.html#channel) 의 참조(reference) 입니다. [BacnetResponse](src/main/java/io/github/u2ware/integration/bacnet/core/BacnetResponse.java)를 처리합니다. 
+2. **local-port**: 생성되는 [SNMP Manager](https://en.wikipedia.org/wiki/Simple_Network_Management_Protocol) 의 로컬 포트 번호 입니다.
+3. **mib-file**: [Management information base (MIB)](https://en.wikipedia.org/wiki/Simple_Network_Management_Protocol#Management_information_base_.28MIB.29) 파일 경로 입니다.4. **request-channel**: [MessageChannel](http://docs.spring.io/spring-integration/docs/4.2.4.RELEASE/reference/html/messaging-channels-section.html#channel) 의 참조(reference)입니다. [SnmpRequest](src/main/java/io/github/u2ware/integration/snmp/core/SnmpRequest.java)를 처리합니다.
+5. **reply-channel**: [MessageChannel](http://docs.spring.io/spring-integration/docs/4.2.4.RELEASE/reference/html/messaging-channels-section.html#channel) 의 참조(reference) 입니다. [SnmpResponse](src/main/java/io/github/u2ware/integration/snmp/core/SnmpResponse.java)를 처리합니다. 
 
 ##Sample Code
 
-* [core](src/test/java/io/github/u2ware/integration/bacnet/core/)
-* [inbound](src/test/java/io/github/u2ware/integration/bacnet/inbound/)
-* [outbound](src/test/java/io/github/u2ware/integration/bacnet/outbound/)
+* [core](src/test/java/io/github/u2ware/integration/snmp/core/)
+* [inbound](src/test/java/io/github/u2ware/integration/snmp/inbound/)
+* [outbound](src/test/java/io/github/u2ware/integration/snmp/outbound/)
 
 
