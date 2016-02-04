@@ -63,7 +63,7 @@ ChannelPipeline 설정에 관한 내용은 [netty.io](http://netty.io/wiki/user-
 public class EchoClient extends AbstractTcpClient{  
 
 	private PollableChannel receiveChannel;   ---(2)
-	private MessageChannel sendChannel;       ---(1)	
+	private MessageChannel sendChannel;       ---(3)	
 	
 	public void setSendChannel(MessageChannel sendChannel) {
 		this.sendChannel = sendChannel;
@@ -98,9 +98,9 @@ public class EchoClient extends AbstractTcpClient{
 	</int:channel>
 ```
 
-(1) [NettyMessagingHandler](src/main/java/io/github/u2ware/integration/netty/support/NettyMessagingHandler.java) 를 ChannelPipeline 에 추가하면,
-(2) receiveChannel 에 수신 가능한 메세지가 있을때, 이 메세지를 [Netty Channel](https://netty.io)에 write 합니다.
-(3) [Netty Channel](https://netty.io)에서 read 한 메세지가 있을 때, 이 메세지를 sendChannel 에 전송합니다.
+1. [NettyMessagingHandler](src/main/java/io/github/u2ware/integration/netty/support/NettyMessagingHandler.java) 를 ChannelPipeline 에 추가하면,
+2. receiveChannel 에 수신 가능한 메세지가 있을때, 이 메세지를 [Netty Channel](https://netty.io)에 write 합니다.
+3. [Netty Channel](https://netty.io)에서 read 한 메세지가 있을 때, 이 메세지를 sendChannel 에 전송합니다.
 
 ##Sample Code
 
