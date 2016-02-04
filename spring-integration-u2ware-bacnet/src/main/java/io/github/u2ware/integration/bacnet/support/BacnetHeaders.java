@@ -27,8 +27,8 @@ public class BacnetHeaders {
 	
 	private static final String PREFIX = "bacnet_";
 
-	public static final String LOCAL_PORT =  PREFIX + "localPort";
-	public static final String LOCAL_INSTANCE_NUMBER =  PREFIX + "localInstanceNumber";
+	public static final String PORT =  PREFIX + "port";
+	//public static final String LOCAL_INSTANCE_NUMBER =  PREFIX + "localInstanceNumber";
 
 	public static final String REQUEST =  PREFIX + "request";
 	

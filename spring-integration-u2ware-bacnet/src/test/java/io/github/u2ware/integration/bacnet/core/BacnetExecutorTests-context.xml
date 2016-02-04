@@ -6,8 +6,7 @@
 		http://www.springframework.org/schema/beans/spring-beans.xsd">
 
 	<bean id="bacnetExcutor" class="io.github.u2ware.integration.bacnet.core.BacnetExecutor">
-		<property name="localPort" value="47808"/>
-		<property name="localInstanceNumber" value="47808"/>
+		<property name="port" value="47808"/>
 	</bean>
 
 </beans>

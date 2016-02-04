@@ -22,7 +22,7 @@
 
 
 	<int-u2ware-bacnet:inbound-channel-adapter id="bacnetInboundChannelAdapter"
-		local-port="47806"
+		port="47806"
 		request-support="bacnetRequest"
 		channel="bacnetResponse">
 				<int:poller fixed-rate="2000"/>

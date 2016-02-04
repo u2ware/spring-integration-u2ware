@@ -63,8 +63,7 @@ implements MessageSource<Object>{
 
 			Map<String, Object> headers = Maps.newHashMap();
 			headers.put(BacnetHeaders.REQUEST, request.toString());
-			headers.put(BacnetHeaders.LOCAL_PORT, executor.getLocalPort());
-			headers.put(BacnetHeaders.LOCAL_INSTANCE_NUMBER, executor.getLocalInstanceNumber());
+			headers.put(BacnetHeaders.PORT, executor.getPort());
 
 			return MessageBuilder.withPayload(response).copyHeaders(headers).build();
 			

@@ -61,61 +61,49 @@ public class BacnetExecutor extends ThreadPoolTaskExecutor {
 
 	private Log logger = LogFactory.getLog(getClass());
 	
-	protected int localPort = IpNetwork.DEFAULT_PORT; //47808;
-	protected int localInstanceNumber;
+	protected int port = IpNetwork.DEFAULT_PORT; //47808;
+	//protected int instanceNumber;
 	
 	private LocalDevice localDevice ;
 	private Transport transport;
 	private IpNetwork network;
 	
-	public int getLocalPort() {
-		return localPort;
+	public int getPort() {
+		return port;
 	}
-	public void setLocalPort(int localPort) {
-		this.localPort = localPort;
-	}
-	public int getLocalInstanceNumber() {
-		return localInstanceNumber;
-	}
-	public void setLocalInstanceNumber(int localInstanceNumber) {
-		this.localInstanceNumber = localInstanceNumber;
+	public void setPort(int port) {
+		this.port = port;
 	}
 
-	@Override
-	public String toString() {
-		return "BacnetExecutor [localPort=" + localPort
-				+ ", localInstanceNumber=" + localInstanceNumber+"]";
-	}
 	@Override
 	public void afterPropertiesSet() {
 		super.afterPropertiesSet();
 		
 		try {
-	        network = new IpNetwork(IpNetwork.DEFAULT_BROADCAST_IP, localPort);
+	        network = new IpNetwork(IpNetwork.DEFAULT_BROADCAST_IP, port);
 	        
 	        transport = new DefaultTransport(network);
 //	               transport.setTimeout(10000);
 //	               transport.setSegTimeout(15000);
-	        
-	        localInstanceNumber = this.localInstanceNumber > 0 ? this.localInstanceNumber : localPort;
-	        localDevice = new LocalDevice(localInstanceNumber, transport);
+//	        localInstanceNumber = this.localInstanceNumber > 0 ? this.localInstanceNumber : localPort;
+	        localDevice = new LocalDevice(port, transport);
 
 			
 			localDevice.initialize();
 	        localDevice.getEventHandler().addListener(new DeviceEventListenerImpl());
 	        localDevice.sendGlobalBroadcast(new WhoIsRequest());
-	        logger .info("BACNet LocalDevice Initialized: <localhost>:"+localPort);
+	        logger .info("BACNet LocalDevice Initialized: <localhost>:"+port);
 		
 		} catch (Exception e) {
-	        logger .info("BACNet LocalDevice Initialized Error: <localhost>:"+localPort+""+e.getMessage());
-			throw new RuntimeException("BACNet LocalDevice Initialized Error: <localhost>:"+localPort);
+	        logger .info("BACNet LocalDevice Initialized Error: <localhost>:"+port+" "+e.getMessage());
+			throw new RuntimeException("BACNet LocalDevice Initialized Error: <localhost>:"+port);
 		}
 	}
 
 	@Override
 	public void destroy()  {
 		localDevice.terminate();
-        logger .info("BACNet LocalDevice Terminated: <localhost>:"+localPort+"["+localPort+"]");
+        logger .info("BACNet LocalDevice Terminated: <localhost>:"+port);
 		super.destroy();
 	}	
 	

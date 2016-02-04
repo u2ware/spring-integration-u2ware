@@ -16,7 +16,7 @@
 
 	<int-u2ware-bacnet:outbound-channel-adapter id="bacnetOutboundChannelAdapter"
 
-			local-port="9992"
+			port="9992"
 
 			channel="bacnetRequest">
 	</int-u2ware-bacnet:outbound-channel-adapter>
