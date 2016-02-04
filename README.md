@@ -8,6 +8,7 @@ Spring Integration Extentions
 |------|---|---|---|---|
 |BACNet|[spring-integration-u2ware-bacnet](spring-integration-u2ware-bacnet/)|[spring-integration-u2ware-bacnet](spring-integration-u2ware-bacnet/)|N|
 |MODBUS|[spring-integration-u2ware-modbus](spring-integration-u2ware-modbus/)|[spring-integration-u2ware-modbus](spring-integration-u2ware-modbus/)|N|
+|MODBUS|[spring-integration-u2ware-snmp](spring-integration-u2ware-snmp/)|[spring-integration-u2ware-snmp](spring-integration-u2ware-snmp/)|N|
 |Netty|N|N|[spring-integration-u2ware-netty](spring-integration-u2ware-netty/)|
 
 Maven Dependency 를 다음과 같이 설정 할 수 있습니다.
@@ -33,7 +34,7 @@ Maven Dependency 를 다음과 같이 설정 할 수 있습니다.
 		</dependency>
 		<dependency>
 			<groupId>io.github.u2ware</groupId>
-			<artifactId>spring-integration-u2ware-momgodb</artifactId>
+			<artifactId>spring-integration-u2ware-snmp</artifactId>
 			<version>1.0.0</version>
 		</dependency>
 		<dependency>
