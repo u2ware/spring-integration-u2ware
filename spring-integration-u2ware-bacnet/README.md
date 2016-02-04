@@ -79,7 +79,7 @@ Spring Context 설정에서 Namespace 선언이 필요합니다.
 
 ##Outbound Gateway
 
-RequestMessageChannel 로 부터 요청 객체 ([BacnetRequest](src/main/java/io/github/u2ware/integration/core/inbound/BacnetRequest.java)) 를 수신 하여, 이를 이용하여 [Remote BACNet Device](http://www.bacnet.org/) 와 통신하고, 그 응답 객체 ([BacnetResponse](src/main/java/io/github/u2ware/integration/core/inbound/BacnetResponse.java)) 를 ReplyMessageChannel 에 전송합니다. 통신을 위해  [Local BACNet Device](http://www.bacnet.org/) 가 생성됩니다.
+RequestMessageChannel 로 부터 요청 객체 ([BacnetRequest](src/main/java/io/github/u2ware/integration/bacnet/core/BacnetRequest.java)) 를 수신 하여, 이를 이용하여 [Remote BACNet Device](http://www.bacnet.org/) 와 통신하고, 그 응답 객체 ([BacnetResponse](src/main/java/io/github/u2ware/integration/bacnet/core/BacnetResponse.java)) 를 ReplyMessageChannel 에 전송합니다. 통신을 위해  [Local BACNet Device](http://www.bacnet.org/) 가 생성됩니다.
 
 ```xml
 	<int-u2ware-bacnet:outbound-gateway 
