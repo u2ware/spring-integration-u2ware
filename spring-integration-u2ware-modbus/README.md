@@ -3,8 +3,8 @@ Spring Integration MODBUS Adapter
 
 #Introduction 
 
-[MODBUS](http://www.modbus.org/) 디바이스와 메세지를 수신하고 전송하는 Channel Adapter 입니다. 
-다음과 같이 Maven Dependency 를 추가합니다.
+
+[MODBUS Slave](http://www.modbus.org/) 와 [MessageChannel](http://docs.spring.io/spring-integration/docs/4.2.4.RELEASE/reference/html/messaging-channels-section.html#channel) 간 메세지를 처리하는 Channel Adapter 입니다. [jamod](http://jamod.sourceforge.net/) 라이브러리를 사용하고 있습니다.
 
 ```xml
 <repositories>
@@ -23,7 +23,7 @@ Spring Integration MODBUS Adapter
 </dependencies>
 ```
 
-[Spring Integration](http://projects.spring.io/spring-integration/) Context 설정에서 Namespace 선언이 필요합니다.
+Spring Context 설정에서 Namespace 선언이 필요합니다.
 
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
@@ -44,49 +44,87 @@ Spring Integration MODBUS Adapter
 
 ##Inbound Channel Adapter
 
-polling 방식으로 원격 MODBUS Device 로 부터 받은 응답을 '수신 Message Channel' 에 담습니다.
+미리 정의된 요청 객체 ([ModbusRequest](src/main/java/io/github/u2ware/integration/modbus/core/ModbusRequest.java)) 를 이용하여 [MODBUS Slave](http://www.modbus.org/) 와 통신하고, 그 응답 객체 ([ModbusResponse](src/main/java/io/github/u2ware/integration/modbus/core/ModbusResponse.java)) 를 [MessageChannel](http://docs.spring.io/spring-integration/docs/4.2.4.RELEASE/reference/html/messaging-channels-section.html#channel) 에 전송합니다. 통신을 위해  [MODBUS Master](http://www.modbus.org/) 가 생성됩니다.
+
+
 
 ```xml
 	<int-u2ware-modbus:inbound-channel-adapter 
-				id="modbusInboundChannelAdapter"   --(1)
-				componentName="modbus"             --(2)
-				host="127.0.0.1"                   --(3)
-				port="10503"                       --(4)
-				unitId="0"                         --(5)
-				functionCode="4"                   --(6)
-				offset="0"                         --(7)
-				count="6"                          --(8)
-				channel="modbusResponse"/>	       --(9)
+				id="modbusInboundChannelAdapter" --(1)
+				host="127.0.0.1"                 --(2)
+				port="10503"                     --(3)
+				request-support="modbusRequest"  --(4)
+				channel="modbusResponse">	     --(5)
+			<int:poller fixed-rate="1000"/>         <!-- 설정에 따라 통신을 반복 합니다.(polling) -->
+	</int-u2ware-modbus:inbound-channel-adapter >
+	
+	<bean id="snmpRequest" class="io.github.u2ware.integration.modbus.inbound.ModbusRequestSupport">
+	 <constructor-arg>
+	  <array>
+	   <bean class="io.github.u2ware.integration.modbus.core.ModbusRequest">
+		<property name="unitId" value="0"/>       <!--Modbus Protocal 의 unitId -->
+		<property name="functionCode" value="4"/> <!--Modbus Protocal 의 functionCode -->
+		<property name="offset" value="0"/>       <!--Modbus Protocal 의 offset -->
+		<property name="count" value="6"/>        <!--Modbus Protocal 의 count -->
+	   </bean>
+	  </array>
+	 </constructor-arg>
+	</bean>
+	
+	<int:channel id="snmpResponse">   
+		<int:queue/>
+	</int:channel>
+	              				
+				
 ```
-1. **id**:	Unique ID.  
-2. **componentName**: 임의대로 지정하는 이름입니다. 
-3. **host**: 원격 MODBUS Device 의 IP 주소 입니다.
-4. **port**: 원격 MODBUS Device 의 포트 번호 입니다. 
-5. **unitId**: MODBUS Request 패킷의 unitId 값입니다.
-6. **functionCode**: MODBUS Request 패킷의 functionCode 값입니다. 
-7. **offset**: MODBUS Request 패킷의 offset 값입니다. 
-8. **count**: MODBUS Request 패킷의 count 값입니다. 
-9. **channel**: 수신 Message Channel입니다. 메세지는 [io.github.u2ware.integration.modbus.core.ModbusResponse](src/main/java/io/github/u2ware/integration/modbus/core/ModbusResponse.java) 객체를 담고 있습니다. 
+
+1. **id**:	Unique ID.  Optional.
+2. **host**: 통신 대상이 되는 [MODBUS Slave](http://www.modbus.org/) 의 ip 입니다. Required.
+3. **port**: 통신 대상이 되는 [MODBUS Slave](http://www.modbus.org/) 의 포트 번호 입니다. Required.
+4. **request-support**:  [ModbusRequestSupport](src/main/java/io/github/u2ware/integration/modbus/inbound/ModbusRequestSupport.java)의 참조(reference)입니다. 한 개 혹은 다수의 [ModbusRequest](src/main/java/io/github/u2ware/integration/modbus/core/ModbusRequest.java) 를 설정 할 수 있습니다. Required.
+5. **channel**: [MessageChannel](http://docs.spring.io/spring-integration/docs/4.2.4.RELEASE/reference/html/messaging-channels-section.html#channel) 의 참조(reference)입니다.
+
 
 ##Outbound Gateway
 
-'전송 Message Channel'의 요청을 원격 BACNet Device 에 전송하고 그 응답을 '수신 Message Channel' 에 담습니다.
+
+RequestMessageChannel 로 부터 요청 객체 ([ModbusRequest](src/main/java/io/github/u2ware/integration/modbus/core/ModbusRequest.java)) 를 수신 하여, 이를 이용하여 [MODBUS Slave](http://www.modbus.org/) 와 통신하고, 그 응답 객체 ([ModbusResponse](src/main/java/io/github/u2ware/integration/modbus/core/ModbusResponse.java)) 를 ReplyMessageChannel 에 전송합니다. 통신을 위해  [MODBUS  Master](http://www.modbus.org/) 가 생성됩니다.
 
 ```xml
 	<int-u2ware-modbus:outbound-gateway 
-				id="modbusOutboundGateway" 
-				componentName="modbus"
-				host="127.0.0.1"
-				port="10505"
-				request-channel="modbusRequest"    --(1)
-				reply-channel="modbusResponse"/>   --(2)
+				id="modbusOutboundGateway"      --(1)
+				host="127.0.0.1"                --(2)
+				port="10505"                    --(3)
+				request-channel="modbusRequest" --(4)
+				reply-channel="modbusResponse"  --(5)
+	/>
+	
+	<int:channel id="modbusRequest">
+	</int:channel>
+
+	<int:channel id="modbusResponse">
+		<int:queue/>
+	</int:channel>
+				
+				
 ```
-1. **request-channel**: '전송 Message Channel'입니다. 메세지는 [io.github.u2ware.integration.modbus.core.ModbusRequest](src/main/java/io/github/u2ware/integration/modbus/core/ModbusRequest.java) 객체를 담고 있습니다. 
-2. **reply-channel**: '수신 Message Channel'입니다. 메세지는 [io.github.u2ware.integration.modbus.core.ModbusResponse](src/main/java/io/github/u2ware/integration/modbus/core/ModbusResponse.java) 객체를 담고 있습니다. 
+
+1. **id**:	Unique ID.  Optional.
+2. **host**: 통신 대상이 되는 [MODBUS Slave](http://www.modbus.org/) 의 ip 입니다. Required.
+3. **port**: 통신 대상이 되는 [MODBUS Slave](http://www.modbus.org/) 의 포트 번호 입니다. Required.
+4. **request-channel**: [MessageChannel](http://docs.spring.io/spring-integration/docs/4.2.4.RELEASE/reference/html/messaging-channels-section.html#channel) 의 참조(reference)입니다. [ModbusRequest](src/main/java/io/github/u2ware/integration/modbus/core/ModbusRequest.java)를 처리합니다.
+5. **reply-channel**: [MessageChannel](http://docs.spring.io/spring-integration/docs/4.2.4.RELEASE/reference/html/messaging-channels-section.html#channel) 의 참조(reference) 입니다. [ModbusResponse](src/main/java/io/github/u2ware/integration/modbus/core/ModbusResponse.java)를 처리합니다. 
+
+
 
 ##Sample Code
 
-* [ModbusInboundChannelAdapterTests-context.xml](src/test/java/io/github/u2ware/integration/modbus/inbound/ModbusInboundChannelAdapterTests-context.xml)
-* [ModbusInboundChannelAdapterTests.java](src/test/java/io/github/u2ware/integration/modbus/inbound/ModbusInboundChannelAdapterTests.java)
+
+* [core](src/test/java/io/github/u2ware/integration/modbus/core/)
+* [inbound](src/test/java/io/github/u2ware/integration/modbus/inbound/)
+* [outbound](src/test/java/io/github/u2ware/integration/modbus/outbound/)
+
+
+
 
 
