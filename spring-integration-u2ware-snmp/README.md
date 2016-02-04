@@ -72,10 +72,10 @@ Spring Context 설정에서 Namespace 선언이 필요합니다.
 	</int:channel>
 	              
 ```
-1. **id**:	Unique ID.  Optianal
-2. **local-port**: 생성되는 [SNMP Manager](https://en.wikipedia.org/wiki/Simple_Network_Management_Protocol) 의 로컬 포트 번호 입니다.
-3. **mib-file**: [Management information base (MIB)](https://en.wikipedia.org/wiki/Simple_Network_Management_Protocol#Management_information_base_.28MIB.29) 파일 경로 입니다.
-4. **request-support**:  [SnmpRequestSupport](src/main/java/io/github/u2ware/integration/snmp/inbound/SnRequempstSupport.java)의 참조(reference)입니다. 한 개 혹은 다수의 [SnmpRequest](src/main/java/io/github/u2ware/integration/snmp/core/SnmpRequest.java) 를 설정 할 수 있습니다.
+1. **id**:	Unique ID.  Optional.
+2. **local-port**: 생성되는 [SNMP Manager](https://en.wikipedia.org/wiki/Simple_Network_Management_Protocol) 의 로컬 포트 번호 입니다. Required.
+3. **mib-file**: [Management information base (MIB)](https://en.wikipedia.org/wiki/Simple_Network_Management_Protocol#Management_information_base_.28MIB.29) 파일 경로 입니다. Optional
+4. **request-support**:  [SnmpRequestSupport](src/main/java/io/github/u2ware/integration/snmp/inbound/SnRequempstSupport.java)의 참조(reference)입니다. 한 개 혹은 다수의 [SnmpRequest](src/main/java/io/github/u2ware/integration/snmp/core/SnmpRequest.java) 를 설정 할 수 있습니다. Required.
 5. **channel**: [MessageChannel](http://docs.spring.io/spring-integration/docs/4.2.4.RELEASE/reference/html/messaging-channels-section.html#channel) 의 참조(reference)입니다. 
 
 
@@ -100,9 +100,10 @@ RequestMessageChannel 로 부터 요청 객체 ([SnmpRequest](src/main/java/io/g
 	</int:channel>
 	
 ```
-1. **id**:	Unique ID.  Optianal
-2. **local-port**: 생성되는 [SNMP Manager](https://en.wikipedia.org/wiki/Simple_Network_Management_Protocol) 의 로컬 포트 번호 입니다.
-3. **mib-file**: [Management information base (MIB)](https://en.wikipedia.org/wiki/Simple_Network_Management_Protocol#Management_information_base_.28MIB.29) 파일 경로 입니다.4. **request-channel**: [MessageChannel](http://docs.spring.io/spring-integration/docs/4.2.4.RELEASE/reference/html/messaging-channels-section.html#channel) 의 참조(reference)입니다. [SnmpRequest](src/main/java/io/github/u2ware/integration/snmp/core/SnmpRequest.java)를 처리합니다.
+1. **id**:	Unique ID.  Optional.
+2. **local-port**: 생성되는 [SNMP Manager](https://en.wikipedia.org/wiki/Simple_Network_Management_Protocol) 의 로컬 포트 번호 입니다. Required.
+3. **mib-file**: [Management information base (MIB)](https://en.wikipedia.org/wiki/Simple_Network_Management_Protocol#Management_information_base_.28MIB.29) 파일 경로 입니다. Optional.
+4. **request-channel**: [MessageChannel](http://docs.spring.io/spring-integration/docs/4.2.4.RELEASE/reference/html/messaging-channels-section.html#channel) 의 참조(reference)입니다. [SnmpRequest](src/main/java/io/github/u2ware/integration/snmp/core/SnmpRequest.java)를 처리합니다.
 5. **reply-channel**: [MessageChannel](http://docs.spring.io/spring-integration/docs/4.2.4.RELEASE/reference/html/messaging-channels-section.html#channel) 의 참조(reference) 입니다. [SnmpResponse](src/main/java/io/github/u2ware/integration/snmp/core/SnmpResponse.java)를 처리합니다. 
 
 ##Sample Code
