@@ -29,7 +29,7 @@ Spring Context 설정에서 Namespace 선언이 필요합니다.
 <beans xmlns="http://www.springframework.org/schema/beans"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xmlns:int="http://www.springframework.org/schema/integration"
-	xmlns:int-u2ware-bacnet="http://u2ware.github.io/schema/integration/snmp"
+	xmlns:int-u2ware-snmp="http://u2ware.github.io/schema/integration/snmp"
 	xsi:schemaLocation="
 		http://www.springframework.org/schema/beans 
 		http://www.springframework.org/schema/beans/spring-beans.xsd
@@ -53,7 +53,7 @@ Spring Context 설정에서 Namespace 선언이 필요합니다.
 				request-support="snmpRequest"  --(3)
 				channel="snmpResponse">        --(4)
 			<int:poller fixed-rate="1000"/>             <!-- 설정에 따라 통신을 반복 합니다.(polling) -->
-	</int-u2ware-bacnet:inbound-channel-adapter >
+	</int-u2ware-snmp:inbound-channel-adapter >
 	
 	<bean id="snmpRequest" class="io.github.u2ware.integration.snmp.inbound.SnmpRequestSupport">
 	 <constructor-arg>
@@ -75,13 +75,13 @@ Spring Context 설정에서 Namespace 선언이 필요합니다.
 1. **id**:	Unique ID.  Optianal
 2. **local-port**: 생성되는 [SNMP Manager](https://en.wikipedia.org/wiki/Simple_Network_Management_Protocol) 의 로컬 포트 번호 입니다.
 3. **mib-file**: [Management information base (MIB)](https://en.wikipedia.org/wiki/Simple_Network_Management_Protocol#Management_information_base_.28MIB.29) 파일 경로 입니다.
-4. **request-support**:  [SnmpRequestSupport](src/main/java/io/github/u2ware/integration/snmp/inbound/SnRequempstSupport.java)의 참조(reference)입니다. 한 개 혹은 다수의 [SnmpRequest](src/main/java/io/github/u2ware/integration/snmp/core/BacnetRequest.java) 를 설정 할 수 있습니다.
+4. **request-support**:  [SnmpRequestSupport](src/main/java/io/github/u2ware/integration/snmp/inbound/SnRequempstSupport.java)의 참조(reference)입니다. 한 개 혹은 다수의 [SnmpRequest](src/main/java/io/github/u2ware/integration/snmp/core/SnmpRequest.java) 를 설정 할 수 있습니다.
 5. **channel**: [MessageChannel](http://docs.spring.io/spring-integration/docs/4.2.4.RELEASE/reference/html/messaging-channels-section.html#channel) 의 참조(reference)입니다. 
 
 
 ##Outbound Gateway
 
-RequestMessageChannel 로 부터 요청 객체 ([SnmpRequest](src/main/java/io/github/u2ware/integration/snmp/core/BacnetRequest.java)) 를 수신 하여, 이를 이용하여 [SNMP Agent](https://en.wikipedia.org/wiki/Simple_Network_Management_Protocol) 와 통신하고, 그 응답 객체 ([SnmpResponse](src/main/java/io/github/u2ware/integration/snmp/core/SnmpResponse.java)) 를 ReplyMessageChannel 에 전송합니다. 통신을 위해  [SNMP Manager](https://en.wikipedia.org/wiki/Simple_Network_Management_Protocol) 가 생성됩니다.
+RequestMessageChannel 로 부터 요청 객체 ([SnmpRequest](src/main/java/io/github/u2ware/integration/snmp/core/SnmpRequest.java)) 를 수신 하여, 이를 이용하여 [SNMP Agent](https://en.wikipedia.org/wiki/Simple_Network_Management_Protocol) 와 통신하고, 그 응답 객체 ([SnmpResponse](src/main/java/io/github/u2ware/integration/snmp/core/SnmpResponse.java)) 를 ReplyMessageChannel 에 전송합니다. 통신을 위해  [SNMP Manager](https://en.wikipedia.org/wiki/Simple_Network_Management_Protocol) 가 생성됩니다.
 
 ```xml
 	<int-u2ware-snmp:outbound-gateway 
