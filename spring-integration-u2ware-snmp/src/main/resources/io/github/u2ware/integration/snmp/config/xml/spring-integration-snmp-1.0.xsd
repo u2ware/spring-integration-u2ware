@@ -198,7 +198,7 @@
 			</xsd:simpleType>
 		</xsd:attribute>
 
-		<xsd:attribute name="local-port" use="required" type="xsd:string">
+		<xsd:attribute name="port" use="required" type="xsd:string">
 			<xsd:annotation>
 				<xsd:documentation><![CDATA[
 					SNMP Local Port

@@ -51,15 +51,15 @@ public class SnmpExecutor implements CommandResponder, InitializingBean, Disposa
 	private Mib mib ;
 	private Map<String,String> mibNames;
 	
-	private Integer localPort;
+	private Integer port;
 	private String mibFile;
 	
 	
-	public Integer getLocalPort() {
-		return localPort;
+	public Integer getPort() {
+		return port;
 	}
-	public void setLocalPort(Integer localPort) {
-		this.localPort = localPort;
+	public void setPort(Integer port) {
+		this.port = port;
 	}
 	public String getMibFile() {
 		return mibFile;
@@ -73,7 +73,7 @@ public class SnmpExecutor implements CommandResponder, InitializingBean, Disposa
 		threadPool = ThreadPool.create("Trap", 2);
 		MultiThreadedMessageDispatcher dispatcher = new MultiThreadedMessageDispatcher(threadPool, new MessageDispatcherImpl());
 		
-		UdpAddress listenAddress = new UdpAddress(InetAddress.getLocalHost(), localPort);
+		UdpAddress listenAddress = new UdpAddress(InetAddress.getLocalHost(), port);
 
 	    transport = new DefaultUdpTransportMapping(listenAddress);
 	    
@@ -101,7 +101,7 @@ public class SnmpExecutor implements CommandResponder, InitializingBean, Disposa
 				mibNames = new HashMap<String,String>();
 			}
 	    }
-		logger.info("SNMP Manager Initialized: <localhost>:"+localPort+",  mibFile="+mibFile);		
+		logger.info("SNMP Manager Initialized: <localhost>:"+port);		
 	}
 	
 	@Override
@@ -110,7 +110,7 @@ public class SnmpExecutor implements CommandResponder, InitializingBean, Disposa
 	    transport.close();
 		threadPool.stop();
 
-		logger.info("SNMP Manager Terminated: <localhost>:"+localPort);		
+		logger.info("SNMP Manager Terminated: <localhost>:"+port);		
 	}
 	
 	@Override

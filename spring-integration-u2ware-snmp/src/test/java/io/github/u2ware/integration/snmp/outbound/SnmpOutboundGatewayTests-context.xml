@@ -16,7 +16,7 @@
 	</int:channel>
 	
 	<int-u2ware-snmp:outbound-gateway id="snmpOutboundGateway" 
-		local-port="10704"
+		port="10704"
 		request-channel="snmpRequest"
 		reply-channel="snmpResponse">
 	</int-u2ware-snmp:outbound-gateway>

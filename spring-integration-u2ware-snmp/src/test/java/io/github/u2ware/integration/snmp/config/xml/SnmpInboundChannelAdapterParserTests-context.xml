@@ -28,7 +28,7 @@
 	</bean>
 
 	<int-u2ware-snmp:inbound-channel-adapter id="snmpInboundChannelAdapter"
-		local-port="10613"
+		port="10613"
 		request-support="snmpRequest"
 		channel="snmpResponse">
 		<int:poller fixed-rate="3000"/>

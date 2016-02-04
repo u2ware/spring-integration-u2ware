@@ -6,7 +6,7 @@
 		http://www.springframework.org/schema/beans/spring-beans.xsd">
 
 	<bean id="snmpManager" class="io.github.u2ware.integration.snmp.core.SnmpExecutor">
-		<property name="localPort" value="10162"/>
+		<property name="port" value="10162"/>
 		<property name="mibFile" value="/Users/U2ware/Dropbox/Develop/u2ware/spring-integration-u2ware/spring-integration-u2ware-snmp/src/test/java/io/github/u2ware/integration/snmp/core/SnmpExecutorTests.mib"/>
 	</bean>
 </beans>
