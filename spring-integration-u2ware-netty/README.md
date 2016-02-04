@@ -3,7 +3,7 @@ Spring Integration Netty Adapter
 
 #Introduction 
 
-[NettyChannel](http://netty.io/wiki/user-guide-for-4.x.html) 과 [MessageChannel](http://docs.spring.io/spring-integration/docs/4.2.4.RELEASE/reference/html/messaging-channels-section.html#channel) 간 메세지를 처리하는 Channel Adapter 입니다. [netty](https://netty.io) 라이브러리를 사용하고 있습니다.
+[NettyChannel](http://netty.io/wiki/user-guide-for-4.x.html) 과 [MessageChannel](http://docs.spring.io/spring-integration/docs/4.2.4.RELEASE/reference/html/messaging-channels-section.html#channel) 간 메세지를 처리하는 Channel Adapter 를 작성하기 위한 라이브러리입니다. [netty](https://netty.io) 라이브러리를 사용하고 있습니다.
 
 
 ```xml
