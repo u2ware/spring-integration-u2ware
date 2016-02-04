@@ -3,7 +3,7 @@ Spring Integration Netty Adapter
 
 #Introduction 
 
-[Netty Channel](https://netty.io) 과 [MessageChannel](http://docs.spring.io/spring-integration/docs/4.2.4.RELEASE/reference/html/messaging-channels-section.html#channel) 간 메세지를 처리하는 Channel Adapter 입니다. [netty](https://netty.io) 라이브러리를 사용하고 있습니다.
+[NettyChannel](http://netty.io/wiki/user-guide-for-4.x.html) 과 [MessageChannel](http://docs.spring.io/spring-integration/docs/4.2.4.RELEASE/reference/html/messaging-channels-section.html#channel) 간 메세지를 처리하는 Channel Adapter 입니다. [netty](https://netty.io) 라이브러리를 사용하고 있습니다.
 
 
 ```xml
@@ -23,10 +23,14 @@ Spring Integration Netty Adapter
 </dependencies>
 ```
 
-## [Netty Channel](https://netty.io)
+## [NettyChannel](http://netty.io/wiki/user-guide-for-4.x.html)
+
+
+EchoServer & EchoClient 예제와 같이 [Netty Channel](https://netty.io) 을 작성할 수 있습니다.
+ChannelPipeline 설정에 관한 내용은 [netty.io](http://netty.io/wiki/user-guide-for-4.x.html)에서 도움을 받을수 있습니다.
 
 ```java
-public class EchoServer extends AbstractTcpServer{   
+public class EchoServer extends AbstractTcpServer{   --(1)
 	
 	@Override
 	protected void initChannelPipeline(ChannelPipeline pipeline) throws Exception { 
@@ -40,7 +44,7 @@ public class EchoServer extends AbstractTcpServer{
 	}
 }
 
-public class EchoClient extends AbstractTcpClient{  
+public class EchoClient extends AbstractTcpClient{   --(2)
 	
 	@Override
 	protected void initChannelPipeline(ChannelPipeline pipeline) throws Exception { 
@@ -51,8 +55,10 @@ public class EchoClient extends AbstractTcpClient{
 }
 
 ```
-EchoServer & EchoClient 예제와 같이 [Netty Channel](https://netty.io) 을 작성할 수 있습니다.
-ChannelPipeline 설정에 관한 내용은 [netty.io](http://netty.io/wiki/user-guide-for-4.x.html)에서 도움을 받을수 있습니다.
+1. [AbstractTcpServer](src/main/java/io/github/u2ware/integration/netty/core/AbstractTcpServer.java) 
+2. [AbstractTcpClient](src/main/java/io/github/u2ware/integration/netty/core/AbstractTcpClient.java)  
+
+
 
 
 ##  [NettyMessagingHandler](src/main/java/io/github/u2ware/integration/netty/support/NettyMessagingHandler.java) 
@@ -100,7 +106,7 @@ public class EchoClient extends AbstractTcpClient{
 
 1. [NettyMessagingHandler](src/main/java/io/github/u2ware/integration/netty/support/NettyMessagingHandler.java) 를 ChannelPipeline 에 추가하면,
 2. receiveChannel 에 수신 가능한 메세지가 있을때, 이 메세지를 [Netty Channel](https://netty.io)에 write 합니다.
-3. [Netty Channel](https://netty.io)에서 read 한 메세지가 있을 때, 이 메세지를 sendChannel 에 전송합니다.
+3. [NettyChannel](https://netty.io)에서 read 한 메세지가 있을 때, 이 메세지를 sendChannel 에 전송합니다.
 
 ##Sample Code
 
