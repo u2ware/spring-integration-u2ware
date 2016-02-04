@@ -3,7 +3,7 @@ Spring Integration BACNet Adapter
 
 #Introduction 
 
-[Remote BACNet Device](http://www.bacnet.org/) 와 [MessageChannel](http://docs.spring.io/spring-integration/docs/4.2.4.RELEASE/reference/html/messaging-channels-section.html#channel)간 메세지를 처리하는 Channel Adapter 입니다. 
+[Remote BACNet Device](http://www.bacnet.org/) 와 [MessageChannel](http://docs.spring.io/spring-integration/docs/4.2.4.RELEASE/reference/html/messaging-channels-section.html#channel) 간 메세지를 처리하는 Channel Adapter 입니다. 
 
 ```xml
 <repositories>
@@ -43,7 +43,7 @@ Spring Context 설정에서 Namespace 선언이 필요합니다.
 
 ##Inbound Channel Adapter
 
-미리 정의된 요청 객체([BacnetRequest](src/main/java/io/github/u2ware/integration/core/inbound/BacnetRequest.java))를 이용하여 [Remote BACNet Device](http://www.bacnet.org/) 와 통신하고, 그 응답 객체([BacnetResponse](src/main/java/io/github/u2ware/integration/core/inbound/BacnetResponse.java))을 [MessageChannel](http://docs.spring.io/spring-integration/docs/4.2.4.RELEASE/reference/html/messaging-channels-section.html#channel)에 전송합니다. 
+미리 정의된 요청 객체 ([BacnetRequest](src/main/java/io/github/u2ware/integration/core/inbound/BacnetRequest.java)) 를 이용하여 [Remote BACNet Device](http://www.bacnet.org/) 와 통신하고, 그 응답 객체 ([BacnetResponse](src/main/java/io/github/u2ware/integration/core/inbound/BacnetResponse.java)) 를 [MessageChannel](http://docs.spring.io/spring-integration/docs/4.2.4.RELEASE/reference/html/messaging-channels-section.html#channel)에 전송합니다. 
 
 ```xml
 	<int-u2ware-bacnet:inbound-channel-adapter 
@@ -58,9 +58,9 @@ Spring Context 설정에서 Namespace 선언이 필요합니다.
 	 <constructor-arg>
 	  <array>
 	   <bean class="io.github.u2ware.integration.bacnet.core.BacnetRequest">
-	    <property name="host" value="127.0.0.1"/>       <!--Remote BACNet Device 의 ip 입니다. -->
-		<property name="port" value="37807"/>           <!--Remote BACNet Device 의 port 입니다. -->
-		<property name="instanceNumber" value="37807"/> <!--Remote BACNet Device 의 instance number 입니다.
+	    <property name="host" value="127.0.0.1"/>       <!--Remote BACNet Device 의 ip -->
+		<property name="port" value="37807"/>           <!--Remote BACNet Device 의 port -->
+		<property name="instanceNumber" value="37807"/> <!--Remote BACNet Device 의 instance number-->
 	   </bean>
 	  </array>
 	 </constructor-arg>
