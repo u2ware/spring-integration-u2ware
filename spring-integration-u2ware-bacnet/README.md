@@ -71,9 +71,9 @@ Spring Context 설정에서 Namespace 선언이 필요합니다.
 	</int:channel>
 	              
 ```
-1. **id**:	Unique ID.  Optianal
-2. **local-port**: 생성되는 [Local BACNet Device](http://www.bacnet.org/) 의 로컬 포트 번호 입니다.
-3. **request-support**:  [BacnetRequestSupport](src/main/java/io/github/u2ware/integration/bacnet/inbound/BacnetRequestSupport.java)의 참조(reference)입니다. 한 개 혹은 다수의 [BacnetRequest](src/main/java/io/github/u2ware/integration/bacnet/core/BacnetRequest.java) 를 설정 할 수 있습니다.
+1. **id**:	Unique ID.  Optional
+2. **local-port**: 생성되는 [Local BACNet Device](http://www.bacnet.org/) 의 로컬 포트 번호 입니다. Required.
+3. **request-support**:  [BacnetRequestSupport](src/main/java/io/github/u2ware/integration/bacnet/inbound/BacnetRequestSupport.java)의 참조(reference)입니다. 한 개 혹은 다수의 [BacnetRequest](src/main/java/io/github/u2ware/integration/bacnet/core/BacnetRequest.java) 를 설정 할 수 있습니다. Required.
 4. **channel**: [MessageChannel](http://docs.spring.io/spring-integration/docs/4.2.4.RELEASE/reference/html/messaging-channels-section.html#channel) 의 참조(reference)입니다. 
 
 
@@ -97,9 +97,9 @@ RequestMessageChannel 로 부터 요청 객체 ([BacnetRequest](src/main/java/io
 	</int:channel>
 	
 ```
-1. **id**:	Unique ID.  Optianal
-2. **local-port**: 생성되는 [Local BACNet Device](http://www.bacnet.org/) 의 로컬 포트 번호 입니다.
-3. **request-channel**: [MessageChannel](http://docs.spring.io/spring-integration/docs/4.2.4.RELEASE/reference/html/messaging-channels-section.html#channel) 의 참조(reference)입니다. [BacnetRequest](src/main/java/io/github/u2ware/integration/bacnet/core/BacnetRequest.java)를 처리합니다.
+1. **id**:	Unique ID.  Optional.
+2. **local-port**: 생성되는 [Local BACNet Device](http://www.bacnet.org/) 의 로컬 포트 번호 입니다. Required.
+3. **request-channel**: [MessageChannel](http://docs.spring.io/spring-integration/docs/4.2.4.RELEASE/reference/html/messaging-channels-section.html#channel) 의 참조(reference)입니다. [BacnetRequest](src/main/java/io/github/u2ware/integration/bacnet/core/BacnetRequest.java)를 처리합니다. 
 4. **reply-channel**: [MessageChannel](http://docs.spring.io/spring-integration/docs/4.2.4.RELEASE/reference/html/messaging-channels-section.html#channel) 의 참조(reference) 입니다. [BacnetResponse](src/main/java/io/github/u2ware/integration/bacnet/core/BacnetResponse.java)를 처리합니다. 
 
 ##Sample Code
