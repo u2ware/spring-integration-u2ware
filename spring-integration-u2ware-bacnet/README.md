@@ -48,7 +48,7 @@ Spring Context 설정에서 Namespace 선언이 필요합니다.
 ```xml
 	<int-u2ware-bacnet:inbound-channel-adapter 
 				id="bacnetInboundChannelAdapter" --(1)
-				local-port="9995"                 --(2)
+				local-port="9995"                --(2)
 				request-support="bacnetRequest"  --(3)
 				channel="bacnetResponse">        --(4)
 			<int:poller fixed-rate="1000"/>             <!-- 설정에 따라 통신을 반복 합니다.(polling) -->
@@ -84,7 +84,7 @@ RequestMessageChannel 로 부터 요청 객체 ([BacnetRequest](src/main/java/io
 ```xml
 	<int-u2ware-bacnet:outbound-gateway 
 				id="bacnetOutboundGateway"       --(1)      
-				local-port="9997"                 --(2)           
+				local-port="9997"                --(2)           
 				request-channel="bacnetRequest"  --(3)
 				reply-channel="bacnetResponse"   --(4)
 	/>
