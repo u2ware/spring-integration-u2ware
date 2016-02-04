@@ -51,19 +51,19 @@ Spring Context 설정에서 Namespace 선언이 필요합니다.
 				localPort="9995"                 --(2)
 				request-support="bacnetRequest"  --(3)
 				channel="bacnetResponse">        --(4)
-			<int:poller fixed-rate="1000"/>      --(a)
+			<int:poller fixed-rate="1000"/>             <!-- 설정에 따라 통신을 반복 합니다.(polling) -->
 	</int-u2ware-bacnet:inbound-channel-adapter >
 	
 	<bean id="bacnetRequest" class="io.github.u2ware.integration.bacnet.inbound.BacnetRequestSupport">
-		<constructor-arg>
-			<array>
-				<bean class="io.github.u2ware.integration.bacnet.core.BacnetRequest">
-					<property name="host" value="127.0.0.1"/>       --(b)
-					<property name="port" value="37807"/>           --(c)
-					<property name="instanceNumber" value="37807"/> --(d)
-				</bean>
-			</array>
-		</constructor-arg>
+	 <constructor-arg>
+	  <array>
+	   <bean class="io.github.u2ware.integration.bacnet.core.BacnetRequest">
+	    <property name="host" value="127.0.0.1"/>       <!--Remote BACNet Device 의 ip 입니다. -->
+		<property name="port" value="37807"/>           <!--Remote BACNet Device 의 port 입니다. -->
+		<property name="instanceNumber" value="37807"/> <!--Remote BACNet Device 의 instance number 입니다.
+	   </bean>
+	  </array>
+	 </constructor-arg>
 	</bean>
 	
 	<int:channel id="bacnetResponse">   
@@ -75,12 +75,6 @@ Spring Context 설정에서 Namespace 선언이 필요합니다.
 2. **localPort**: 생성되는 [Local BACNet Device](http://www.bacnet.org/) 의 로컬 포트 번호 입니다.
 3. **request-support**:  [BacnetRequestSupport](src/main/java/io/github/u2ware/integration/bacnet/inbound/BacnetRequestSupport.java)의 참조(reference)입니다. 한 개 혹은 다수의 [BacnetRequest](src/main/java/io/github/u2ware/integration/core/inbound/BacnetRequest.java) 를 설정 할 수 있습니다.
 4. **channel**: Message Channel의 참조(reference)입니다. 
-
-
-a. 설정에 따라 통신을 반복 합니다.(polling) 
-b. 통신하고자 하는 [Remote BACNet Device](http://www.bacnet.org/) 의 ip 입니다.
-c. 통신하고자 하는 [Remote BACNet Device](http://www.bacnet.org/) 의 port 입니다.
-d. 통신하고자 하는 [Remote BACNet Device](http://www.bacnet.org/) 의 [Instance Number](http://www.bacnet.org/) 입니다.
 
 
 ##Outbound Gateway
