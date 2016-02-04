@@ -64,7 +64,7 @@ implements MessageSource<Object>{
 			Map<String, Object> headers = Maps.newHashMap();
 			headers.put(SnmpHeaders.REQUEST, request.toString());
 			headers.put(SnmpHeaders.LOCAL_PORT, executor.getLocalPort());
-			headers.put(SnmpHeaders.LOCAL_MIB, executor.getLocalMib());
+			headers.put(SnmpHeaders.MIB_FILE, executor.getMibFile());
 			
 			return MessageBuilder.withPayload(response).copyHeaders(headers).build();
 			

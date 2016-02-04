@@ -40,8 +40,8 @@ public class SnmpOutboundChannelAdapterParser extends AbstractOutboundChannelAda
 
 		////////
 		final BeanDefinitionBuilder executorBuilder = BeanDefinitionBuilder.genericBeanDefinition(SnmpExecutor.class);
-		IntegrationNamespaceUtils.setValueIfAttributeDefined(executorBuilder, element, "localPort");
-		IntegrationNamespaceUtils.setValueIfAttributeDefined(executorBuilder, element, "LocalMib");
+		IntegrationNamespaceUtils.setValueIfAttributeDefined(executorBuilder, element, "local-port", "localPort");
+		IntegrationNamespaceUtils.setValueIfAttributeDefined(executorBuilder, element, "mib-file", "mibFile");
 
 		final BeanDefinition executorBuilderBeanDefinition = executorBuilder.getBeanDefinition();
 		final String executorBeanName = channelAdapterId + ".snmpExecutor";

@@ -21,7 +21,7 @@
 
 
 	<int-u2ware-snmp:inbound-channel-adapter id="snmpInboundChannelAdapter"
-		localPort="10164"
+		local-port="10164"
 		request-support="snmpRequest"
 		channel="snmpResponse"
 	>

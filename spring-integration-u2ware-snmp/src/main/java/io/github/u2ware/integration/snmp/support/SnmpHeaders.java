@@ -28,7 +28,7 @@ public class SnmpHeaders {
 	private static final String PREFIX = "snmp_";
 	
 	public static final String LOCAL_PORT =  PREFIX + "localPort";
-	public static final String LOCAL_MIB =  PREFIX + "localMib";
+	public static final String MIB_FILE =  PREFIX + "mibFile";
 
 	public static final String REQUEST =  PREFIX + "request";
 	

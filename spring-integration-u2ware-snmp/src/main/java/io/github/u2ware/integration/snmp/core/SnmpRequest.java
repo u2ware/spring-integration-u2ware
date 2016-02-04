@@ -1,9 +1,5 @@
 package io.github.u2ware.integration.snmp.core;
 
-
-
-
-
 public class SnmpRequest {
 
 	private String host;
@@ -38,6 +34,6 @@ public class SnmpRequest {
 	@Override
 	public String toString() {
 		return "SnmpRequest [host=" + host + ", port=" + port + ", rootOid="
-				+ rootOid + "]";
+				+ rootOid  + "]";
 	}
 }

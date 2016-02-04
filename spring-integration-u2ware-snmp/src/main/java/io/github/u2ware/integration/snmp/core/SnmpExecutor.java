@@ -52,7 +52,7 @@ public class SnmpExecutor implements CommandResponder, InitializingBean, Disposa
 	private Map<String,String> mibNames;
 	
 	private Integer localPort;
-	private String localMib;
+	private String mibFile;
 	
 	
 	public Integer getLocalPort() {
@@ -61,14 +61,12 @@ public class SnmpExecutor implements CommandResponder, InitializingBean, Disposa
 	public void setLocalPort(Integer localPort) {
 		this.localPort = localPort;
 	}
-	public String getLocalMib() {
-		return localMib;
+	public String getMibFile() {
+		return mibFile;
 	}
-	public void setLocalMib(String localMib) {
-		this.localMib = localMib;
+	public void setMibFile(String mibFile) {
+		this.mibFile = mibFile;
 	}
-
-	
 	@Override
 	public void afterPropertiesSet() throws Exception {
 
@@ -91,8 +89,8 @@ public class SnmpExecutor implements CommandResponder, InitializingBean, Disposa
 	    snmp.addCommandResponder(this);
 	    
 	    
-	    if(localMib != null){
-			File file = new File(localMib);
+	    if(mibFile != null){
+			File file = new File(mibFile);
 
 			if(file.exists()){
 
@@ -103,7 +101,7 @@ public class SnmpExecutor implements CommandResponder, InitializingBean, Disposa
 				mibNames = new HashMap<String,String>();
 			}
 	    }
-		logger.info("SNMP Manager Initialized: <localhost>:"+localPort+",  localMib="+localMib);		
+		logger.info("SNMP Manager Initialized: <localhost>:"+localPort+",  mibFile="+mibFile);		
 	}
 	
 	@Override
