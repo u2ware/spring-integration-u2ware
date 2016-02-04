@@ -14,7 +14,11 @@
 	<bean id="bacnetRequest" class="io.github.u2ware.integration.bacnet.inbound.BacnetRequestSupport">
 		<constructor-arg>
 			<array>
-				<value>127.0.0.1:37807:37807</value>
+				<bean class="io.github.u2ware.integration.bacnet.core.BacnetRequest">
+					<property name="host" value="127.0.0.1"/>
+					<property name="port" value="37807"/>
+					<property name="instanceNumber" value="37807"/>
+				</bean>
 			</array>
 		</constructor-arg>
 	</bean>
