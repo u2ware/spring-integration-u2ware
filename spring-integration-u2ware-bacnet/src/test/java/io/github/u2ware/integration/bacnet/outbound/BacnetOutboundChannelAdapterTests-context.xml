@@ -15,7 +15,7 @@
 	</int:channel>
 		
 	<int-u2ware-bacnet:outbound-channel-adapter id="bacnetInboundChannelAdapter" 
-		localPort="47805"
+		local-port="47805"
 		
 		channel="bacnetRequest">
 	</int-u2ware-bacnet:outbound-channel-adapter>

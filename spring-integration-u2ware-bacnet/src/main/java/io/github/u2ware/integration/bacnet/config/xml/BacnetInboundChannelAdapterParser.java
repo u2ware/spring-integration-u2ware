@@ -46,7 +46,7 @@ public class BacnetInboundChannelAdapterParser extends AbstractPollingInboundCha
 
 		////////
 		final BeanDefinitionBuilder executorBuilder = BeanDefinitionBuilder.genericBeanDefinition(BacnetExecutor.class);
-		IntegrationNamespaceUtils.setValueIfAttributeDefined(executorBuilder, element, "localPort");
+		IntegrationNamespaceUtils.setValueIfAttributeDefined(executorBuilder, element, "local-port", "localPort");
 		
 
 		final BeanDefinition executorBuilderBeanDefinition = executorBuilder.getBeanDefinition();

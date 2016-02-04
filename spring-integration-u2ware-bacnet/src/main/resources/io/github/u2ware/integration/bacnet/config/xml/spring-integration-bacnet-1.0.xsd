@@ -198,7 +198,7 @@
 			</xsd:simpleType>
 		</xsd:attribute>
 
-		<xsd:attribute name="localPort" use="required" type="xsd:string">
+		<xsd:attribute name="local-port" use="required" type="xsd:string">
 			<xsd:annotation>
 				<xsd:documentation><![CDATA[
 					Bacnet Local Port
