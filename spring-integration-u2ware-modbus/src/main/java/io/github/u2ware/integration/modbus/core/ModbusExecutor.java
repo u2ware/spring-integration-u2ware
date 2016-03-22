@@ -58,14 +58,37 @@ public class ModbusExecutor implements InitializingBean, DisposableBean{
 		logger.info("Mobdus Client Terminated: "+host+":"+port);
 	}
 	
-	private InetAddress getInetAddress() throws Exception{
+	@SuppressWarnings("unchecked")
+	public synchronized <Q extends net.wimpi.modbus.msg.ModbusRequest, A extends net.wimpi.modbus.msg.ModbusResponse> A execute(Q request) throws Exception{
+
+		InetAddress address = null;
 		if("localhost".equals(host) || "127.0.0.1".equals(host)){
-			return InetAddress.getLocalHost();
+			address = InetAddress.getLocalHost();
 		}else{
-			return InetAddress.getByName(host); 
+			address = InetAddress.getByName(host); 
 		}
+		
+		TCPMasterConnection con = new TCPMasterConnection(address);
+        con.setPort(port);
+		con.setTimeout(100000);
+        
+		ModbusTransaction trans = new ModbusTCPTransaction(con);
+		//trans.setRetries(100);
+		
+		//logger.debug("Mobdus Client Request: "+host+":"+port+"\n"+request.getClass().getName()+"\n"+request.getHexMessage());
+		trans.setRequest(request);
+		trans.execute();
+		net.wimpi.modbus.msg.ModbusResponse response = trans.getResponse();
+		//logger.debug("Mobdus Client Response: "+host+":"+port+"\n"+response.getClass().getName()+"\n"+response.getHexMessage());
+		
+        con.close();
+
+		return (A)response;
 	}
 	
+	//////////////////
+	//
+	/////////////////
 	public Object execute(ModbusRequest request) throws Exception{
 		return readValues(request);
 	}
@@ -84,29 +107,9 @@ public class ModbusExecutor implements InitializingBean, DisposableBean{
 		return response;
 	}
 	
-	
-	@SuppressWarnings("unchecked")
-	public synchronized <Q extends net.wimpi.modbus.msg.ModbusRequest, A extends net.wimpi.modbus.msg.ModbusResponse> A execute(Q request) throws Exception{
-
-		TCPMasterConnection con = new TCPMasterConnection(getInetAddress());
-        con.setPort(port);
-		con.setTimeout(100000);
-        
-		ModbusTransaction trans = new ModbusTCPTransaction(con);
-		//trans.setRetries(100);
-		
-		//logger.debug("Mobdus Client Request: "+host+":"+port+"\n"+request.getClass().getName()+"\n"+request.getHexMessage());
-		trans.setRequest(request);
-		trans.execute();
-		net.wimpi.modbus.msg.ModbusResponse response = trans.getResponse();
-		//logger.debug("Mobdus Client Response: "+host+":"+port+"\n"+response.getClass().getName()+"\n"+response.getHexMessage());
-		
-        con.close();
-
-		return (A)response;
-	}
-
-	
+	//////////////////
+	//
+	/////////////////
 	//0x01	//Read Coils              //read-write   //ReadCoils 
 	//0x02	//Read Discrete Inputs    //read-only    //ReadInputDiscretes
 	//0x03	//Read Holding Registers  //read-write   //ReadMultipleRegisters
@@ -171,7 +174,4 @@ public class ModbusExecutor implements InitializingBean, DisposableBean{
 		}
 		return results;
 	}
-	
-	
-	
 }
