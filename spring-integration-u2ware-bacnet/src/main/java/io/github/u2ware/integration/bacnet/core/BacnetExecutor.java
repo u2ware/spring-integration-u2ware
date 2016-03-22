@@ -107,18 +107,10 @@ public class BacnetExecutor extends ThreadPoolTaskExecutor {
 		super.destroy();
 	}	
 	
-	public List<RemoteDevice> getRemoteDevices() {
-		List<RemoteDevice> result = Lists.newArrayList(localDevice.getRemoteDevices());
-		Collections.sort(result, new Comparator<RemoteDevice>() {
-			@Override
-			public int compare(RemoteDevice o1, RemoteDevice o2) {
-				return o1.getInstanceNumber() > o2.getInstanceNumber() ? 1 : -1;
-			}
-		});
-		return result;
-	}
-
-	public void sendGlobalBroadcast(boolean isNewThread){
+	///////////////////////
+	//
+	///////////////////////
+	protected void sendGlobalBroadcast(boolean isNewThread){
 		if(isNewThread){
 		    super.execute(new Runnable() {
 				public void run() {
@@ -129,109 +121,33 @@ public class BacnetExecutor extends ThreadPoolTaskExecutor {
 	        localDevice.sendGlobalBroadcast(new WhoIsRequest());
 		}
 	}
-
-	
-	////////////////////////////////////
-	//
-	////////////////////////////////////
-	public Object execute(BacnetRequest request) throws Exception{
-		return readValues(request);
-	}
-
-	
-	////////////////////////////////////
-	//
-	////////////////////////////////////
-	public synchronized List<BacnetResponse> readValues(BacnetRequest request) throws Exception{		
-
-	    long startTime = System.currentTimeMillis();
-		
-		Address address = new Address(IpNetworkUtils.toOctetString(request.getHost()+":"+request.getPort()));
-		RemoteDevice remoteDevice = localDevice.getRemoteDevice(address);
-		if(remoteDevice == null){
-			remoteDevice = findRemoteDevice(address, request.getInstanceNumber());
-	        logger .info("BACNet RemoteDevice Find: "+remoteDevice.getAddress().getDescription()+"["+remoteDevice.getInstanceNumber()+"]");
-		}
-		Collection<ObjectIdentifier> oids = sendReadPropertyAllowNull(remoteDevice);
-		PropertyReferences refs = createPropertyReferences(oids);
-		PropertyValues pvs = readProperties(remoteDevice, refs);
-		
-		List<BacnetResponse> result = readValueProcess(pvs, remoteDevice);
-		
-	    logger.info(request+", BacnetResponse [size="+result.size()
-				+", timeInMillis="+ (System.currentTimeMillis()-startTime)
-				+"]");
-		
+	protected List<RemoteDevice> findAllRemoteDevices() {
+		List<RemoteDevice> result = Lists.newArrayList(localDevice.getRemoteDevices());
+		Collections.sort(result, new Comparator<RemoteDevice>() {
+			@Override
+			public int compare(RemoteDevice o1, RemoteDevice o2) {
+				return o1.getInstanceNumber() > o2.getInstanceNumber() ? 1 : -1;
+			}
+		});
 		return result;
 	}
-	
-	
-	//////////////////////////
-	//
-	//////////////////////////
-	private List<BacnetResponse> readValueProcess(PropertyValues pvs, RemoteDevice remoteDevice){
-		Map<Object, BacnetResponse> responseMap = Maps.newHashMap();
-        
-        for (ObjectPropertyReference opr : pvs) {
+	protected RemoteDevice findRemoteDevice(final Address address, final int instanceNumber) throws Exception{
 
-        	Object value = pvs.getNoErrorCheck(opr);//.toString();
-        	
-        	if(! ClassUtils.isAssignableValue(BACnetError.class, value)){
-        		ObjectIdentifier oid = opr.getObjectIdentifier();
-            	PropertyIdentifier pid = opr.getPropertyIdentifier();
-
-            	BacnetResponse obj = responseMap.get(oid);
-            	if(obj == null){
-            		obj = new BacnetResponse();
-                	
-            		obj.setId(remoteDevice.getInstanceNumber()+"_"+oid.getObjectType().intValue()+"_"+oid.getInstanceNumber());
-            		obj.setObjectIdentifier(oid.toString());
-            	}
-            	
-            	
-            	if(PropertyIdentifier.presentValue.equals(pid)){
-            		try{
-                		obj.setValue(Float.parseFloat(value.toString()));
-            		}catch(Exception e){
-                		obj.setValue(value.toString());
-            		}
-        		
-            	}else if(PropertyIdentifier.units.equals(pid)){
-            		obj.setUnits(value.toString());
-
-            	}else if(PropertyIdentifier.outputUnits.equals(pid)){
-            		obj.setOutputUnits(value.toString());
-            		
-            	}else if(PropertyIdentifier.inactiveText.equals(pid)){
-            		obj.setInactiveText(value.toString());
-            	
-            	}else if(PropertyIdentifier.activeText.equals(pid)){
-            		obj.setActiveText(value.toString());
-            	}
-            	responseMap.put(oid, obj);
-        	}
-        }
-        
-        List<BacnetResponse> results = Lists.newArrayList(responseMap.values().iterator());
-		return results;
+		RemoteDevice remoteDevice = localDevice.getRemoteDevice(address);
+		if(remoteDevice == null){
+			remoteDevice = super.submit(new Callable<RemoteDevice>() {
+				@Override
+				public RemoteDevice call() throws Exception {
+					RemoteDevice d = localDevice.findRemoteDevice(address, instanceNumber);
+			        return d;
+				}
+		    }).get();
+	        logger .info("BACNet RemoteDevice Find: "+remoteDevice.getAddress().getDescription()+"["+remoteDevice.getInstanceNumber()+"]");
+		}
+		return remoteDevice;
 	}
 	
-	
-
-	///////////////////////
-	//
-	///////////////////////
-	public RemoteDevice findRemoteDevice(final Address address, final int instanceNumber) throws Exception{
-		return super.submit(new Callable<RemoteDevice>() {
-			@Override
-			public RemoteDevice call() throws Exception {
-				RemoteDevice d = localDevice.findRemoteDevice(address, instanceNumber);
-		        return d;
-			}
-	    }).get();
-	}
-	
-	private Collection<ObjectIdentifier> sendReadPropertyAllowNull(final RemoteDevice d) throws Exception {
+	protected Collection<ObjectIdentifier> sendReadPropertyAllowNull(final RemoteDevice d) throws Exception {
 		return super.submit(new Callable<Collection<ObjectIdentifier>>() {
 			@Override @SuppressWarnings("unchecked")
 			public Collection<ObjectIdentifier> call() throws Exception {
@@ -242,50 +158,7 @@ public class BacnetExecutor extends ThreadPoolTaskExecutor {
 			}
 	    }).get();
 	}
-	
-	private PropertyReferences createPropertyReferences(Collection<ObjectIdentifier> oids){
-		PropertyReferences refs = new PropertyReferences();
-		
-		ObjectType d = new ObjectType(384);
-		
-        for (ObjectIdentifier oid : oids){
-        	
-        	if( ! d.equals(oid.getObjectType())){
-            	
-                refs.add(oid, PropertyIdentifier.objectIdentifier);
-                refs.add(oid, PropertyIdentifier.objectName);
-                refs.add(oid, PropertyIdentifier.objectType);
-                refs.add(oid, PropertyIdentifier.presentValue);
-
-                
-                ObjectType type = oid.getObjectType();
-                if (ObjectType.accumulator.equals(type)) {
-                    refs.add(oid, PropertyIdentifier.units);
-                }
-                else if (ObjectType.analogInput.equals(type) || ObjectType.analogOutput.equals(type)
-                        || ObjectType.analogValue.equals(type) || ObjectType.pulseConverter.equals(type)) {
-                    refs.add(oid, PropertyIdentifier.units);
-                }
-                else if (ObjectType.binaryInput.equals(type) || ObjectType.binaryOutput.equals(type)
-                        || ObjectType.binaryValue.equals(type)) {
-                    refs.add(oid, PropertyIdentifier.inactiveText);
-                    refs.add(oid, PropertyIdentifier.activeText);
-                }
-                else if (ObjectType.lifeSafetyPoint.equals(type)) {
-                    refs.add(oid, PropertyIdentifier.units);
-                }
-                else if (ObjectType.loop.equals(type)) {
-                    refs.add(oid, PropertyIdentifier.outputUnits);
-                }
-                else if (ObjectType.multiStateInput.equals(type) || ObjectType.multiStateOutput.equals(type)
-                        || ObjectType.multiStateValue.equals(type)) {
-                    refs.add(oid, PropertyIdentifier.stateText);
-                }
-        	}
-        }
-        return refs;
-	}
-	private PropertyValues readProperties(final RemoteDevice d, final PropertyReferences refs) throws Exception{		
+	protected PropertyValues readProperties(final RemoteDevice d, final PropertyReferences refs) throws Exception{		
 		return super.submit(new Callable<PropertyValues>() {
 			@Override
 			public PropertyValues call() throws Exception {
@@ -294,9 +167,8 @@ public class BacnetExecutor extends ThreadPoolTaskExecutor {
 			}
 	    }).get();
 	}
-	
-	
-	private class DeviceEventListenerImpl implements DeviceEventListener{
+
+	protected class DeviceEventListenerImpl implements DeviceEventListener{
 		@Override
 		public void iAmReceived(final RemoteDevice d) {
 	        logger .info("BACNet iAmReceived: "+d);
@@ -372,5 +244,134 @@ public class BacnetExecutor extends ThreadPoolTaskExecutor {
 		public void synchronizeTime(Address from, DateTime dateTime, boolean utc) {
 			logger .info("BACNet synchronizeTime: ");
 		}
+	}
+	
+	////////////////////////////////////
+	//
+	////////////////////////////////////
+	public Object execute(BacnetRequest request) throws Exception{
+		return readValues(request);
+	}
+
+	public synchronized List<BacnetResponse> readValues(BacnetRequest request) throws Exception{		
+
+	    long startTime = System.currentTimeMillis();
+		
+		//RemoteDevice
+		RemoteDevice remoteDevice = convertRemoteDevice(request);
+		
+		//PropertyReferences
+		Collection<ObjectIdentifier> oids = sendReadPropertyAllowNull(remoteDevice);
+		PropertyReferences refs = convertPropertyReferences(request, oids);
+		
+		//PropertyValues
+		PropertyValues pvs = readProperties(remoteDevice, refs);
+		
+		//BacnetResponse
+		List<BacnetResponse> result = convertPropertyValues(request, pvs);
+	    logger.info(request+", BacnetResponse [size="+result.size()
+				+", timeInMillis="+ (System.currentTimeMillis()-startTime)
+				+"]");
+		
+		return result;
+	}
+	
+	//////////////////////////
+	//
+	//////////////////////////
+	private RemoteDevice convertRemoteDevice(BacnetRequest request) throws Exception{
+		Address address = new Address(IpNetworkUtils.toOctetString(request.getHost()+":"+request.getPort()));
+		int instanceNumber = request.getInstanceNumber();
+		return findRemoteDevice(address, instanceNumber);
+	}
+	
+	private PropertyReferences convertPropertyReferences(BacnetRequest request, Collection<ObjectIdentifier> oids){
+		PropertyReferences refs = new PropertyReferences();
+		
+		ObjectType d = new ObjectType(384);
+		
+        for (ObjectIdentifier oid : oids){
+        	
+        	if( ! d.equals(oid.getObjectType())){
+            	
+                refs.add(oid, PropertyIdentifier.objectIdentifier);
+                refs.add(oid, PropertyIdentifier.objectName);
+                refs.add(oid, PropertyIdentifier.objectType);
+                refs.add(oid, PropertyIdentifier.presentValue);
+
+                
+                ObjectType type = oid.getObjectType();
+                if (ObjectType.accumulator.equals(type)) {
+                    refs.add(oid, PropertyIdentifier.units);
+                }
+                else if (ObjectType.analogInput.equals(type) || ObjectType.analogOutput.equals(type)
+                        || ObjectType.analogValue.equals(type) || ObjectType.pulseConverter.equals(type)) {
+                    refs.add(oid, PropertyIdentifier.units);
+                }
+                else if (ObjectType.binaryInput.equals(type) || ObjectType.binaryOutput.equals(type)
+                        || ObjectType.binaryValue.equals(type)) {
+                    refs.add(oid, PropertyIdentifier.inactiveText);
+                    refs.add(oid, PropertyIdentifier.activeText);
+                }
+                else if (ObjectType.lifeSafetyPoint.equals(type)) {
+                    refs.add(oid, PropertyIdentifier.units);
+                }
+                else if (ObjectType.loop.equals(type)) {
+                    refs.add(oid, PropertyIdentifier.outputUnits);
+                }
+                else if (ObjectType.multiStateInput.equals(type) || ObjectType.multiStateOutput.equals(type)
+                        || ObjectType.multiStateValue.equals(type)) {
+                    refs.add(oid, PropertyIdentifier.stateText);
+                }
+        	}
+        }
+        return refs;
+	}
+	
+	private List<BacnetResponse> convertPropertyValues(BacnetRequest request, PropertyValues pvs){
+		Map<Object, BacnetResponse> responseMap = Maps.newHashMap();
+        
+        for (ObjectPropertyReference opr : pvs) {
+
+        	Object value = pvs.getNoErrorCheck(opr);//.toString();
+        	
+        	if(! ClassUtils.isAssignableValue(BACnetError.class, value)){
+        		ObjectIdentifier oid = opr.getObjectIdentifier();
+            	PropertyIdentifier pid = opr.getPropertyIdentifier();
+
+            	BacnetResponse obj = responseMap.get(oid);
+            	if(obj == null){
+            		obj = new BacnetResponse();
+                	
+            		obj.setId(request.getInstanceNumber()+"_"+oid.getObjectType().intValue()+"_"+oid.getInstanceNumber());
+            		obj.setObjectIdentifier(oid.toString());
+            	}
+            	
+            	
+            	if(PropertyIdentifier.presentValue.equals(pid)){
+            		try{
+                		obj.setValue(Float.parseFloat(value.toString()));
+            		}catch(Exception e){
+                		obj.setValue(value.toString());
+            		}
+        		
+            	}else if(PropertyIdentifier.units.equals(pid)){
+            		obj.setUnits(value.toString());
+
+            	}else if(PropertyIdentifier.outputUnits.equals(pid)){
+            		obj.setOutputUnits(value.toString());
+            		
+            	}else if(PropertyIdentifier.inactiveText.equals(pid)){
+            		obj.setInactiveText(value.toString());
+            	
+            	}else if(PropertyIdentifier.activeText.equals(pid)){
+            		obj.setActiveText(value.toString());
+            	}
+            	responseMap.put(oid, obj);
+        	}
+        }
+        
+        List<BacnetResponse> results = Lists.newArrayList(responseMap.values().iterator());
+		return results;
 	}
 }

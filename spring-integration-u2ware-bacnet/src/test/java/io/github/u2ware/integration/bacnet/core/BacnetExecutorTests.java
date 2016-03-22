@@ -43,7 +43,7 @@ public class BacnetExecutorTests {
         logger.debug(bacnetExecutor);
 
         Thread.sleep(3000);
-        for(RemoteDevice d : bacnetExecutor.getRemoteDevices()){
+        for(RemoteDevice d : bacnetExecutor.findAllRemoteDevices()){
         	logger.debug(d.getInstanceNumber()+" "+d.getAddress().getDescription());
         }
         Thread.sleep(3000);
