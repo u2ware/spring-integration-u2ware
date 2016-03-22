@@ -41,7 +41,7 @@ public class SnmpExecutorTests {
         SnmpRequest request = new SnmpRequest("127.0.0.1", 10161, "1.3.6");
         //SnmpRequest request = new SnmpRequest("192.168.245.181", 161, "1.3.6.1.4.1.318");
         
-        Collection<SnmpResponse> response = snmpManager.readValue(request);
+        Collection<SnmpResponse> response = snmpManager.readValues(request);
         Assert.assertNotNull(response);
         for(SnmpResponse r : response){
             logger.debug(r);

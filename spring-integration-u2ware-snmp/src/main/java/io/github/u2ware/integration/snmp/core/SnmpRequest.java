@@ -4,6 +4,7 @@ public class SnmpRequest {
 
 	private String host;
 	private int port;
+	private String pduType = "GETNEXT";
 	private String rootOid;
 	
 	public SnmpRequest(){
@@ -24,6 +25,12 @@ public class SnmpRequest {
 	}
 	public void setPort(int port) {
 		this.port = port;
+	}
+	public String getPduType() {
+		return pduType;
+	}
+	public void setPduType(String pduType) {
+		this.pduType = pduType;
 	}
 	public String getRootOid() {
 		return rootOid;
